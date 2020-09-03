@@ -116,12 +116,6 @@ class StatesComp(om.ImplicitComponent):
             dR_dinput = self.compute_derivative(state_name, input_function)
             partials[state_name,input_name] = dR_dinput.data
 
-        # self.dR_du_sparse = as_backend_type(self.A).mat()
-        
-        # partials['displacements','rho_e'] = dR_dC_coo.data
-        # partials['displacements','displacements'] = dR_du_coo.data
-    
-
     # should I write those linear_solver options outside/seperately
     def solve_linear(self, d_outputs, d_residuals, mode):
 
@@ -223,6 +217,5 @@ class StatesComp(om.ImplicitComponent):
 
 
 
-if __name__ == '__main__':    
-
-
+if __name__ == '__main__':   
+    pass
