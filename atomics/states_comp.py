@@ -1,6 +1,7 @@
 from __future__ import division
 import dolfin as df
 from six.moves import range
+from six import iteritems
 
 import numpy as np
 from scipy.sparse import csr_matrix
@@ -41,17 +42,20 @@ class StatesComp(om.ImplicitComponent):
         state_name = self.options['state_name']
         state_function = pde_problem.states_dict[state_name]['function']
 
-        for input_name in pde_problem.states_dict[state_name]['inputs']:
-            input_function = pde_problem.inputs_dict[input_name]['function']
-            self.add_input(input_name, shape=input_function.function_space().dim())
+        self.argument_functions_dict = argument_functions_dict = dict()
+        for argument_name in pde_problem.states_dict[state_name]['arguments']:
+            argument_functions_dict[argument_name] = pde_problem.inputs_dict[argument_name]['function']
+
+        for argument_name, argument_function in iteritems(self.argument_functions_dict):
+            self.add_input(argument_name, shape=argument_function.function_space().dim())
         self.add_output(state_name, shape=state_function.function_space().dim())
+
         dR_dstate = self.compute_derivative(state_name, state_function)
- 
         self.declare_partials(state_name, state_name, rows=dR_dstate.row, cols=dR_dstate.col)
-        for input_name in pde_problem.states_dict[state_name]['inputs']:
-            input_function = pde_problem.inputs_dict[input_name]['function']
-            dR_dinput = self.compute_derivative(state_name, input_function)
-            self.declare_partials(state_name, input_name, rows=dR_dinput.row, cols=dR_dinput.col)
+
+        for argument_name, argument_function in iteritems(self.argument_functions_dict):
+            dR_dinput = self.compute_derivative(state_name, argument_function)
+            self.declare_partials(state_name, argument_name, rows=dR_dinput.row, cols=dR_dinput.col)
 
     def compute_derivative(self, arg_name, arg_function):
         pde_problem = self.options['pde_problem']
@@ -71,9 +75,8 @@ class StatesComp(om.ImplicitComponent):
         state_function = pde_problem.states_dict[state_name]['function']
 
         state_function.vector().set_local(outputs[state_name])
-        for input_name in pde_problem.states_dict[state_name]['inputs']:
-            input_function = pde_problem.inputs_dict[input_name]['function']
-            input_function.vector().set_local(inputs[input_name])
+        for argument_name, argument_function in iteritems(self.argument_functions_dict):
+            argument_function.vector().set_local(inputs[argument_name])
 
     def apply_nonlinear(self, inputs, outputs, residuals):
         pde_problem = self.options['pde_problem']
@@ -111,18 +114,16 @@ class StatesComp(om.ImplicitComponent):
         self.dR_dstate = self.compute_derivative(state_name, state_function)
         partials[state_name,state_name] = self.dR_dstate.data
 
-        for input_name in pde_problem.states_dict[state_name]['inputs']:
-            input_function = pde_problem.inputs_dict[input_name]['function']
-            dR_dinput = self.compute_derivative(state_name, input_function)
-            partials[state_name,input_name] = dR_dinput.data
+        for argument_name, argument_function in iteritems(self.argument_functions_dict):
+            dR_dinput = self.compute_derivative(state_name, argument_function)
+            partials[state_name, argument_name] = dR_dinput.data
 
     # should I write those linear_solver options outside/seperately
     def solve_linear(self, d_outputs, d_residuals, mode):
-
         linear_solver = self.options['linear_solver']
-
         pde_problem = self.options['pde_problem']
         state_name = self.options['state_name']
+
         state_function = pde_problem.states_dict[state_name]['function']
 
         residual_form = pde_problem.states_dict[state_name]['residual_form']

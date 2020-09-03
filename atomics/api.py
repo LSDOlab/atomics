@@ -1,3 +1,3 @@
 from atomics.pde_problem import PDEProblem
 
-from atomics.states_comp import StatesComp
+from atomics.atomics_group import AtomicsGroup

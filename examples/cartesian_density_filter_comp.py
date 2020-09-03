@@ -11,11 +11,11 @@ class CartesianDensityFilterComp(ExplicitComponent):
     (<= 8 element for 2d; <= 26 elements for 3d).
     Parameters
     ----------
-    rho_e_unfiltered[num_dvs] : numpy array
+    density_unfiltered[num_dvs] : numpy array
         density for each element before filtering
     Returns
     -------
-    rho_e[num_dvs] : numpy array
+    density[num_dvs] : numpy array
         density for each element after filtering
     """
 
@@ -36,8 +36,8 @@ class CartesianDensityFilterComp(ExplicitComponent):
         num_nodes_y = self.options['num_nodes_y']
         radius = self.options['radius']
 
-        self.add_input('rho_e_unfiltered', shape=num_dvs)
-        self.add_output('rho_e', shape=num_dvs)
+        self.add_input('density_unfiltered', shape=num_dvs)
+        self.add_output('density', shape=num_dvs)
 
         num_elem_x = num_nodes_x - 1
         num_elem_y = num_nodes_y - 1
@@ -89,10 +89,10 @@ class CartesianDensityFilterComp(ExplicitComponent):
         wij = np.array(wij)
         self.mtx = scipy.sparse.csr_matrix((wij, (row, col)), shape=(num_elem, num_elem))
                 
-        self.declare_partials('rho_e', 'rho_e_unfiltered', rows = row, cols = col, val = wij)
+        self.declare_partials('density', 'density_unfiltered', rows = row, cols = col, val = wij)
 
     def compute(self, inputs, outputs):
-        outputs['rho_e'] = self.mtx.dot(inputs['rho_e_unfiltered'])
+        outputs['density'] = self.mtx.dot(inputs['density_unfiltered'])
 
 
 
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     intial_density[1601:2000] = np.arange(400,1,-1)
 
     comp = IndepVarComp()
-    comp.add_output('rho_e_unfiltered', shape=num_elements, val=intial_density)
+    comp.add_output('density_unfiltered', shape=num_elements, val=intial_density)
     group.add_subsystem('input', comp, promotes=['*'])
 
     comp = DensityFilterComp()
@@ -121,8 +121,8 @@ if __name__ == '__main__':
     prob.check_partials(compact_print=False)
     import matplotlib.pyplot as plt
     import numpy as np
-    E_org = prob['rho_e_unfiltered'].reshape(80, 40)
-    E_filered = prob['rho_e'].reshape(80, 40)
+    E_org = prob['density_unfiltered'].reshape(80, 40)
+    E_filered = prob['density'].reshape(80, 40)
     plt.figure(1)
     plt.imshow(E_org, cmap='hot', interpolation='nearest')
     plt.title('origial stiffness (one slice in xy plane)')
@@ -133,11 +133,11 @@ if __name__ == '__main__':
     plt.title('filtered stiffness (one slice in xy plane)')
 
     plt.figure(3)
-    plt.plot(prob['rho_e'])
+    plt.plot(prob['density'])
     plt.title('Stiffness(all element---filtered)')
 
     plt.figure(4)
-    plt.plot(prob['rho_e_unfiltered'])   
+    plt.plot(prob['density_unfiltered'])   
     plt.title('Stiffness(all element---original)')
  
     plt.show()

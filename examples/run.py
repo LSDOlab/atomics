@@ -1,39 +1,40 @@
 import dolfin as df
 
+import numpy as np
+
 import openmdao.api as om
 
-from atomics.api import PDEProblem, StatesComp
+from atomics.api import PDEProblem, AtomicsGroup
 from atomics.pdes.thermo_mechanical_uniform_temp import get_residual_form
 
 from cartesian_density_filter_comp import CartesianDensityFilterComp
 
 
-# Define the mesh and create the PDE problem
+np.random.seed(0)
 
-num_elements_x = 60
-num_elements_y = 40
-length_x = .06
-length_y = .04
-k = 2
+# Define the mesh and create the PDE problem
+NUM_ELEMENTS_X = 48
+NUM_ELEMENTS_Y = 32
+LENGTH_X = .06
+LENGTH_Y = .04
 
 mesh = df.RectangleMesh.create(
-    [df.Point(0.0, 0.0), df.Point(length_x, length_y)],
-    [num_elements_x, num_elements_y],
+    [df.Point(0.0, 0.0), df.Point(LENGTH_X, LENGTH_Y)],
+    [NUM_ELEMENTS_X, NUM_ELEMENTS_Y],
     df.CellType.Type.quadrilateral,
 )
 
 # Define the boundary condition
 class BottomBoundary(df.SubDomain):
     def inside(self, x, on_boundary):
-        l_x = 0.06
-        return (abs(x[1]-0.) < df.DOLFIN_EPS_LARGE and abs(x[0] - l_x/2)< 2.5e-3)
+        return (abs(x[1] - 0.) < df.DOLFIN_EPS_LARGE and abs(x[0] - LENGTH_X / 2) < 2.5e-3)
 
 # Define the traction boundary
 sub_domains = df.MeshFunction('size_t', mesh, mesh.topology().dim() - 1)
 upper_edge = BottomBoundary()
 upper_edge.mark(sub_domains, 6)
 dss = df.Measure('ds')(subdomain_data=sub_domains)
-f = df.Constant((0, -1.e-4))
+f = df.Constant((0, -1.))
 
 # PDE problem
 pde_problem = PDEProblem(mesh)
@@ -60,17 +61,13 @@ residual_form -= df.dot(f, v) * dss(6)
 pde_problem.add_state('displacements', displacements_function, residual_form, 'density')
 
 # Add output-avg_density to the PDE problem:
-avg_density_function_space = df.FunctionSpace(mesh, 'R', 0)
-avg_density_function = df.Function(avg_density_function_space)
 volume = df.assemble(df.Constant(1.) * df.dx(domain=mesh))
-avg_density_expression = density_function / (df.Constant(1. * volume)) * df.dx(domain=mesh)
-pde_problem.add_output('avg_density', avg_density_function, avg_density_expression, 'density')
+avg_density_form = density_function / (df.Constant(1. * volume)) * df.dx(domain=mesh)
+pde_problem.add_scalar_output('avg_density', avg_density_form, 'density')
 
 # Add output-compliance to the PDE problem:
-compliance_function_space = df.FunctionSpace(mesh, 'R', 0)
-compliance_function = df.Function(compliance_function_space)
-compliance_expression = df.dot(f, displacements_function) * dss(6)
-pde_problem.add_output('compliance', compliance_function, compliance_expression, 'compliance')
+compliance_form = df.dot(f, displacements_function) * dss(6)
+pde_problem.add_scalar_output('compliance', compliance_form, 'displacements')
 
 # Add boundary conditions to the PDE problem:
 pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0, 0.0)), '(abs(x[0]-0.) < DOLFIN_EPS)'))
@@ -82,29 +79,51 @@ pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0
 
 prob = om.Problem()
 
+num_dof_density = pde_problem.inputs_dict['density']['function'].function_space().dim()
+
 comp = om.IndepVarComp()
-comp.add_output('density_unfiltered', shape=pde_problem.inputs_dict['density']['function'].function_space().dim())
+comp.add_output(
+    'density_unfiltered', 
+    shape=num_dof_density, 
+    val=np.random.random(num_dof_density) * 0.86,
+)
 prob.model.add_subsystem('indep_var_comp', comp, promotes=['*'])
 
 comp = CartesianDensityFilterComp(
-    length_x=length_x,
-    length_y=length_y,
-    num_nodes_x=num_elements_x + 1,
-    num_nodes_y=num_elements_y + 1,
-    num_dvs=pde_problem.inputs_dict['density']['function'].function_space().dim(), 
-    radius=.04*2/32,
+    length_x=LENGTH_X,
+    length_y=LENGTH_Y,
+    num_nodes_x=NUM_ELEMENTS_X + 1,
+    num_nodes_y=NUM_ELEMENTS_Y + 1,
+    num_dvs=num_dof_density, 
+    radius=2. * LENGTH_Y / NUM_ELEMENTS_Y,
 )
 prob.model.add_subsystem('density_filter_comp', comp, promotes=['*'])
 
-comp = StatesComp(
-    pde_problem=pde_problem,
-    state_name='displacements',
-)
-prob.model.add_subsystem('states_comp', comp, promotes=['*'])
+group = AtomicsGroup(pde_problem=pde_problem)
+prob.model.add_subsystem('atomics_group', group, promotes=['*'])
+
+prob.model.add_design_var('density_unfiltered',upper=1, lower=1e-4)
+prob.model.add_objective('compliance')
+prob.model.add_constraint('avg_density',upper=0.20)
+
+prob.driver = driver = om.pyOptSparseDriver()
+driver.options['optimizer'] = 'SNOPT'
+driver.opt_settings['Verify level'] = 0
+
+driver.opt_settings['Major iterations limit'] = 100000
+driver.opt_settings['Minor iterations limit'] = 100000
+driver.opt_settings['Iterations limit'] = 100000000
+driver.opt_settings['Major step limit'] = 2.0
+
+driver.opt_settings['Major feasibility tolerance'] = 1.0e-6
+driver.opt_settings['Major optimality tolerance'] =2.e-10
 
 prob.setup()
 prob.run_model()
-prob.check_partials(compact_print=True)
+# print(prob['compliance']); exit()
+
+prob.run_driver()
+# prob.check_partials(compact_print=True)
 
 
 #save the solution vector
