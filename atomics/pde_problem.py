@@ -28,7 +28,8 @@ class PDEProblem(object):
 
     def add_output(self, name, function, expression, *inputs):
         function.rename(name, name)
-        self.states_dict[name] = dict(
+        # self.states_dict[name] = dict(
+        self.outputs_dict[name] = dict(
             function=function,
             expression=expression,
             inputs=inputs,
