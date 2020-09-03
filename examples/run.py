@@ -22,23 +22,32 @@ mesh = df.RectangleMesh.create(
     df.CellType.Type.quadrilateral,
 )
 
+# Define the boundary condition
 class BottomBoundary(df.SubDomain):
     def inside(self, x, on_boundary):
         l_x = 0.06
         return (abs(x[1]-0.) < df.DOLFIN_EPS_LARGE and abs(x[0] - l_x/2)< 2.5e-3)
 
+# Define the traction boundary
 sub_domains = df.MeshFunction('size_t', mesh, mesh.topology().dim() - 1)
 upper_edge = BottomBoundary()
 upper_edge.mark(sub_domains, 6)
 dss = df.Measure('ds')(subdomain_data=sub_domains)
-f = df.Constant((0, -1.))
+f = df.Constant((0, -1.e-4))
 
+# PDE problem
 pde_problem = PDEProblem(mesh)
 
+# Add input to the PDE problem:
+# name = 'density', function = density_function (function is the solution vector here)
 density_function_space = df.FunctionSpace(mesh, 'DG', 0)
 density_function = df.Function(density_function_space)
 pde_problem.add_input('density', density_function)
 
+# Add states to the PDE problem (line 58):
+# name = 'displacements', function = displacements_function (function is the solution vector here)
+# residual_form = get_residual_form(u, v, rho_e) from atomics.pdes.thermo_mechanical_uniform_temp
+# *inputs = density (can be multiple, here 'density' is the only input)
 displacements_function_space = df.VectorFunctionSpace(mesh, 'Lagrange', 1)
 displacements_function = df.Function(displacements_function_space)
 v = df.TestFunction(displacements_function_space)
@@ -50,17 +59,20 @@ residual_form = get_residual_form(
 residual_form -= df.dot(f, v) * dss(6)
 pde_problem.add_state('displacements', displacements_function, residual_form, 'density')
 
+# Add output-avg_density to the PDE problem:
 avg_density_function_space = df.FunctionSpace(mesh, 'R', 0)
 avg_density_function = df.Function(avg_density_function_space)
 volume = df.assemble(df.Constant(1.) * df.dx(domain=mesh))
 avg_density_expression = density_function / (df.Constant(1. * volume)) * df.dx(domain=mesh)
 pde_problem.add_output('avg_density', avg_density_function, avg_density_expression, 'density')
 
+# Add output-compliance to the PDE problem:
 compliance_function_space = df.FunctionSpace(mesh, 'R', 0)
 compliance_function = df.Function(compliance_function_space)
 compliance_expression = df.dot(f, displacements_function) * dss(6)
 pde_problem.add_output('compliance', compliance_function, compliance_expression, 'compliance')
 
+# Add boundary conditions to the PDE problem:
 pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0, 0.0)), '(abs(x[0]-0.) < DOLFIN_EPS)'))
 pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0, 0.0)), '(abs(x[0]-0.06) < DOLFIN_EPS)'))
 
@@ -92,3 +104,8 @@ prob.model.add_subsystem('states_comp', comp, promotes=['*'])
 
 prob.setup()
 prob.run_model()
+prob.check_partials(compact_print=True)
+
+
+#save the solution vector
+df.File('solutions/displacement.pvd') << displacements_function
