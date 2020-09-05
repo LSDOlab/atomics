@@ -8,6 +8,7 @@ from atomics.api import PDEProblem, AtomicsGroup
 from atomics.pdes.thermo_mechanical_uniform_temp import get_residual_form
 
 from cartesian_density_filter_comp import CartesianDensityFilterComp
+from atomics.general_filter_comp import GeneralFilterComp
 
 
 np.random.seed(0)
@@ -89,15 +90,19 @@ comp.add_output(
 )
 prob.model.add_subsystem('indep_var_comp', comp, promotes=['*'])
 
-comp = CartesianDensityFilterComp(
-    length_x=LENGTH_X,
-    length_y=LENGTH_Y,
-    num_nodes_x=NUM_ELEMENTS_X + 1,
-    num_nodes_y=NUM_ELEMENTS_Y + 1,
-    num_dvs=num_dof_density, 
-    radius=2. * LENGTH_Y / NUM_ELEMENTS_Y,
-)
-prob.model.add_subsystem('density_filter_comp', comp, promotes=['*'])
+# comp = CartesianDensityFilterComp(
+#     length_x=LENGTH_X,
+#     length_y=LENGTH_Y,
+#     num_nodes_x=NUM_ELEMENTS_X + 1,
+#     num_nodes_y=NUM_ELEMENTS_Y + 1,
+#     num_dvs=num_dof_density, 
+#     radius=2. * LENGTH_Y / NUM_ELEMENTS_Y,
+# )
+# prob.model.add_subsystem('density_filter_comp', comp, promotes=['*'])
+
+comp = GeneralFilterComp(density_function_space=density_function_space)
+prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
+
 
 group = AtomicsGroup(pde_problem=pde_problem)
 prob.model.add_subsystem('atomics_group', group, promotes=['*'])
@@ -128,3 +133,4 @@ prob.run_driver()
 
 #save the solution vector
 df.File('solutions/displacement.pvd') << displacements_function
+df.File('solutions/stiffness_carti.pvd') << density_function
