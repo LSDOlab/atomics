@@ -33,7 +33,6 @@ class GeneralFilterComp(ExplicitComponent):
         # 1.414 is because the hmax is defined as the 
         # greatest distance between any two vertices (sqrt(2))
 
-
         weight_ij = []
         col = []
         row = []
@@ -54,9 +53,6 @@ class GeneralFilterComp(ExplicitComponent):
                 weight_ij.append(weight)       
        
         self.weight_mtx = scipy.sparse.csr_matrix((weight_ij, (row, col)), shape=(NUM_ELEMENTS, NUM_ELEMENTS))
-        print('The shape of row:',np.array(row).shape)
-        print()
-        print('The shape of weight_mtx:', np.array(weight_ij).shape)
 
         self.declare_partials('density', 'density_unfiltered',rows=np.array(row), cols=np.array(col),val=np.array(weight_ij))
 
