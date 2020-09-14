@@ -5,7 +5,7 @@ import numpy as np
 import openmdao.api as om
 
 from atomics.api import PDEProblem, AtomicsGroup
-from atomics.pdes.thermo_mechanical_uniform_temp import get_residual_form
+from atomics.pdes.elastic_cantilever_beam import get_residual_form
 
 from cartesian_density_filter_comp import CartesianDensityFilterComp
 from atomics.general_filter_comp import GeneralFilterComp
@@ -14,10 +14,10 @@ from atomics.general_filter_comp import GeneralFilterComp
 np.random.seed(0)
 
 # Define the mesh and create the PDE problem
-NUM_ELEMENTS_X = 48
-NUM_ELEMENTS_Y = 32
-LENGTH_X = .06
-LENGTH_Y = .04
+NUM_ELEMENTS_X = 80
+NUM_ELEMENTS_Y = 40
+LENGTH_X = 160.
+LENGTH_Y = 80.
 
 mesh = df.RectangleMesh.create(
     [df.Point(0.0, 0.0), df.Point(LENGTH_X, LENGTH_Y)],
@@ -25,17 +25,18 @@ mesh = df.RectangleMesh.create(
     df.CellType.Type.quadrilateral,
 )
 
-# Define the boundary condition
-class BottomBoundary(df.SubDomain):
+# Define the traction condition:
+# here traction force is applied on the middle of the right edge
+class TractionBoundary(df.SubDomain):
     def inside(self, x, on_boundary):
-        return (abs(x[1] - 0.) < df.DOLFIN_EPS_LARGE and abs(x[0] - LENGTH_X / 2) < 2.5e-3)
+        return ((abs(x[1] - LENGTH_Y/2) < LENGTH_Y/NUM_ELEMENTS_Y + df.DOLFIN_EPS) and (abs(x[0] - LENGTH_X ) < df.DOLFIN_EPS*1.5e15))
 
 # Define the traction boundary
 sub_domains = df.MeshFunction('size_t', mesh, mesh.topology().dim() - 1)
-upper_edge = BottomBoundary()
+upper_edge = TractionBoundary()
 upper_edge.mark(sub_domains, 6)
 dss = df.Measure('ds')(subdomain_data=sub_domains)
-f = df.Constant((0, -1.))
+f = df.Constant((0, -1. / 4 ))
 
 # PDE problem
 pde_problem = PDEProblem(mesh)
@@ -58,6 +59,8 @@ residual_form = get_residual_form(
     v, 
     density_function,
 )
+
+
 residual_form -= df.dot(f, v) * dss(6)
 pde_problem.add_state('displacements', displacements_function, residual_form, 'density')
 
@@ -72,7 +75,7 @@ pde_problem.add_scalar_output('compliance', compliance_form, 'displacements')
 
 # Add boundary conditions to the PDE problem:
 pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0, 0.0)), '(abs(x[0]-0.) < DOLFIN_EPS)'))
-pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0, 0.0)), '(abs(x[0]-0.06) < DOLFIN_EPS)'))
+# pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0, 0.0)), '(abs(x[0]-0.06) < DOLFIN_EPS)'))
 
 # num_dof_density = V_density.dim()
 
@@ -109,7 +112,7 @@ prob.model.add_subsystem('atomics_group', group, promotes=['*'])
 
 prob.model.add_design_var('density_unfiltered',upper=1, lower=1e-4)
 prob.model.add_objective('compliance')
-prob.model.add_constraint('avg_density',upper=0.20)
+prob.model.add_constraint('avg_density',upper=0.40)
 
 prob.driver = driver = om.pyOptSparseDriver()
 driver.options['optimizer'] = 'SNOPT'
@@ -133,4 +136,4 @@ prob.run_driver()
 
 #save the solution vector
 df.File('solutions/displacement.pvd') << displacements_function
-df.File('solutions/stiffness_carti.pvd') << density_function
+df.File('solutions/stiffness_gen.pvd') << density_function
