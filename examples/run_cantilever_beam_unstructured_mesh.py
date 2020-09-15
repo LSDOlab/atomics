@@ -22,16 +22,7 @@ LENGTH_Y = 80.
 r = Rectangle(df.Point(0,0),df.Point(LENGTH_X,LENGTH_Y))
 N = 36
 mesh = generate_mesh(r,N) 
-# print(df.FunctionSpace(mesh,'DG',0).dim())
-# exit()
-# mesh = df.RectangleMesh.create(
-#     [df.Point(0.0, 0.0), df.Point(LENGTH_X, LENGTH_Y)],
-#     [NUM_ELEMENTS_X, NUM_ELEMENTS_Y],
-#     df.CellType.Type.quadrilateral,
-# )
 
-# Define the traction condition:
-# here traction force is applied on the middle of the right edge
 class TractionBoundary(df.SubDomain):
     def inside(self, x, on_boundary):
         return ((abs(x[1] - LENGTH_Y/2) < LENGTH_Y/NUM_ELEMENTS_Y * 2.) and (abs(x[0] - LENGTH_X ) < df.DOLFIN_EPS))
