@@ -96,48 +96,48 @@ class CartesianDensityFilterComp(ExplicitComponent):
 
 
 
-if __name__ == '__main__':
-    from openmdao.api import Problem, Group
-    from openmdao.api import IndepVarComp
-    from penalty_comp import Penaltycomp
+# if __name__ == '__main__':
+    # from openmdao.api import Problem, Group
+    # from openmdao.api import IndepVarComp
+    # from penalty_comp import Penaltycomp
 
-    num_elements = 3200
-    group = Group()
-    intial_density = np.zeros((num_elements))
-    intial_density[1201:1601] = np.arange(400)
-    intial_density[1601:2000] = np.arange(400,1,-1)
+    # num_elements = 3200
+    # group = Group()
+    # intial_density = np.zeros((num_elements))
+    # intial_density[1201:1601] = np.arange(400)
+    # intial_density[1601:2000] = np.arange(400,1,-1)
 
-    comp = IndepVarComp()
-    comp.add_output('density_unfiltered', shape=num_elements, val=intial_density)
-    group.add_subsystem('input', comp, promotes=['*'])
+    # comp = IndepVarComp()
+    # comp.add_output('density_unfiltered', shape=num_elements, val=intial_density)
+    # group.add_subsystem('input', comp, promotes=['*'])
 
-    comp = DensityFilterComp()
-    group.add_subsystem('DensityFilterComp', comp, promotes=['*'])
-    prob = Problem()
-    prob.model = group
-    prob.setup()
-    prob.run_model()
-    prob.check_partials(compact_print=True)
-    prob.check_partials(compact_print=False)
-    import matplotlib.pyplot as plt
-    import numpy as np
-    E_org = prob['density_unfiltered'].reshape(80, 40)
-    E_filered = prob['density'].reshape(80, 40)
-    plt.figure(1)
-    plt.imshow(E_org, cmap='hot', interpolation='nearest')
-    plt.title('origial stiffness (one slice in xy plane)')
+    # comp = DensityFilterComp()
+    # group.add_subsystem('DensityFilterComp', comp, promotes=['*'])
+    # prob = Problem()
+    # prob.model = group
+    # prob.setup()
+    # prob.run_model()
+    # prob.check_partials(compact_print=True)
+    # prob.check_partials(compact_print=False)
+    # import matplotlib.pyplot as plt
+    # import numpy as np
+    # E_org = prob['density_unfiltered'].reshape(80, 40)
+    # E_filered = prob['density'].reshape(80, 40)
+    # plt.figure(1)
+    # plt.imshow(E_org, cmap='hot', interpolation='nearest')
+    # plt.title('origial stiffness (one slice in xy plane)')
 
-    plt.figure(2)
-    plt.imshow(E_filered, cmap='hot', interpolation='nearest')
-    plt.title('filtered stiffness')
-    plt.title('filtered stiffness (one slice in xy plane)')
+    # plt.figure(2)
+    # plt.imshow(E_filered, cmap='hot', interpolation='nearest')
+    # plt.title('filtered stiffness')
+    # plt.title('filtered stiffness (one slice in xy plane)')
 
-    plt.figure(3)
-    plt.plot(prob['density'])
-    plt.title('Stiffness(all element---filtered)')
+    # plt.figure(3)
+    # plt.plot(prob['density'])
+    # plt.title('Stiffness(all element---filtered)')
 
-    plt.figure(4)
-    plt.plot(prob['density_unfiltered'])   
-    plt.title('Stiffness(all element---original)')
+    # plt.figure(4)
+    # plt.plot(prob['density_unfiltered'])   
+    # plt.title('Stiffness(all element---original)')
  
-    plt.show()
+    # plt.show()

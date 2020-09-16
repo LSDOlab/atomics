@@ -14,8 +14,10 @@ def get_residual_form(u, v, rho_e, E = 1):
 
     w_ij = 0.5 * (df.grad(u) + df.grad(u).T)
     v_ij = 0.5 * (df.grad(v) + df.grad(v).T)
+    
+    d = len(u)
 
-    sigm = lambda_*df.div(u)*df.Identity(2) + 2*mu*w_ij
+    sigm = lambda_*df.div(u)*df.Identity(d) + 2*mu*w_ij
 
     a = df.inner(sigm, v_ij) * df.dx 
     

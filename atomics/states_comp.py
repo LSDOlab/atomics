@@ -36,6 +36,10 @@ class StatesComp(om.ImplicitComponent):
             'linear_solver', default='fenics_direct', 
             values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu'],
         )
+        self.options.declare(
+            'problem_type', default='nonlinear_problem', 
+            values=['linear_problem', 'nonlinear_problem'],
+        )
 
     def setup(self):
         pde_problem = self.options['pde_problem']
@@ -90,6 +94,7 @@ class StatesComp(om.ImplicitComponent):
     def solve_nonlinear(self, inputs, outputs):
         pde_problem = self.options['pde_problem']
         state_name = self.options['state_name']
+        problem_type = self.options['problem_type']
 
         state_function = pde_problem.states_dict[state_name]['function']
         residual_form = pde_problem.states_dict[state_name]['residual_form']
@@ -99,8 +104,21 @@ class StatesComp(om.ImplicitComponent):
         self.derivative_form = df.derivative(residual_form, state_function)
 
         df.set_log_active(True)
-        df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form,
-              solver_parameters={"newton_solver":{"maximum_iterations":1, "error_on_nonconvergence":False}})
+        # df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form)
+        if problem_type == 'linear_problem':
+            df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form,
+                solver_parameters={"newton_solver":{"maximum_iterations":20, "error_on_nonconvergence":False}})
+        else:
+            problem = df.NonlinearVariationalProblem(residual_form, state_function, pde_problem.bcs_list, self.derivative_form)
+            solver  = df.NonlinearVariationalSolver(problem)
+            solver.parameters['nonlinear_solver']='snes' 
+
+            solver.parameters["newton_solver"]["linear_solver"]='gmres' # "cg" "gmres"
+            solver.parameters["newton_solver"]["krylov_solver"]["relative_tolerance"]=1e-6
+            solver.parameters["newton_solver"]["krylov_solver"]["maximum_iterations"]=1000
+            solver.parameters["snes_solver"]["line_search"] = 'bt' 
+            # solver.parameters["newton_solver"]["krylov_solver"]['error_on_nonconvergence'] = False
+            solver.solve()
 
         self.L = -residual_form
 
@@ -118,7 +136,6 @@ class StatesComp(om.ImplicitComponent):
             dR_dinput = self.compute_derivative(state_name, argument_function)
             partials[state_name, argument_name] = dR_dinput.data
 
-    # should I write those linear_solver options outside/seperately
     def solve_linear(self, d_outputs, d_residuals, mode):
         linear_solver = self.options['linear_solver']
         pde_problem = self.options['pde_problem']
