@@ -14,10 +14,12 @@ from atomics.general_filter_comp import GeneralFilterComp
 np.random.seed(0)
 
 # Define the mesh and create the PDE problem
-NUM_ELEMENTS_X = 48
-NUM_ELEMENTS_Y = 32
-LENGTH_X = .06
-LENGTH_Y = .04
+NUM_ELEMENTS_X = 80
+NUM_ELEMENTS_Y = 40
+LENGTH_X = 2.
+LENGTH_Y = 1.
+K = 199.5e9
+ALPHA = 1.54e-5
 
 mesh = df.RectangleMesh.create(
     [df.Point(0.0, 0.0), df.Point(LENGTH_X, LENGTH_Y)],
@@ -28,14 +30,14 @@ mesh = df.RectangleMesh.create(
 # Define the boundary condition
 class BottomBoundary(df.SubDomain):
     def inside(self, x, on_boundary):
-        return (abs(x[1] - 0.) < df.DOLFIN_EPS_LARGE and abs(x[0] - LENGTH_X / 2) < 2.5e-3)
+        return (abs(x[1] - 0.) < df.DOLFIN_EPS_LARGE and abs(x[0] - LENGTH_X / 2) < 2. * LENGTH_X / NUM_ELEMENTS_X)
 
 # Define the traction boundary
 sub_domains = df.MeshFunction('size_t', mesh, mesh.topology().dim() - 1)
 upper_edge = BottomBoundary()
 upper_edge.mark(sub_domains, 6)
 dss = df.Measure('ds')(subdomain_data=sub_domains)
-f = df.Constant((0, -1.))
+f = df.Constant((0, -5.e6/(4. * LENGTH_X / NUM_ELEMENTS_X)))
 
 # PDE problem
 pde_problem = PDEProblem(mesh)
@@ -57,6 +59,8 @@ residual_form = get_residual_form(
     displacements_function, 
     v, 
     density_function,
+    K,
+    ALPHA
 )
 residual_form -= df.dot(f, v) * dss(6)
 pde_problem.add_state('displacements', displacements_function, residual_form, 'density')
@@ -72,7 +76,7 @@ pde_problem.add_scalar_output('compliance', compliance_form, 'displacements')
 
 # Add boundary conditions to the PDE problem:
 pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0, 0.0)), '(abs(x[0]-0.) < DOLFIN_EPS)'))
-pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0, 0.0)), '(abs(x[0]-0.06) < DOLFIN_EPS)'))
+pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0, 0.0)), '(abs(x[0]-2.) < DOLFIN_EPS)'))
 
 # num_dof_density = V_density.dim()
 
@@ -121,15 +125,15 @@ driver.opt_settings['Iterations limit'] = 100000000
 driver.opt_settings['Major step limit'] = 2.0
 
 driver.opt_settings['Major feasibility tolerance'] = 1.0e-6
-driver.opt_settings['Major optimality tolerance'] =2.e-10
+driver.opt_settings['Major optimality tolerance'] =2.e-12
 
 prob.setup()
 prob.run_model()
+
+# prob.check_partials(compact_print=True)
 # print(prob['compliance']); exit()
 
 prob.run_driver()
-# prob.check_partials(compact_print=True)
-
 
 #save the solution vector
 df.File('solutions/displacement.pvd') << displacements_function

@@ -5,12 +5,11 @@ import numpy as np
 import openmdao.api as om
 
 from atomics.api import PDEProblem, AtomicsGroup
-from atomics.pdes.elastic_cantilever_beam import get_residual_form
+from atomics.pdes.hyperelastic_neo_hookean import get_residual_form
 
 from cartesian_density_filter_comp import CartesianDensityFilterComp
 from atomics.general_filter_comp import GeneralFilterComp
 
-from mshr import Rectangle, generate_mesh
 
 np.random.seed(0)
 
@@ -19,19 +18,26 @@ NUM_ELEMENTS_X = 80
 NUM_ELEMENTS_Y = 40
 LENGTH_X = 160.
 LENGTH_Y = 80.
-r = Rectangle(df.Point(0,0),df.Point(LENGTH_X,LENGTH_Y))
-N = 36
-mesh = generate_mesh(r,N) 
 
+mesh = df.RectangleMesh.create(
+    [df.Point(0.0, 0.0), df.Point(LENGTH_X, LENGTH_Y)],
+    [NUM_ELEMENTS_X, NUM_ELEMENTS_Y],
+    df.CellType.Type.quadrilateral,
+)
+
+# Define the traction condition:
+# here traction force is applied on the middle of the right edge
 class TractionBoundary(df.SubDomain):
     def inside(self, x, on_boundary):
-        return ((abs(x[1] - LENGTH_Y/2) < LENGTH_Y/NUM_ELEMENTS_Y * 2.) and (abs(x[0] - LENGTH_X ) < df.DOLFIN_EPS))
+        return ((abs(x[1] - LENGTH_Y/2) < LENGTH_Y/NUM_ELEMENTS_Y + df.DOLFIN_EPS) and (abs(x[0] - LENGTH_X ) < df.DOLFIN_EPS*1.5e15))
 
 # Define the traction boundary
 sub_domains = df.MeshFunction('size_t', mesh, mesh.topology().dim() - 1)
 upper_edge = TractionBoundary()
 upper_edge.mark(sub_domains, 6)
 dss = df.Measure('ds')(subdomain_data=sub_domains)
+tractionBC = dss(6)
+
 f = df.Constant((0, -1. / 4 ))
 
 # PDE problem
@@ -41,6 +47,7 @@ pde_problem = PDEProblem(mesh)
 # name = 'density', function = density_function (function is the solution vector here)
 density_function_space = df.FunctionSpace(mesh, 'DG', 0)
 density_function = df.Function(density_function_space)
+density_function.vector().set_local(np.ones(density_function_space.dim()))
 pde_problem.add_input('density', density_function)
 
 # Add states to the PDE problem (line 58):
@@ -54,10 +61,11 @@ residual_form = get_residual_form(
     displacements_function, 
     v, 
     density_function,
+    tractionBC
 )
 
 
-residual_form -= df.dot(f, v) * dss(6)
+
 pde_problem.add_state('displacements', displacements_function, residual_form, 'density')
 
 # Add output-avg_density to the PDE problem:
@@ -85,7 +93,8 @@ comp = om.IndepVarComp()
 comp.add_output(
     'density_unfiltered', 
     shape=num_dof_density, 
-    val=np.random.random(num_dof_density) * 0.86,
+    val=np.ones(num_dof_density),
+    # val=np.random.random(num_dof_density) * 0.86,
 )
 prob.model.add_subsystem('indep_var_comp', comp, promotes=['*'])
 
@@ -106,7 +115,7 @@ prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
 group = AtomicsGroup(pde_problem=pde_problem)
 prob.model.add_subsystem('atomics_group', group, promotes=['*'])
 
-prob.model.add_design_var('density_unfiltered',upper=1, lower=1e-4)
+prob.model.add_design_var('density_unfiltered',upper=1, lower=1e-3)
 prob.model.add_objective('compliance')
 prob.model.add_constraint('avg_density',upper=0.40)
 

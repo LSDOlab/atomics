@@ -10,29 +10,46 @@ from atomics.pdes.elastic_cantilever_beam import get_residual_form
 from cartesian_density_filter_comp import CartesianDensityFilterComp
 from atomics.general_filter_comp import GeneralFilterComp
 
-from mshr import Rectangle, generate_mesh
+# from mshr import Rectangle, generate_mesh
 
 np.random.seed(0)
+
+# import L-shaped bracket from gmsh vtk file and use meshio to convert to xml file
+# (TODO: XDMF not working)
+import meshio
+filename = '../tests/test_gmsh_vtk'
+mesh = meshio.read(
+    filename,  
+    file_format="vtk"  
+)
+points = mesh.points
+cells = mesh.cells
+meshio.write_points_cells(
+    "fenics_mesh_l_bracket.xml",
+    points,
+    cells,
+    )
+
+mesh = df.Mesh("fenics_mesh_l_bracket.xml")
+
 
 # Define the mesh and create the PDE problem
 NUM_ELEMENTS_X = 80
 NUM_ELEMENTS_Y = 40
-LENGTH_X = 160.
-LENGTH_Y = 80.
-r = Rectangle(df.Point(0,0),df.Point(LENGTH_X,LENGTH_Y))
-N = 36
-mesh = generate_mesh(r,N) 
+LENGTH_X = 20.
+LENGTH_Y = 10.
+AVG_ELEMENT_SIZE = (mesh.hmax() + mesh.hmin()) / 2.
 
 class TractionBoundary(df.SubDomain):
     def inside(self, x, on_boundary):
-        return ((abs(x[1] - LENGTH_Y/2) < LENGTH_Y/NUM_ELEMENTS_Y * 2.) and (abs(x[0] - LENGTH_X ) < df.DOLFIN_EPS))
+        return ((abs(x[1] - LENGTH_Y) < AVG_ELEMENT_SIZE * 2.) and (abs(x[0] - LENGTH_X ) < df.DOLFIN_EPS))
 
 # Define the traction boundary
 sub_domains = df.MeshFunction('size_t', mesh, mesh.topology().dim() - 1)
 upper_edge = TractionBoundary()
 upper_edge.mark(sub_domains, 6)
 dss = df.Measure('ds')(subdomain_data=sub_domains)
-f = df.Constant((0, -1. / 4 ))
+f = df.Constant((0, -1. / 4 , 0.))
 
 # PDE problem
 pde_problem = PDEProblem(mesh)
@@ -70,7 +87,7 @@ compliance_form = df.dot(f, displacements_function) * dss(6)
 pde_problem.add_scalar_output('compliance', compliance_form, 'displacements')
 
 # Add boundary conditions to the PDE problem:
-pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0, 0.0)), '(abs(x[0]-0.) < DOLFIN_EPS)'))
+pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0, 0.0, 0.0)), '(abs(x[1]-30.) < DOLFIN_EPS)'))
 # pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0, 0.0)), '(abs(x[0]-0.06) < DOLFIN_EPS)'))
 
 # num_dof_density = V_density.dim()
@@ -133,4 +150,4 @@ prob.run_driver()
 
 #save the solution vector
 df.File('solutions/displacement.pvd') << displacements_function
-df.File('solutions/stiffness_gen.pvd') << density_function
+df.File('solutions/stiffness_l_bracket.pvd') << density_function
