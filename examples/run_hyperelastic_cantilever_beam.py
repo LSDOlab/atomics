@@ -14,10 +14,10 @@ from atomics.general_filter_comp import GeneralFilterComp
 np.random.seed(0)
 
 # Define the mesh and create the PDE problem
-NUM_ELEMENTS_X = 80
-NUM_ELEMENTS_Y = 40
-LENGTH_X = 160.
-LENGTH_Y = 80.
+NUM_ELEMENTS_X = 480
+NUM_ELEMENTS_Y = 160
+LENGTH_X = 2.4
+LENGTH_Y = 0.8
 
 mesh = df.RectangleMesh.create(
     [df.Point(0.0, 0.0), df.Point(LENGTH_X, LENGTH_Y)],
@@ -38,7 +38,7 @@ upper_edge.mark(sub_domains, 6)
 dss = df.Measure('ds')(subdomain_data=sub_domains)
 tractionBC = dss(6)
 
-f = df.Constant((0, -1. / 4 ))
+f = df.Constant((0.0, -9.e-1))
 
 # PDE problem
 pde_problem = PDEProblem(mesh)
@@ -61,7 +61,8 @@ residual_form = get_residual_form(
     displacements_function, 
     v, 
     density_function,
-    tractionBC
+    tractionBC,
+    f
 )
 
 
@@ -115,7 +116,7 @@ prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
 group = AtomicsGroup(pde_problem=pde_problem)
 prob.model.add_subsystem('atomics_group', group, promotes=['*'])
 
-prob.model.add_design_var('density_unfiltered',upper=1, lower=1e-3)
+prob.model.add_design_var('density_unfiltered',upper=1, lower=7e-2)
 prob.model.add_objective('compliance')
 prob.model.add_constraint('avg_density',upper=0.40)
 
@@ -128,8 +129,8 @@ driver.opt_settings['Minor iterations limit'] = 100000
 driver.opt_settings['Iterations limit'] = 100000000
 driver.opt_settings['Major step limit'] = 2.0
 
-driver.opt_settings['Major feasibility tolerance'] = 1.0e-6
-driver.opt_settings['Major optimality tolerance'] =2.e-10
+driver.opt_settings['Major feasibility tolerance'] = 1.0e-5
+driver.opt_settings['Major optimality tolerance'] =3.e-8
 
 prob.setup()
 prob.run_model()
