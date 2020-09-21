@@ -33,7 +33,7 @@ class StatesComp(om.ImplicitComponent):
         self.options.declare('pde_problem', types=PDEProblem)
         self.options.declare('state_name', types=str)
         self.options.declare(
-            'linear_solver', default='fenics_direct', 
+            'linear_solver', default='scipy_splu', 
             values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu'],
         )
         self.options.declare(
@@ -112,12 +112,12 @@ class StatesComp(om.ImplicitComponent):
             problem = df.NonlinearVariationalProblem(residual_form, state_function, pde_problem.bcs_list, self.derivative_form)
             solver  = df.NonlinearVariationalSolver(problem)
             solver.parameters['nonlinear_solver']='snes' 
-
-            solver.parameters["newton_solver"]["linear_solver"]='gmres' # "cg" "gmres"
-            solver.parameters["newton_solver"]["krylov_solver"]["relative_tolerance"]=1e-6
-            solver.parameters["newton_solver"]["krylov_solver"]["maximum_iterations"]=1000
             solver.parameters["snes_solver"]["line_search"] = 'bt' 
-            # solver.parameters["newton_solver"]["krylov_solver"]['error_on_nonconvergence'] = False
+            solver.parameters["snes_solver"]["linear_solver"]='mumps' # "cg" "gmres"
+            solver.parameters["snes_solver"]["maximum_iterations"]=1000
+            # solver.parameters["newton_solver"]["krylov_solver"]["relative_tolerance"]=1e-6
+            # solver.parameters["snes_solver"]["linear_solver"]["maximum_iterations"]=1000
+            solver.parameters["snes_solver"]["error_on_nonconvergence"] = False
             solver.solve()
 
         self.L = -residual_form
