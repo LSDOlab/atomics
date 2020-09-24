@@ -5,19 +5,19 @@ import numpy as np
 import openmdao.api as om
 
 from atomics.api import PDEProblem, AtomicsGroup
-from atomics.pdes.hyperelastic_neo_hookean import get_residual_form
+from atomics.pdes.elastic_cantilever_beam import get_residual_form
 
-from cartesian_density_filter_comp import CartesianDensityFilterComp
+# from cartesian_density_filter_comp import CartesianDensityFilterComp
 from atomics.general_filter_comp import GeneralFilterComp
-
+from paraview.simple import *
 
 np.random.seed(0)
 
 # Define the mesh and create the PDE problem
-NUM_ELEMENTS_X = 240 #480
-NUM_ELEMENTS_Y = 80 # 160
-LENGTH_X = 2.4
-LENGTH_Y = 0.8
+NUM_ELEMENTS_X = 80
+NUM_ELEMENTS_Y = 40
+LENGTH_X = 160.
+LENGTH_Y = 80.
 
 mesh = df.RectangleMesh.create(
     [df.Point(0.0, 0.0), df.Point(LENGTH_X, LENGTH_Y)],
@@ -36,9 +36,7 @@ sub_domains = df.MeshFunction('size_t', mesh, mesh.topology().dim() - 1)
 upper_edge = TractionBoundary()
 upper_edge.mark(sub_domains, 6)
 dss = df.Measure('ds')(subdomain_data=sub_domains)
-tractionBC = dss(6)
-
-f = df.Constant((0.0, -9.e-1))
+f = df.Constant((0, -1. / 4 ))
 
 # PDE problem
 pde_problem = PDEProblem(mesh)
@@ -47,7 +45,6 @@ pde_problem = PDEProblem(mesh)
 # name = 'density', function = density_function (function is the solution vector here)
 density_function_space = df.FunctionSpace(mesh, 'DG', 0)
 density_function = df.Function(density_function_space)
-density_function.vector().set_local(np.ones(density_function_space.dim()))
 pde_problem.add_input('density', density_function)
 
 # Add states to the PDE problem (line 58):
@@ -61,12 +58,10 @@ residual_form = get_residual_form(
     displacements_function, 
     v, 
     density_function,
-    tractionBC,
-    f
 )
 
 
-
+residual_form -= df.dot(f, v) * dss(6)
 pde_problem.add_state('displacements', displacements_function, residual_form, 'density')
 
 # Add output-avg_density to the PDE problem:
@@ -86,6 +81,8 @@ pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0
 
 # Define the OpenMDAO problem and model
 
+# from lsdo_viz.api import Problem
+
 prob = om.Problem()
 
 num_dof_density = pde_problem.inputs_dict['density']['function'].function_space().dim()
@@ -94,8 +91,7 @@ comp = om.IndepVarComp()
 comp.add_output(
     'density_unfiltered', 
     shape=num_dof_density, 
-    val=np.ones(num_dof_density),
-    # val=np.random.random(num_dof_density) * 0.86,
+    val=np.random.random(num_dof_density) * 0.86,
 )
 prob.model.add_subsystem('indep_var_comp', comp, promotes=['*'])
 
@@ -116,7 +112,7 @@ prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
 group = AtomicsGroup(pde_problem=pde_problem)
 prob.model.add_subsystem('atomics_group', group, promotes=['*'])
 
-prob.model.add_design_var('density_unfiltered',upper=1, lower=1.5e-1)
+prob.model.add_design_var('density_unfiltered',upper=1, lower=1e-4)
 prob.model.add_objective('compliance')
 prob.model.add_constraint('avg_density',upper=0.40)
 
@@ -129,16 +125,15 @@ driver.opt_settings['Minor iterations limit'] = 100000
 driver.opt_settings['Iterations limit'] = 100000000
 driver.opt_settings['Major step limit'] = 2.0
 
-driver.opt_settings['Major feasibility tolerance'] = 1.0e-5
-driver.opt_settings['Major optimality tolerance'] =1.3e-8
+driver.opt_settings['Major feasibility tolerance'] = 1.0e-6
+driver.opt_settings['Major optimality tolerance'] =2.e-7
 
 prob.setup()
 prob.run_model()
-# prob.check_partials(compact_print=True)
-
 # print(prob['compliance']); exit()
 
 prob.run_driver()
+# prob.check_partials(compact_print=True)
 
 
 #save the solution vector

@@ -124,7 +124,7 @@ driver.opt_settings['Iterations limit'] = 100000000
 driver.opt_settings['Major step limit'] = 2.0
 
 driver.opt_settings['Major feasibility tolerance'] = 1.0e-6
-driver.opt_settings['Major optimality tolerance'] =2.e-10
+driver.opt_settings['Major optimality tolerance'] =2.e-7
 
 prob.setup()
 prob.run_model()

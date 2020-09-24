@@ -1,0 +1,14 @@
+# run_file_name = 'run_cantilever_beam_unstructured_mesh.py'
+# viz_file_name = '../atomics/visualization/viz.py'
+run_file_name = 'run.py'
+viz_file_name = 'viz.py'
+data_dir = '_data'
+data_file_name = 'opt'
+frames_dir = '_frames'
+fps = 10
+stride = 1
+write_stride = 1
+savefig_dpi = 250
+print_opt_variables = True
+print_nonlinear_status = False
+print_linear_status = False

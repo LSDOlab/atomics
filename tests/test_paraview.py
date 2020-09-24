@@ -15,7 +15,7 @@ stiffness_genpvd.CellArrays = ['density']
 # get active view
 renderView1 = GetActiveViewOrCreate('RenderView')
 # uncomment following to set a specific view size
-renderView1.ViewSize = [1266, 810]
+renderView1.ViewSize = [4220, 2700]
 
 # get layout
 layout1 = GetLayout()
@@ -25,9 +25,13 @@ stiffness_genpvdDisplay = Show(stiffness_genpvd, renderView1, 'UnstructuredGridR
 
 # get color transfer function/color map for 'density'
 densityLUT = GetColorTransferFunction('density')
+densityLUT.RGBPoints = [0.14999999999999986, 0.231373, 0.298039, 0.752941, 0.5750000000000002, 0.865003, 0.865003, 0.865003, 1.0000000000000004, 0.705882, 0.0156863, 0.14902]
+densityLUT.ScalarRangeInitialized = 1.0
 
 # get opacity transfer function/opacity map for 'density'
 densityPWF = GetOpacityTransferFunction('density')
+densityPWF.Points = [0.14999999999999986, 0.0, 0.5, 0.0, 1.0000000000000004, 1.0, 0.5, 0.0]
+densityPWF.ScalarRangeInitialized = 1
 
 # trace defaults for the display properties.
 stiffness_genpvdDisplay.Representation = 'Surface'
@@ -35,11 +39,11 @@ stiffness_genpvdDisplay.ColorArrayName = ['CELLS', 'density']
 stiffness_genpvdDisplay.LookupTable = densityLUT
 stiffness_genpvdDisplay.OSPRayScaleFunction = 'PiecewiseFunction'
 stiffness_genpvdDisplay.SelectOrientationVectors = 'None'
-stiffness_genpvdDisplay.ScaleFactor = 16.0
+stiffness_genpvdDisplay.ScaleFactor = 0.24
 stiffness_genpvdDisplay.SelectScaleArray = 'density'
 stiffness_genpvdDisplay.GlyphType = 'Arrow'
 stiffness_genpvdDisplay.GlyphTableIndexArray = 'density'
-stiffness_genpvdDisplay.GaussianRadius = 0.8
+stiffness_genpvdDisplay.GaussianRadius = 0.012
 stiffness_genpvdDisplay.SetScaleArray = [None, '']
 stiffness_genpvdDisplay.ScaleTransferFunction = 'PiecewiseFunction'
 stiffness_genpvdDisplay.OpacityArray = [None, '']
@@ -47,15 +51,10 @@ stiffness_genpvdDisplay.OpacityTransferFunction = 'PiecewiseFunction'
 stiffness_genpvdDisplay.DataAxesGrid = 'GridAxesRepresentation'
 stiffness_genpvdDisplay.PolarAxes = 'PolarAxesRepresentation'
 stiffness_genpvdDisplay.ScalarOpacityFunction = densityPWF
-stiffness_genpvdDisplay.ScalarOpacityUnitDistance = 12.086595437738142
+stiffness_genpvdDisplay.ScalarOpacityUnitDistance = 0.09447630744140174
 
 # reset view to fit data
 renderView1.ResetCamera()
-
-#changing interaction mode based on data extents
-renderView1.InteractionMode = '2D'
-renderView1.CameraPosition = [80.0, 40.0, 10000.0]
-renderView1.CameraFocalPoint = [80.0, 40.0, 0.0]
 
 # get the material library
 materialLibrary1 = GetMaterialLibrary()
@@ -68,26 +67,29 @@ renderView1.Update()
 
 # get color legend/bar for densityLUT in view renderView1
 densityLUTColorBar = GetScalarBar(densityLUT, renderView1)
-
-# change scalar bar placement
 densityLUTColorBar.Orientation = 'Horizontal'
 densityLUTColorBar.WindowLocation = 'AnyLocation'
-densityLUTColorBar.Position = [0.21383886255924128, 0.10592592592592631]
-densityLUTColorBar.ScalarBarLength = 0.32999999999999946
+densityLUTColorBar.Position = [0.2707109004739336, 0.05777777777777774]
+densityLUTColorBar.Title = 'density'
+densityLUTColorBar.ComponentTitle = ''
+densityLUTColorBar.ScalarBarLength = 0.3300000000000008
 
 # change scalar bar placement
-densityLUTColorBar.ScalarBarLength = 0.4935071090047389
+densityLUTColorBar.Position = [0.2979620853080568, 0.1855555555555555]
+densityLUTColorBar.ScalarBarLength = 0.3300000000000015
 
-# change scalar bar placement
-densityLUTColorBar.Position = [0.17118483412322238, 0.045]
-densityLUTColorBar.ScalarBarLength = 0.4935071090047388
+# Properties modified on densityLUTColorBar
+densityLUTColorBar.TitleColor = [0.0, 0.0, 0.0]
+densityLUTColorBar.LabelColor = [0.0, 0.0, 0.0]
 
 # current camera placement for renderView1
 renderView1.InteractionMode = '2D'
-renderView1.CameraPosition = [80.0, 40.0, 10000.0]
-renderView1.CameraFocalPoint = [80.0, 40.0, 0.0]
-renderView1.CameraParallelScale = 73.91960256197652
+renderView1.CameraPosition = [1.2, 0.4, 4.887241058965766]
+renderView1.CameraFocalPoint = [1.2, 0.4, 0.0]
+renderView1.CameraParallelScale = 1.2649110640673518
 
 # save screenshot
-SaveScreenshot('python_paraview.png', renderView1, ImageResolution=[844, 540],
-    TransparentBackground=1)
+SaveScreenshot('/home/jyan_linux/Desktop/1.png', renderView1, ImageResolution=[844, 540],
+    TransparentBackground=1, 
+    # PNG options
+    CompressionLevel='3')
