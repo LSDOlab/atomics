@@ -13,6 +13,8 @@
 .vscode/
 *.stl
 *.csv
+*.pvd
+*.vtu
 *optimization_output.txt*
 .idea
 *get_layout.py

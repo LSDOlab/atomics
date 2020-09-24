@@ -11,7 +11,7 @@ def get_residual_form(u, v, rho_e, k = 1, alpha = 1.1e-5):
     lambda_ = E * nu/(1. + nu)/(1 - 2 * nu)
     mu = E / 2 / (1 + nu) #lame's parameters
 
-    Th = df.Constant(18.)
+    Th = df.Constant(17.)
 
     w_ij = 0.5 * (df.grad(u) + df.grad(u).T)
     v_ij = 0.5 * (df.grad(v) + df.grad(v).T)

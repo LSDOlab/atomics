@@ -14,8 +14,8 @@ from atomics.general_filter_comp import GeneralFilterComp
 np.random.seed(0)
 
 # Define the mesh and create the PDE problem
-NUM_ELEMENTS_X = 480
-NUM_ELEMENTS_Y = 160
+NUM_ELEMENTS_X = 240 #480
+NUM_ELEMENTS_Y = 80 # 160
 LENGTH_X = 2.4
 LENGTH_Y = 0.8
 
@@ -116,7 +116,7 @@ prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
 group = AtomicsGroup(pde_problem=pde_problem)
 prob.model.add_subsystem('atomics_group', group, promotes=['*'])
 
-prob.model.add_design_var('density_unfiltered',upper=1, lower=7e-2)
+prob.model.add_design_var('density_unfiltered',upper=1, lower=1.5e-1)
 prob.model.add_objective('compliance')
 prob.model.add_constraint('avg_density',upper=0.40)
 
@@ -130,7 +130,7 @@ driver.opt_settings['Iterations limit'] = 100000000
 driver.opt_settings['Major step limit'] = 2.0
 
 driver.opt_settings['Major feasibility tolerance'] = 1.0e-5
-driver.opt_settings['Major optimality tolerance'] =3.e-8
+driver.opt_settings['Major optimality tolerance'] =1.3e-8
 
 prob.setup()
 prob.run_model()

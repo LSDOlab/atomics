@@ -37,8 +37,12 @@ class StatesComp(om.ImplicitComponent):
             values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu'],
         )
         self.options.declare(
-            'problem_type', default='nonlinear_problem', 
+            'problem_type', default='linear_problem', 
             values=['linear_problem', 'nonlinear_problem'],
+        )
+        self.options.declare(
+            'visualization', default='True', 
+            values=['True', 'False'],
         )
 
     def setup(self):
@@ -46,6 +50,7 @@ class StatesComp(om.ImplicitComponent):
         state_name = self.options['state_name']
         state_function = pde_problem.states_dict[state_name]['function']
 
+        self.itr = 0
         self.argument_functions_dict = argument_functions_dict = dict()
         for argument_name in pde_problem.states_dict[state_name]['arguments']:
             argument_functions_dict[argument_name] = pde_problem.inputs_dict[argument_name]['function']
@@ -95,6 +100,8 @@ class StatesComp(om.ImplicitComponent):
         pde_problem = self.options['pde_problem']
         state_name = self.options['state_name']
         problem_type = self.options['problem_type']
+        visualization = self.options['visualization']
+        self.itr = self.itr + 1
 
         state_function = pde_problem.states_dict[state_name]['function']
         residual_form = pde_problem.states_dict[state_name]['residual_form']
@@ -119,6 +126,11 @@ class StatesComp(om.ImplicitComponent):
             # solver.parameters["snes_solver"]["linear_solver"]["maximum_iterations"]=1000
             solver.parameters["snes_solver"]["error_on_nonconvergence"] = False
             solver.solve()
+
+        # option to store the visualization results
+        if visualization == 'True':
+            for argument_name, argument_function in iteritems(self.argument_functions_dict):
+                df.File('solutions_iterations/{}_{}.pvd'.format(argument_name, self.itr)) << argument_function
 
         self.L = -residual_form
 
