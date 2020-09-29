@@ -10,14 +10,20 @@ from atomics.pdes.hyperelastic_neo_hookean import get_residual_form
 from cartesian_density_filter_comp import CartesianDensityFilterComp
 from atomics.general_filter_comp import GeneralFilterComp
 
+# alpha = Constant(0) 
+# alpha.assign(step_index) 
+# try:
+# some code
+# except: 
+
 
 np.random.seed(0)
 
 # Define the mesh and create the PDE problem
 NUM_ELEMENTS_X = 240 #480
 NUM_ELEMENTS_Y = 80 # 160
-LENGTH_X = 2.4
-LENGTH_Y = 0.8
+LENGTH_X = 4.8
+LENGTH_Y = 1.6
 
 mesh = df.RectangleMesh.create(
     [df.Point(0.0, 0.0), df.Point(LENGTH_X, LENGTH_Y)],
@@ -116,7 +122,7 @@ prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
 group = AtomicsGroup(pde_problem=pde_problem)
 prob.model.add_subsystem('atomics_group', group, promotes=['*'])
 
-prob.model.add_design_var('density_unfiltered',upper=1, lower=1.5e-1)
+prob.model.add_design_var('density_unfiltered',upper=1, lower=1.e-2)
 prob.model.add_objective('compliance')
 prob.model.add_constraint('avg_density',upper=0.40)
 
@@ -130,7 +136,7 @@ driver.opt_settings['Iterations limit'] = 100000000
 driver.opt_settings['Major step limit'] = 2.0
 
 driver.opt_settings['Major feasibility tolerance'] = 1.0e-5
-driver.opt_settings['Major optimality tolerance'] =1.3e-8
+driver.opt_settings['Major optimality tolerance'] =1.3e-9
 
 prob.setup()
 prob.run_model()
@@ -143,4 +149,4 @@ prob.run_driver()
 
 #save the solution vector
 df.File('solutions/displacement.pvd') << displacements_function
-df.File('solutions/stiffness_gen.pvd') << density_function
+df.File('solutions/stiffness_hyper_load_stp.pvd') << density_function

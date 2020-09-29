@@ -1,0 +1,14 @@
+Thermoelastic biclamped
+==========================
+
+1. PDE
+-------------
+
+.. embed-module :: atomics.pdes.thermo_mechanical_uniform_temp
+
+2. Run_script
+--------------
+
+.. embed-module :: atomics.examples.run_biclamped_thermoelastic
+
+

@@ -13,6 +13,9 @@ import openmdao.api as om
 
 from atomics.pde_problem import PDEProblem
 
+# from atomics.pdes.elastic_cantilever_beam import get_residual_form
+from atomics.pdes.hyperelastic_neo_hookean import get_residual_form
+
 
 class StatesComp(om.ImplicitComponent):
     """
@@ -37,7 +40,7 @@ class StatesComp(om.ImplicitComponent):
             values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu'],
         )
         self.options.declare(
-            'problem_type', default='linear_problem', 
+            'problem_type', default='nonlinear_problem', 
             values=['linear_problem', 'nonlinear_problem'],
         )
         self.options.declare(
@@ -101,10 +104,22 @@ class StatesComp(om.ImplicitComponent):
         state_name = self.options['state_name']
         problem_type = self.options['problem_type']
         visualization = self.options['visualization']
+        state_function = pde_problem.states_dict[state_name]['function']
+        for argument_name, argument_function in iteritems(self.argument_functions_dict):
+            density_func = argument_function
+        mesh = state_function.function_space().mesh()
+        sub_domains = df.MeshFunction('size_t', mesh, mesh.topology().dim() - 1)
+        upper_edge = TractionBoundary()
+        upper_edge.mark(sub_domains, 6)
+        dss = df.Measure('ds')(subdomain_data=sub_domains)
+        tractionBC = dss(6)
+
+        
         self.itr = self.itr + 1
 
         state_function = pde_problem.states_dict[state_name]['function']
         residual_form = pde_problem.states_dict[state_name]['residual_form']
+     
 
         self._set_values(inputs, outputs)
 
@@ -116,16 +131,36 @@ class StatesComp(om.ImplicitComponent):
             df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form,
                 solver_parameters={"newton_solver":{"maximum_iterations":20, "error_on_nonconvergence":False}})
         else:
-            problem = df.NonlinearVariationalProblem(residual_form, state_function, pde_problem.bcs_list, self.derivative_form)
-            solver  = df.NonlinearVariationalSolver(problem)
-            solver.parameters['nonlinear_solver']='snes' 
-            solver.parameters["snes_solver"]["line_search"] = 'bt' 
-            solver.parameters["snes_solver"]["linear_solver"]='mumps' # "cg" "gmres"
-            solver.parameters["snes_solver"]["maximum_iterations"]=1000
-            # solver.parameters["newton_solver"]["krylov_solver"]["relative_tolerance"]=1e-6
-            # solver.parameters["snes_solver"]["linear_solver"]["maximum_iterations"]=1000
-            solver.parameters["snes_solver"]["error_on_nonconvergence"] = False
-            solver.solve()
+            num_steps = 20
+            for i in range(num_steps):
+                v = df.TestFunction(state_function.function_space())
+
+                residual_form = get_residual_form(
+                    state_function, 
+                    v, 
+                    density_func,
+                    tractionBC,
+                    df.Constant((0.0, -9.e-1/num_steps*(i+1)))) 
+                ''' test for linear problem using a nonlinear load steping solve'''
+                # f = df.Constant((0.0, -1.e-0/4/num_steps*(i+1)))
+                # residual_form = get_residual_form(
+                #     state_function, 
+                #     v, 
+                #     density_func,
+                # )                
+                # residual_form -= df.dot(f, v) * dss(6)
+                ''' test for linear problem using a nonlinear load steping solve'''
+              
+                problem = df.NonlinearVariationalProblem(residual_form, state_function, pde_problem.bcs_list, self.derivative_form)
+                solver  = df.NonlinearVariationalSolver(problem)
+                solver.parameters['nonlinear_solver']='snes' 
+                solver.parameters["snes_solver"]["line_search"] = 'bt' 
+                solver.parameters["snes_solver"]["linear_solver"]='mumps' # "cg" "gmres"
+                solver.parameters["snes_solver"]["maximum_iterations"]=1000
+                # solver.parameters["newton_solver"]["krylov_solver"]["relative_tolerance"]=1e-6
+                # solver.parameters["snes_solver"]["linear_solver"]["maximum_iterations"]=1000
+                solver.parameters["snes_solver"]["error_on_nonconvergence"] = False
+                solver.solve()
 
         # option to store the visualization results
         if visualization == 'True':
@@ -242,8 +277,13 @@ class StatesComp(om.ImplicitComponent):
                 d_residuals[state_name] = dR.getValues(range(size))
                 
 
-
-
+NUM_ELEMENTS_X = 240 #480
+NUM_ELEMENTS_Y = 80 # 160
+LENGTH_X = 0.48
+LENGTH_Y = 0.16
+class TractionBoundary(df.SubDomain):
+    def inside(self, x, on_boundary):
+        return ((abs(x[1] - LENGTH_Y/2) < LENGTH_Y/NUM_ELEMENTS_Y + df.DOLFIN_EPS) and (abs(x[0] - LENGTH_X ) < df.DOLFIN_EPS*1.5e15))
 
 
 
