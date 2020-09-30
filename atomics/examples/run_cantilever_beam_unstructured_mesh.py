@@ -7,7 +7,7 @@ import openmdao.api as om
 from atomics.api import PDEProblem, AtomicsGroup
 from atomics.pdes.elastic_cantilever_beam import get_residual_form
 
-from cartesian_density_filter_comp import CartesianDensityFilterComp
+# from cartesian_density_filter_comp import CartesianDensityFilterComp
 from atomics.general_filter_comp import GeneralFilterComp
 
 from mshr import Rectangle, generate_mesh
