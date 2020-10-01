@@ -131,7 +131,7 @@ class StatesComp(om.ImplicitComponent):
             df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form,
                 solver_parameters={"newton_solver":{"maximum_iterations":20, "error_on_nonconvergence":False}})
         else:
-            num_steps = 20
+            num_steps = 15
             for i in range(num_steps):
                 v = df.TestFunction(state_function.function_space())
 

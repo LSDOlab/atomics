@@ -122,7 +122,7 @@ prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
 group = AtomicsGroup(pde_problem=pde_problem)
 prob.model.add_subsystem('atomics_group', group, promotes=['*'])
 
-prob.model.add_design_var('density_unfiltered',upper=1, lower=1.e-2)
+prob.model.add_design_var('density_unfiltered',upper=1, lower=3.5e-2)
 prob.model.add_objective('compliance')
 prob.model.add_constraint('avg_density',upper=0.40)
 
