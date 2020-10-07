@@ -5,8 +5,9 @@
 
 Welcome to atomics's documentation!
 ===================================
-Hi, this is atomics 0.1.
+Hi, this is atomics 0.1. An open-source density-based topology optimization tool.
 It is built on top of the `OpenMDAO framework <https://github.com/openmdao/blue>`_, which is described and documented `here <http://openmdao.org/twodocs/versions/latest>`_.
+The solution approach to the PDE problem are wrapped from `FEniCS Project <https://fenicsproject.org/>`_, the documentation is `here <https://fenicsproject.org/docs/dolfin/latest/python/>`_.
 
 Documentation
 -------------
@@ -17,8 +18,8 @@ Documentation
 
    _src_docs/getting_started
    _src_docs/api
-   _src_docs/interacting
    _src_docs/methods
+   _src_docs/pdes
    _src_docs/examples
 
 Indices and tables

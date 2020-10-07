@@ -22,11 +22,11 @@ def make_mp4(png_filename, movie_filename):
 
 
     # real time 130fps; two times slower 65fps; four times lower 37.5fps
-    bashCommand = "ffmpeg -f image2 -r 65 -i {} -vcodec libx264 -y {}.mp4".format(png_filename, movie_filename)
+    bashCommand = "ffmpeg -f image2 -r 300 -i {} -vcodec libx264 -y {}.mp4".format(png_filename, movie_filename)
     process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
 
-png_filename = 'density_' + '%1d.png'
+png_filename = 'density_'+'%1d.png'
 movie_filename = 'mov'
 make_mov(png_filename, movie_filename)
 make_mp4(png_filename, movie_filename)

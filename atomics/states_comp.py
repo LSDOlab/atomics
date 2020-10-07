@@ -40,7 +40,7 @@ class StatesComp(om.ImplicitComponent):
             values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu'],
         )
         self.options.declare(
-            'problem_type', default='nonlinear_problem', 
+            'problem_type', default='linear_problem', 
             values=['linear_problem', 'nonlinear_problem'],
         )
         self.options.declare(
@@ -165,7 +165,7 @@ class StatesComp(om.ImplicitComponent):
         # option to store the visualization results
         if visualization == 'True':
             for argument_name, argument_function in iteritems(self.argument_functions_dict):
-                df.File('solutions_iterations/{}_{}.pvd'.format(argument_name, self.itr)) << argument_function
+                df.File('solutions_iterations_3d/{}_{}.pvd'.format(argument_name, self.itr)) << argument_function
 
         self.L = -residual_form
 
