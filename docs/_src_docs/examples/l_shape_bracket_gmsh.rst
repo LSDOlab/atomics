@@ -1,5 +1,7 @@
 L-shape bracket gmsh
 ==========================
+.. image:: image.png
+
 
 1. PDE
 -------------
