@@ -16,7 +16,7 @@ def get_residual_form(u, v, rho_e, tractionBC, T, k = 10.):
 
     E = k * stiffness # rho_e is the design variable, its values is from 0 to 1
 
-    nu = 0.3 # Poisson's ratio
+    nu = 0.4 # Poisson's ratio
 
     lambda_ = E * nu/(1. + nu)/(1 - 2 * nu)
     mu = E / 2 / (1 + nu) #lame's parameters

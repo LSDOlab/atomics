@@ -40,11 +40,11 @@ class StatesComp(om.ImplicitComponent):
             values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu'],
         )
         self.options.declare(
-            'problem_type', default='linear_problem', 
-            values=['linear_problem', 'nonlinear_problem'],
+            'problem_type', default='nonlinear_problem_load_stepping', 
+            values=['linear_problem', 'nonlinear_problem', 'nonlinear_problem_load_stepping'],
         )
         self.options.declare(
-            'visualization', default='True', 
+            'visualization', default='False', 
             values=['True', 'False'],
         )
 
@@ -124,14 +124,29 @@ class StatesComp(om.ImplicitComponent):
         self._set_values(inputs, outputs)
 
         self.derivative_form = df.derivative(residual_form, state_function)
-
+        df.set_log_level(df.LogLevel.ERROR)
         df.set_log_active(True)
         # df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form)
         if problem_type == 'linear_problem':
             df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form,
-                solver_parameters={"newton_solver":{"maximum_iterations":20, "error_on_nonconvergence":False}})
-        else:
-            num_steps = 15
+                solver_parameters={"newton_solver":{"maximum_iterations":60, "error_on_nonconvergence":False}})
+        elif problem_type == 'nonlinear_problem':
+            problem = df.NonlinearVariationalProblem(residual_form, state_function, pde_problem.bcs_list, self.derivative_form)
+            solver  = df.NonlinearVariationalSolver(problem)
+            solver.parameters['nonlinear_solver']='snes' 
+            solver.parameters["snes_solver"]["line_search"] = 'bt' 
+            solver.parameters["snes_solver"]["linear_solver"]='mumps' # "cg" "gmres"
+            solver.parameters["snes_solver"]["maximum_iterations"]=500
+            solver.parameters["snes_solver"]["relative_tolerance"]=1e-15
+            solver.parameters["snes_solver"]["absolute_tolerance"]=1e-15
+
+            # solver.parameters["snes_solver"]["linear_solver"]["maximum_iterations"]=1000
+            solver.parameters["snes_solver"]["error_on_nonconvergence"] = False
+            solver.solve()
+
+        elif problem_type == 'nonlinear_problem_load_stepping':
+            num_steps = 2
+            state_function.vector().set_local(np.zeros((state_function.function_space().dim())))
             for i in range(num_steps):
                 v = df.TestFunction(state_function.function_space())
 
@@ -140,24 +155,18 @@ class StatesComp(om.ImplicitComponent):
                     v, 
                     density_func,
                     tractionBC,
-                    df.Constant((0.0, -9.e-1/num_steps*(i+1)))) 
-                ''' test for linear problem using a nonlinear load steping solve'''
-                # f = df.Constant((0.0, -1.e-0/4/num_steps*(i+1)))
-                # residual_form = get_residual_form(
-                #     state_function, 
-                #     v, 
-                #     density_func,
-                # )                
-                # residual_form -= df.dot(f, v) * dss(6)
-                ''' test for linear problem using a nonlinear load steping solve'''
-              
+                    df.Constant((0.0, -9.e-1))
+                    # df.Constant((0.0, -9.e-1/num_steps*(i+1)))
+                    ) 
                 problem = df.NonlinearVariationalProblem(residual_form, state_function, pde_problem.bcs_list, self.derivative_form)
                 solver  = df.NonlinearVariationalSolver(problem)
                 solver.parameters['nonlinear_solver']='snes' 
                 solver.parameters["snes_solver"]["line_search"] = 'bt' 
                 solver.parameters["snes_solver"]["linear_solver"]='mumps' # "cg" "gmres"
-                solver.parameters["snes_solver"]["maximum_iterations"]=1000
-                # solver.parameters["newton_solver"]["krylov_solver"]["relative_tolerance"]=1e-6
+                solver.parameters["snes_solver"]["maximum_iterations"]=500
+                solver.parameters["snes_solver"]["relative_tolerance"]=1e-15
+                solver.parameters["snes_solver"]["absolute_tolerance"]=1e-15
+
                 # solver.parameters["snes_solver"]["linear_solver"]["maximum_iterations"]=1000
                 solver.parameters["snes_solver"]["error_on_nonconvergence"] = False
                 solver.solve()

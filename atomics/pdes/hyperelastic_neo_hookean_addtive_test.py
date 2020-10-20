@@ -1,7 +1,7 @@
 import dolfin as df
 
 
-def get_residual_form(u, v, rho_e, tractionBC, T, additive ='False',k = 20.):
+def get_residual_form(u, v, rho_e,V_density, tractionBC, T, additive ='vol',k = 5.,iteration_number=2):
     stiffness = rho_e/(1 + 8. * (1. - rho_e))
     # print('the value of stiffness is:', rho_e.vector().get_local())
     # Kinematics
@@ -13,39 +13,75 @@ def get_residual_form(u, v, rho_e, tractionBC, T, additive ='False',k = 20.):
     Ic = df.tr(C)
     J  = df.det(F)
     stiffen_pow=1.
-    threshold_vol= 0.84
-    threshold_strain= 0.2
+    threshold_vol= 0.92
 
-    eps_star= 1.
+    eps_star= 0.2
+    # print("eps_star--------")
+
     if additive == 'strain':
-        # eps_eq_proj = df.Function(rho_e.function_space())
-        # fFile = df.HDF5File(df.MPI.comm_world,"eps_eq_proj.h5","r")
-        # fFile.read(f2,"/f")
-        # fFile.close()
-        # TODO: initiate the zero iteration value of the variables
-        eps = df.sym(df.grad(u))
-        eps_dev = eps - 1/3 * df.tr(eps) * df.Identity(2)
-        eps_eq = df.sqrt(2.0 / 3.0 * df.inner(eps_dev, eps_dev))
-        eps_eq_proj = df.project(eps_eq, density_function_space)   
-        ratio = eps / eps_eq
+        print("additive == strain")
 
-        c1_e = k*(5.e-2)/(1 + 8. * (1. - (5.e-2)))/6
-        ratio = eps_eq_proj/eps_star
+        if iteration_number == 1:
+            print('iteration_number == 1')
+            eps = df.sym(df.grad(u))
+            eps_dev = eps - 1/3 * df.tr(eps) * df.Identity(2)
+            eps_eq = df.sqrt(2.0 / 3.0 * df.inner(eps_dev, eps_dev))
+            # eps_eq_proj = df.project(eps_eq, density_function_space)   
+            ratio = eps_eq / eps_star
+            ratio_proj  = df.project(ratio, V_density) 
 
-        c2_e = df.conditional(df.le(ratio,threshold_strain), c2_e * df.sqrt(ratio), eps_eq_proj *(ratio**3))
-        phi_add = (1 - stiffness)*( (c1_e*(Ic-3)) + (c2_e*(Ic-3))**2)
-        E = k * stiffness
+            c1_e = k*(5.e-2)/(1 + 8. * (1. - (5.e-2)))/6
 
-        eps = df.sym(df.grad(u))
-        # TensorFunctionSpace(mesh,"DG",0) 
-        eps_dev = eps - 1/3 * df.tr(eps) * df.Identity(2)
-        eps_eq = df.sqrt(2.0 / 3.0 * df.inner(eps_dev, eps_dev))
-        eps_eq_proj = df.project(eps_eq, density_function_space)   
-        ratio = eps / eps_eq
+            c2_e = df.Function(V_density)
+            c2_e.vector().set_local(5e-4 * np.ones(V_density.dim()))
 
-        fFile = df.HDF5File(df.MPI.comm_world,"eps_eq_proj.h5","w")
-        fFile.write(eps_eq_proj,"/f")
-        fFile.close()
+            fFile = df.HDF5File(df.MPI.comm_world,"c2_e_proj.h5","w")
+            fFile.write(c2_e,"/f")
+            fFile.close()
+
+            fFile = df.HDF5File(df.MPI.comm_world,"ratio_proj.h5","w")
+            fFile.write(ratio_proj,"/f")
+            fFile.close()
+            iteration_number += 1
+            E = k * stiffness 
+            phi_add = (1 - stiffness)*( (c1_e*(Ic-3)) + (c2_e*(Ic-3))**2)
+
+        else:
+            ratio_proj = df.Function(V_density)
+            fFile = df.HDF5File(df.MPI.comm_world,"ratio_proj.h5","r")
+            fFile.read(ratio_proj,"/f")
+            fFile.close()
+
+
+            c2_e = df.Function(V_density)
+            fFile = df.HDF5File(df.MPI.comm_world,"c2_e_proj.h5","r")
+            fFile.read(c2_e,"/f")
+            fFile.close()
+            c1_e = k*(5.e-2)/(1 + 8. * (1. - (5.e-2)))/6
+
+            eps = df.sym(df.grad(u))
+            eps_dev = eps - 1/3 * df.tr(eps) * df.Identity(2)
+            eps_eq = df.sqrt(2.0 / 3.0 * df.inner(eps_dev, eps_dev))
+            # eps_eq_proj = df.project(eps_eq, V_density)   
+            ratio = eps_eq / eps_star
+            ratio_proj  = df.project(ratio, V_density) 
+
+            
+
+            c2_e = df.conditional(df.le(ratio,eps_star), c2_e * df.sqrt(ratio), c2_e *(ratio**3))
+            phi_add = (1 - stiffness)*( (c1_e*(Ic-3)) + (c2_e*(Ic-3))**2)
+            E = k * stiffness
+
+            c2_e_proj =df.project(c2_e, V_density) 
+            print('c2_e projected -------------')
+
+            fFile = df.HDF5File(df.MPI.comm_world,"c2_e_proj.h5","w")
+            fFile.write(c2_e_proj,"/f")
+            fFile.close()
+
+            fFile = df.HDF5File(df.MPI.comm_world,"ratio_proj.h5","w")
+            fFile.write(ratio_proj,"/f")
+            fFile.close()
 
     elif additive == 'vol':
         print("additive == vol")
@@ -122,10 +158,13 @@ if __name__ == '__main__':
         displacements_function, 
         v, 
         density_function,
+        density_function_space, 
         tractionBC,
         df.Constant((0.0, -0.9)),
         
     )
+
+
     bcs = df.DirichletBC(displacements_function_space, df.Constant((0.0, 0.0)), '(abs(x[0]-0.) < DOLFIN_EPS)')
     Dres = df.derivative(residual_form, displacements_function)
 
@@ -139,12 +178,7 @@ if __name__ == '__main__':
     # solver.parameters["snes_solver"]["linear_solver"]["maximum_iterations"]=1000
     solver.parameters["snes_solver"]["error_on_nonconvergence"] = False
     solver.solve()
-    # def dev(s):
-    #     return s-tr(s) * Identity(3)/3.0
-    # def von_mises(s):
-    #     return sqrt(3.0/2.0 * inner(dev(s), dev(s)))
-    # C = F.T*F 
-    # E=1/2(C−I)
+
     eps = df.sym(df.grad(displacements_function))
     # TensorFunctionSpace(mesh,"DG",0) 
     eps_dev = eps - 1/3 * df.tr(eps) * df.Identity(2)
