@@ -17,7 +17,7 @@ np.random.seed(0)
 # import L-shaped bracket from gmsh vtk file and use meshio to convert to xml file
 # (TODO: XDMF not working)
 import meshio
-filename = '../tests/test_gmsh_vtk'
+filename = '/home/jyan_linux/Downloads/Software/atomics_jy/atomics/tests/test_gmsh_fine'
 mesh = meshio.read(
     filename,  
     file_format="vtk"  
@@ -150,4 +150,4 @@ prob.run_driver()
 
 #save the solution vector
 df.File('solutions/displacement.pvd') << displacements_function
-df.File('solutions/stiffness_l_bracket.pvd') << density_function
+df.File('solutions/stiffness_l_bracket_fine.pvd') << density_function

@@ -131,5 +131,5 @@ prob.run_driver()
 
 
 #save the solution vector
-df.File('solutions/displacement.pvd') << displacements_function
-df.File('solutions/stiffness_gen.pvd') << density_function
+df.File('solutions/displacement_unstructure_rec.pvd') << displacements_function
+df.File('solutions/stiffness_unstructure_rec.pvd') << density_function

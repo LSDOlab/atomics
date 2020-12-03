@@ -14,7 +14,7 @@ import openmdao.api as om
 from atomics.pde_problem import PDEProblem
 
 # from atomics.pdes.elastic_cantilever_beam import get_residual_form
-# from atomics.pdes.hyperelastic_neo_hookean_addtive_test import get_residual_form
+from atomics.pdes.hyperelastic_neo_hookean_addtive_test import get_residual_form
 
 
 
@@ -41,7 +41,7 @@ class StatesComp(om.ImplicitComponent):
             values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu'],
         )
         self.options.declare(
-            'problem_type', default='nonlinear_problem', 
+            'problem_type', default='nonlinear_problem_load_stepping', 
             values=['linear_problem', 'nonlinear_problem', 'nonlinear_problem_load_stepping'],
         )
         self.options.declare(
@@ -54,7 +54,7 @@ class StatesComp(om.ImplicitComponent):
         state_name = self.options['state_name']
         state_function = pde_problem.states_dict[state_name]['function']
 
-        self.itr = 0
+        self.itr = 1
         self.argument_functions_dict = argument_functions_dict = dict()
         for argument_name in pde_problem.states_dict[state_name]['arguments']:
             argument_functions_dict[argument_name] = pde_problem.inputs_dict[argument_name]['function']
@@ -119,36 +119,42 @@ class StatesComp(om.ImplicitComponent):
         self.itr = self.itr + 1
 
         state_function = pde_problem.states_dict[state_name]['function']
-        residual_form = pde_problem.states_dict[state_name]['residual_form']
-     
+        residual_form = get_residual_form(
+            state_function, 
+            df.TestFunction(state_function.function_space()), 
+            density_func,
+            density_func.function_space(),
+            tractionBC,
+            # df.Constant((0.0, -9.e-1))
+            df.Constant((0.0, -9.e-1)),
+            int(self.itr)
+            )      
 
         self._set_values(inputs, outputs)
 
         self.derivative_form = df.derivative(residual_form, state_function)
-        # df.set_log_level(df.LogLevel.ERROR)
+        df.set_log_level(df.LogLevel.ERROR)
         df.set_log_active(True)
         # df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form)
         if problem_type == 'linear_problem':
             df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form,
-                solver_parameters={"newton_solver":{"maximum_iterations":8, "error_on_nonconvergence":False}})
+                solver_parameters={"newton_solver":{"maximum_iterations":60, "error_on_nonconvergence":False}})
         elif problem_type == 'nonlinear_problem':
             problem = df.NonlinearVariationalProblem(residual_form, state_function, pde_problem.bcs_list, self.derivative_form)
             solver  = df.NonlinearVariationalSolver(problem)
             solver.parameters['nonlinear_solver']='snes' 
-            solver.parameters["snes_solver"]["relative_tolerance"]=5e-16
-            solver.parameters["snes_solver"]["absolute_tolerance"]=5e-16
             solver.parameters["snes_solver"]["line_search"] = 'bt' 
             solver.parameters["snes_solver"]["linear_solver"]='mumps' # "cg" "gmres"
             solver.parameters["snes_solver"]["maximum_iterations"]=500
-            solver.parameters["snes_solver"]["relative_tolerance"]=5e-16
-            solver.parameters["snes_solver"]["absolute_tolerance"]=5e-16
+            solver.parameters["snes_solver"]["relative_tolerance"]=5e-13
+            solver.parameters["snes_solver"]["absolute_tolerance"]=5e-13
 
             # solver.parameters["snes_solver"]["linear_solver"]["maximum_iterations"]=1000
             solver.parameters["snes_solver"]["error_on_nonconvergence"] = False
             solver.solve()
 
         elif problem_type == 'nonlinear_problem_load_stepping':
-            num_steps = 4
+            num_steps = 2
             state_function.vector().set_local(np.zeros((state_function.function_space().dim())))
             for i in range(num_steps):
                 v = df.TestFunction(state_function.function_space())
@@ -157,22 +163,22 @@ class StatesComp(om.ImplicitComponent):
                         state_function, 
                         v, 
                         density_func,
-                        density_func.function_space,
+                        density_func.function_space(),
                         tractionBC,
                         # df.Constant((0.0, -9.e-1))
                         df.Constant((0.0, -9.e-1/num_steps*(i+1))),
-                        'False'
+                        int(self.itr)
                         ) 
                 else:
                     residual_form = get_residual_form(
                         state_function, 
                         v, 
                         density_func,
-                        density_func.function_space,
+                        density_func.function_space(),
                         tractionBC,
                         # df.Constant((0.0, -9.e-1))
                         df.Constant((0.0, -9.e-1/num_steps*(i+1))),
-                        'vol'
+                        int(self.itr)
                         ) 
                 problem = df.NonlinearVariationalProblem(residual_form, state_function, pde_problem.bcs_list, self.derivative_form)
                 solver  = df.NonlinearVariationalSolver(problem)
@@ -193,7 +199,7 @@ class StatesComp(om.ImplicitComponent):
                 df.File('solutions_iterations_3d/{}_{}.pvd'.format(argument_name, self.itr)) << argument_function
 
         self.L = -residual_form
-
+        self.itr = self.itr+1
         outputs[state_name] = state_function.vector().get_local()
 
     def linearize(self, inputs, outputs, partials):
@@ -214,8 +220,26 @@ class StatesComp(om.ImplicitComponent):
         state_name = self.options['state_name']
 
         state_function = pde_problem.states_dict[state_name]['function']
+        for argument_name, argument_function in iteritems(self.argument_functions_dict):
+            density_func = argument_function
+        mesh = state_function.function_space().mesh()
+        sub_domains = df.MeshFunction('size_t', mesh, mesh.topology().dim() - 1)
+        upper_edge = TractionBoundary()
+        upper_edge.mark(sub_domains, 6)
+        dss = df.Measure('ds')(subdomain_data=sub_domains)
+        tractionBC = dss(6)
 
-        residual_form = pde_problem.states_dict[state_name]['residual_form']
+        residual_form = get_residual_form(
+            state_function, 
+            df.TestFunction(state_function.function_space()), 
+            density_func,
+            density_func.function_space(),
+            tractionBC,
+            # df.Constant((0.0, -9.e-1))
+            df.Constant((0.0, -9.e-1)),
+            int(self.itr)
+            )
+            
         A, _ = df.assemble_system(self.derivative_form, - residual_form, pde_problem.bcs_list)
 
         if linear_solver=='fenics_direct':
@@ -302,10 +326,10 @@ class StatesComp(om.ImplicitComponent):
                 d_residuals[state_name] = dR.getValues(range(size))
                 
 
-NUM_ELEMENTS_X = 240 #480
-NUM_ELEMENTS_Y = 80 # 160
-LENGTH_X = 0.48
-LENGTH_Y = 0.16
+NUM_ELEMENTS_X = 120 #480
+NUM_ELEMENTS_Y = 30 # 160
+LENGTH_X = 0.12
+LENGTH_Y = 0.03
 class TractionBoundary(df.SubDomain):
     def inside(self, x, on_boundary):
         return ((abs(x[1] - LENGTH_Y/2) < LENGTH_Y/NUM_ELEMENTS_Y + df.DOLFIN_EPS) and (abs(x[0] - LENGTH_X ) < df.DOLFIN_EPS*1.5e15))

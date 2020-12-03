@@ -2,6 +2,7 @@ import openmdao.api as om
 
 from atomics.pde_problem import PDEProblem
 from atomics.states_comp import StatesComp
+# from atomics.states_comp_nonlinear import StatesComp
 from atomics.scalar_output_comp import ScalarOutputsComp
 
 

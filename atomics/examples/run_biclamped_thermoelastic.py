@@ -19,7 +19,7 @@ NUM_ELEMENTS_Y = 40
 LENGTH_X = 2.
 LENGTH_Y = 1.
 K = 199.5e9
-ALPHA = 1.54e-5
+ALPHA = 15.4e-6
 
 mesh = df.RectangleMesh.create(
     [df.Point(0.0, 0.0), df.Point(LENGTH_X, LENGTH_Y)],
@@ -137,4 +137,4 @@ prob.run_driver()
 
 #save the solution vector
 df.File('solutions/displacement.pvd') << displacements_function
-df.File('solutions/stiffness_Cartesian.pvd') << density_function
+df.File('solutions/stiffness_th_55.pvd') << density_function

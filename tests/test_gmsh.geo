@@ -31,3 +31,13 @@ Line(8) = {6, 1};
 Curve Loop(1) = {7, 4, 8, 1, 6, 2};
 //+
 Plane Surface(1) = {1};
+//+
+Field[1] = AutomaticMeshSizeField;
+//+
+Characteristic Length {6, 5, 4, 3, 2, 1} = 0.1;
+//+
+Field[1].NRefine = 10;
+//+
+Field[1].NRefine = 5;
+//+
+Delete Field [1];

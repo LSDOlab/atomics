@@ -1,7 +1,7 @@
 import dolfin as df
 
 
-def get_residual_form(u, v, rho_e, tractionBC, T, additive ='False',k = 20.):
+def get_residual_form(u, v, rho_e, tractionBC, T, additive ='vol',k = 20.):
     stiffness = rho_e/(1 + 8. * (1. - rho_e))
     # print('the value of stiffness is:', rho_e.vector().get_local())
     # Kinematics
