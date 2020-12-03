@@ -33,6 +33,7 @@ class ScalarOutputsComp(om.ExplicitComponent):
             elif argument_name in pde_problem.states_dict:
                 argument_functions_dict[argument_name] = pde_problem.states_dict[argument_name]['function']
             else:
+                print(argument_name)
                 raise Exception()
 
         for argument_name, argument_function in iteritems(self.argument_functions_dict):

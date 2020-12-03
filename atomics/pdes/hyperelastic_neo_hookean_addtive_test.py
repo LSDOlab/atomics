@@ -1,7 +1,8 @@
 import dolfin as df
+import numpy as np
 
-
-def get_residual_form(u, v, rho_e,V_density, tractionBC, T, additive ='vol',k = 5.,iteration_number=2):
+def get_residual_form(u, v, rho_e,V_density, tractionBC, T, iteration_number,additive ='strain',k = 8.):
+    df.dx = df.dx(metadata={"quadrature_degree":4}) 
     stiffness = rho_e/(1 + 8. * (1. - rho_e))
     # print('the value of stiffness is:', rho_e.vector().get_local())
     # Kinematics
@@ -13,7 +14,7 @@ def get_residual_form(u, v, rho_e,V_density, tractionBC, T, additive ='vol',k = 
     Ic = df.tr(C)
     J  = df.det(F)
     stiffen_pow=1.
-    threshold_vol= 0.92
+    threshold_vol= 1.
 
     eps_star= 0.2
     # print("eps_star--------")
@@ -59,21 +60,23 @@ def get_residual_form(u, v, rho_e,V_density, tractionBC, T, additive ='vol',k = 
             fFile.close()
             c1_e = k*(5.e-2)/(1 + 8. * (1. - (5.e-2)))/6
 
+
+
+            
+
+            c2_e = df.conditional(df.le(ratio_proj,eps_star), c2_e * df.sqrt(ratio_proj), c2_e *(ratio_proj**3))
+            phi_add = (1 - stiffness)*( (c1_e*(Ic-3)) + (c2_e*(Ic-3))**2)
+            E = k * stiffness
+
+            c2_e_proj =df.project(c2_e, V_density) 
+            print('c2_e projected -------------')
+            
             eps = df.sym(df.grad(u))
             eps_dev = eps - 1/3 * df.tr(eps) * df.Identity(2)
             eps_eq = df.sqrt(2.0 / 3.0 * df.inner(eps_dev, eps_dev))
             # eps_eq_proj = df.project(eps_eq, V_density)   
             ratio = eps_eq / eps_star
             ratio_proj  = df.project(ratio, V_density) 
-
-            
-
-            c2_e = df.conditional(df.le(ratio,eps_star), c2_e * df.sqrt(ratio), c2_e *(ratio**3))
-            phi_add = (1 - stiffness)*( (c1_e*(Ic-3)) + (c2_e*(Ic-3))**2)
-            E = k * stiffness
-
-            c2_e_proj =df.project(c2_e, V_density) 
-            print('c2_e projected -------------')
 
             fFile = df.HDF5File(df.MPI.comm_world,"c2_e_proj.h5","w")
             fFile.write(c2_e_proj,"/f")
@@ -87,7 +90,7 @@ def get_residual_form(u, v, rho_e,V_density, tractionBC, T, additive ='vol',k = 
         print("additive == vol")
         stiffness = stiffness/(df.det(F)**stiffen_pow)
 
-        # stiffness = df.conditional(df.le(df.det(F),threshold_vol), stiffness/(df.det(F)**stiffen_pow), stiffness)
+        # stiffness = df.conditional(df.le(df.det(F),threshold_vol), (stiffness/(df.det(F)/threshold_vol))**stiffen_pow, stiffness)
         E = k * stiffness    
 
     elif additive == 'False':
@@ -158,9 +161,10 @@ if __name__ == '__main__':
         displacements_function, 
         v, 
         density_function,
-        density_function_space, 
+        density_function.function_space(), 
         tractionBC,
         df.Constant((0.0, -0.9)),
+        1
         
     )
 
