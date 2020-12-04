@@ -135,13 +135,13 @@ class StatesComp(om.ImplicitComponent):
             problem = df.NonlinearVariationalProblem(residual_form, state_function, pde_problem.bcs_list, self.derivative_form)
             solver  = df.NonlinearVariationalSolver(problem)
             solver.parameters['nonlinear_solver']='snes' 
-            solver.parameters["snes_solver"]["relative_tolerance"]=5e-16
-            solver.parameters["snes_solver"]["absolute_tolerance"]=5e-16
+            solver.parameters["snes_solver"]["relative_tolerance"]=5e-100
+            solver.parameters["snes_solver"]["absolute_tolerance"]=5e-50
             solver.parameters["snes_solver"]["line_search"] = 'bt' 
             solver.parameters["snes_solver"]["linear_solver"]='mumps' # "cg" "gmres"
             solver.parameters["snes_solver"]["maximum_iterations"]=500
-            solver.parameters["snes_solver"]["relative_tolerance"]=5e-16
-            solver.parameters["snes_solver"]["absolute_tolerance"]=5e-16
+            solver.parameters["snes_solver"]["relative_tolerance"]=5e-100
+            solver.parameters["snes_solver"]["absolute_tolerance"]=5e-50
 
             # solver.parameters["snes_solver"]["linear_solver"]["maximum_iterations"]=1000
             solver.parameters["snes_solver"]["error_on_nonconvergence"] = False
