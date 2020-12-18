@@ -2,12 +2,17 @@ import dolfin as df
 import meshio
 import numpy as np
 import pygmsh
+import scipy.sparse 
+from scipy import spatial
 
 import openmdao.api as om
 
 from atomics.api import PDEProblem, AtomicsGroup
 from atomics.pdes.thermo_mechanical_mix_2d_stress import get_residual_form
 from atomics.general_filter_comp import GeneralFilterComp
+
+from atomics.extract_comp import ExtractComp
+from atomics.ksconstraints_comp import KSConstraintsComp
 
 '''
 This code tries to replicate the Kamapadi 2020 results
@@ -48,15 +53,18 @@ AREA_SIDE = WIDTH * HIGHT
 POWER = 90.
 T_0 = 20.
 q = df.Constant((POWER/AREA_CYLINDER)) # bdry heat flux
-
+q_half = df.Constant((POWER/AREA_CYLINDER))
+q_quart = df.Constant((POWER/AREA_CYLINDER))
 
 # constants for thermoelastic model
 K = 69e9
+# K = 69e6
 ALPHA = 13e-6
-f_l = df.Constant(( 1.e6/AREA_SIDE/2, 0.)) 
-f_r = df.Constant((-1.e6/AREA_SIDE/2, 0.)) 
-f_b = df.Constant(( 0.,  1.e6/AREA_SIDE/2)) 
-f_t = df.Constant(( 0., -1.e6/AREA_SIDE/2))
+f_l = df.Constant(( 1.e6/AREA_SIDE, 0.)) 
+f_r = df.Constant((-1.e6/AREA_SIDE, 0.)) 
+f_b = df.Constant(( 0.,  1.e6/AREA_SIDE)) 
+f_t = df.Constant(( 0., -1.e6/AREA_SIDE))
+
 
 
 # f_l = df.Constant(( 0., 0.)) 
@@ -69,8 +77,8 @@ f_t = df.Constant(( 0., -1.e6/AREA_SIDE/2))
 
 #-----------------Generate--mesh----------------
 with pygmsh.occ.Geometry() as geom:
-    geom.characteristic_length_min = 0.004
-    geom.characteristic_length_max = 0.004
+    geom.characteristic_length_min = 0.001
+    geom.characteristic_length_max = 0.001
     disk_dic = {}
     disks = []
 
@@ -109,21 +117,43 @@ os.system('dolfin-convert test_2d.msh mesh_2d.xml')
 mesh = df.Mesh("mesh_2d.xml")
 
 import matplotlib.pyplot as plt
+plt.figure(1)
+
 df.plot(mesh)
-plt.show()
+# plt.show()
 
 '''
 3. Define traction bc subdomains
 '''
 
 #-----------define-heating-boundary-------
-class HeatBoundary(df.SubDomain):
+class HeatBoundaryAll(df.SubDomain):
     def inside(self, x, on_boundary):
         cond_list = []
         for i in range(num_cells):
             cond = (abs(( x[0]-(xv.flatten()[i]) )**2 + ( x[1]-(yv.flatten()[i]) )**2) < (radius**2) + df.DOLFIN_EPS)
             cond_list = cond_list or cond
         return cond_list
+
+class HeatBoundary(df.SubDomain):
+    def inside(self, x, on_boundary):
+        cond_list = []
+        for i in [24, 23, 19, 18]:
+            cond = (abs(( x[0]-(xv.flatten()[i]) )**2 + ( x[1]-(yv.flatten()[i]) )**2) < (radius**2) + df.DOLFIN_EPS)
+            cond_list = cond_list or cond
+        return cond_list
+
+class HalfHeatBoundary(df.SubDomain):
+    def inside(self, x, on_boundary):
+        cond_list = []
+        for i in [22, 17, 14, 13]:
+            cond = (abs(( x[0]-(xv.flatten()[i]) )**2 + ( x[1]-(yv.flatten()[i]) )**2) < (radius**2) + df.DOLFIN_EPS)
+            cond_list = cond_list or cond
+        return cond_list
+
+class QuartHeatBoundary(df.SubDomain):
+    def inside(self, x, on_boundary):
+        return (abs(( x[0] - 0.)**2 + ( x[1] - 0.)**2) < (radius**2) + df.DOLFIN_EPS)
 
 #-----------define-surrounding-heat-sink-boundary-------
 class SurroundingBoundary(df.SubDomain):
@@ -136,8 +166,15 @@ class SurroundingBoundary(df.SubDomain):
 
 # Mark the HeatBoundary ass dss(6)
 sub_domains = df.MeshFunction('size_t', mesh, mesh.topology().dim() - 1)
+heat_edge_all = HeatBoundaryAll()
 heat_edge = HeatBoundary()
-heat_edge.mark(sub_domains, 6)
+heat_edge_half = HalfHeatBoundary()
+heat_edge_quarter = QuartHeatBoundary()
+
+heat_edge_all.mark(sub_domains, 4)
+heat_edge.mark(sub_domains, 5)
+heat_edge_half.mark(sub_domains, 6)
+heat_edge_quarter.mark(sub_domains, 7)
 
 class MidHBoundary(df.SubDomain):
     def inside(self, x, on_boundary):
@@ -158,9 +195,7 @@ class TopBoundary(df.SubDomain):
     def inside(self, x, on_boundary):
         return (abs(x[1] + START_Y)< df.DOLFIN_EPS)
 
-class CenterBoundary(df.SubDomain):
-    def inside(self, x, on_boundary):
-        return (abs(( x[0] - 0.)**2 + ( x[1] - 0.)**2) < (radius**2) + df.DOLFIN_EPS)
+
 
 # Mark the traction boundaries 8 10 12 14
 # sub_domains = df.MeshFunction('size_t', mesh, mesh.topology().dim() - 1)
@@ -175,7 +210,7 @@ top_edge.mark(sub_domains, 14)
 
 dss = df.Measure('ds')(subdomain_data=sub_domains)
 
-df.File('solutions_2d/domains.pvd') << sub_domains
+df.File('solutions_2d/domains_quart.pvd') << sub_domains
 
 '''
 4. Define PDE problem
@@ -202,7 +237,7 @@ displacement_fe = df.VectorElement("CG",cell,1)
 temperature_fe = df.FiniteElement("CG",cell,1)
 
 mixed_fs = df.FunctionSpace(mesh, df.MixedElement([displacement_fe,temperature_fe]))
-
+mixed_fs.sub(1).dofmap().dofs()
 mixed_function = df.Function(mixed_fs)
 displacements_function,temperature_function = df.split(mixed_function)
 
@@ -219,7 +254,8 @@ residual_form = get_residual_form(
     ALPHA
 )
 
-residual_form -=  (df.dot(f_r, v) * dss(10) + df.dot(f_t, v) * dss(14)  + q*T_hat*dss(6) )
+residual_form -=  (df.dot(f_r, v) * dss(10) + df.dot(f_t, v) * dss(14)  + \
+                    q*T_hat*dss(5) + q_half*T_hat*dss(6) + q_quart*T_hat*dss(7))
 print("get residual_form-------")
 pde_problem.add_state('mixed_states', mixed_function, residual_form, 'density')
 
@@ -255,6 +291,56 @@ pde_problem.add_bc(bc_displacements)
 pde_problem.add_bc(bc_displacements_1)
 pde_problem.add_bc(bc_temperature)
 
+'''
+'''
+coords = density_function_space.tabulate_dof_coordinates()
+tree = spatial.cKDTree(coords)
+idx_list = []
+plt.figure(2)
+for i in [12, 13, 14 , 17, 18, 19, 22, 23, 24]:
+    idx = tree.query_ball_point(list(np.array([xv.flatten()[i], yv.flatten()[i]])), radius+2e-3)
+    idx_list.extend(idx)
+nearest_points = coords[idx_list]
+plt.gca().set_aspect('equal', adjustable='box')
+plt.plot(nearest_points[:,0],nearest_points[:,1],'bo')
+
+
+# plt.figure(3)
+x = []
+y = []
+idx_rec = []
+x_line = y_line = np.linspace(0, 0.1, num=100)
+x_0 = y_0 = np.zeros(100)
+x_1 = y_1 = np.ones(100) * 0.1
+# x.extend(x_line)
+x.extend(x_1)
+x.extend(x_line)
+# x.extend(x_0)
+
+# y.extend(y_0)
+y.extend(y_line)
+y.extend(y_1)
+# y.extend(y_line)
+plt.gca().set_aspect('equal', adjustable='box')
+
+for i in range(len(x)):
+    idx = tree.query_ball_point(list(np.array([x[i], y[i]])), 2e-3)
+    idx_rec.extend(idx)
+nearest_points_rec = coords[idx_rec]
+plt.plot(nearest_points_rec[:,0],nearest_points_rec[:,1],'go')
+
+# plt.plot([x_line, x_1, x_line, x_0],[y_0, y_line, y_1, y_line],'bo')
+plt.show()
+
+idx_list.extend(idx_rec)
+lower_bd = np.ones(coords[:,0].size)*1e-5
+idx_list_norepeat = []
+for i in idx_list:
+    if i not in idx_list_norepeat:
+        idx_list_norepeat.append(i)
+idx_array = np.asarray(idx_list_norepeat)
+lower_bd[idx_array] = 1.
+
 
 # Define the OpenMDAO problem and model
 
@@ -271,42 +357,101 @@ comp.add_output(
 )
 prob.model.add_subsystem('indep_var_comp', comp, promotes=['*'])
 
+print('indep_var_comp')
 
 comp = GeneralFilterComp(density_function_space=density_function_space)
 prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
+print('general_filter_comp')
 
 
 group = AtomicsGroup(pde_problem=pde_problem)
 prob.model.add_subsystem('atomics_group', group, promotes=['*'])
+print('atomics_group')
 
-prob.model.add_design_var('density_unfiltered',upper=1, lower=1e-4)
+comp = ExtractComp(
+    in_name='mixed_states',
+    out_name='temperature_field',
+    in_shape=pde_problem.states_dict['mixed_states']['function'].function_space().dim(),
+    partial_dof=np.array(mixed_fs.sub(1).dofmap().dofs()),
+)
+prob.model.add_subsystem('ExtractComp', comp, promotes=['*'])
+print('ExtractComp')
+
+comp = KSConstraintsComp(
+    in_name='temperature_field',
+    out_name='t_max',
+    shape=(np.array(mixed_fs.sub(1).dofmap().dofs()).size,),
+    axis=0,
+    # rho=50.,
+    rho=10.,
+)
+prob.model.add_subsystem('KSConstraintsComp', comp, promotes=['*'])
+print('KSConstraintsComp')
+
+# comp = TemperatureComp(density_function_space=density_function_space)
+# prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
+
+prob.model.add_design_var('density_unfiltered',upper=1., lower=1e-4)
+# prob.model.add_design_var('density',upper=1., lower=lower_bd)
+
 prob.model.add_objective('compliance')
-prob.model.add_constraint('avg_density',upper=0.60)
+prob.model.add_constraint('avg_density',upper=0.70, linear=True)
+# prob.model.add_constraint('avg_density',upper=0.70, linear=False)
+prob.model.add_constraint('t_max',upper=55)
+prob.model.add_constraint('density',upper=1.,lower=1., indices=idx_array,linear=True)
 
 prob.driver = driver = om.pyOptSparseDriver()
 driver.options['optimizer'] = 'SNOPT'
 driver.opt_settings['Verify level'] = 0
-driver.opt_settings['Major iterations limit'] = 500
-driver.opt_settings['Minor iterations limit'] = 100000
+driver.opt_settings['Major iterations limit'] = 10000
+driver.opt_settings['Minor iterations limit'] = 1000000
 driver.opt_settings['Iterations limit'] = 100000000
 driver.opt_settings['Major step limit'] = 2.0
 
-driver.opt_settings['Major feasibility tolerance'] = 1.0e-6
-driver.opt_settings['Major optimality tolerance'] =2.e-12
+driver.opt_settings['Major feasibility tolerance'] = 1.0e-5
+driver.opt_settings['Major optimality tolerance'] =2.e-10
 
 prob.setup()
+
 prob.run_model()
+print('run_model')
 
 # prob.check_partials(compact_print=True)
 # print(prob['compliance']); exit()
 
-# prob.run_driver()
+prob.run_driver()
 
 displacements_function_val, temperature_function_val= mixed_function.split()
 
 #save the solution vector
-df.File('solutions/displacement_org.pvd') << displacements_function_val
-df.File('solutions/temperature_org.pvd') << temperature_function_val
+df.File('solutions/displacements_function_val_t55_lrf.pvd') << displacements_function_val
+df.File('solutions/temperature_function_val_t55_lrf.pvd') << temperature_function_val
 
-# df.File('solutions/stiffness_th_55.pvd') << density_function
+df.File('solutions/density_function_t55_lrf.pvd') << density_function
 
+# df.File('solutions/displacement__quarter_9_75.pvd') << displacements_function_val
+# df.File('solutions/temperature__quarter_9_75.pvd') << temperature_function_val
+stiffness  = df.project(density_function/(1 + 8. * (1. - density_function)), density_function_space) 
+df.File('solutions/stiffness_t55_lrf.pvd') << stiffness
+
+# df.plot(density_function)
+
+# import matplotlib.pyplot as plt
+# plt.figure(1)
+# coords = density_function_space.tabulate_dof_coordinates()
+# plt.gca().set_aspect('equal', adjustable='box')
+# plt.plot(coords[:,0],coords[:,1],'ro')
+# plt.show()
+
+
+# plt.figure(2)
+# tree = spatial.cKDTree(coords)
+# idx_list = []
+# for i in [12, 13, 14 , 17, 18, 19, 22, 23, 24]:
+#     idx = tree.query_ball_point(list(np.array([xv.flatten()[i], yv.flatten()[i]])), radius+1e-3)
+#     idx_list.extend(idx)
+# nearest_points = coords[idx_list]
+# plt.gca().set_aspect('equal', adjustable='box')
+# plt.plot(nearest_points[:,0],nearest_points[:,1],'bo')
+# plt.show()
+# idx_array = np.asarray(idx_list) # (266,)
