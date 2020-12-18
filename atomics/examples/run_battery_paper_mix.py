@@ -51,7 +51,7 @@ q = df.Constant((POWER/AREA_CYLINDER)) # bdry heat flux
 
 
 # constants for thermoelastic model
-K = 69e9
+K = 69e7
 ALPHA = 13e-6
 f_l = df.Constant(( 1.e6/AREA_SIDE, 0.)) 
 f_r = df.Constant((-1.e6/AREA_SIDE, 0.)) 
@@ -64,8 +64,8 @@ f_t = df.Constant(( 0., -1.e6/AREA_SIDE))
 
 #-----------------Generate--mesh----------------
 with pygmsh.occ.Geometry() as geom:
-    geom.characteristic_length_min = 0.004
-    geom.characteristic_length_max = 0.004
+    geom.characteristic_length_min = 0.002
+    geom.characteristic_length_max = 0.002
     disk_dic = {}
     disks = []
 
@@ -270,12 +270,12 @@ prob.model.add_subsystem('atomics_group', group, promotes=['*'])
 
 prob.model.add_design_var('density_unfiltered',upper=1, lower=1e-4)
 prob.model.add_objective('compliance')
-prob.model.add_constraint('avg_density',upper=0.60)
+prob.model.add_constraint('avg_density',upper=0.45)
 
 prob.driver = driver = om.pyOptSparseDriver()
 driver.options['optimizer'] = 'SNOPT'
 driver.opt_settings['Verify level'] = 0
-driver.opt_settings['Major iterations limit'] = 500
+driver.opt_settings['Major iterations limit'] = 5000
 driver.opt_settings['Minor iterations limit'] = 100000
 driver.opt_settings['Iterations limit'] = 100000000
 driver.opt_settings['Major step limit'] = 2.0
@@ -294,8 +294,8 @@ prob.run_driver()
 displacements_function_val, temperature_function_val= mixed_function.split()
 
 #save the solution vector
-df.File('solutions/displacement_org.pvd') << displacements_function_val
-df.File('solutions/temperature_org.pvd') << temperature_function_val
+df.File('solutions/displacement_whole.pvd') << displacements_function_val
+df.File('solutions/temperature_whole.pvd') << temperature_function_val
 
-# df.File('solutions/stiffness_th_55.pvd') << density_function
+df.File('solutions/stiffness_whole.pvd') << density_function
 

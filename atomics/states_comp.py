@@ -7,6 +7,13 @@ import numpy as np
 from scipy.sparse import csr_matrix
 from scipy.sparse import coo_matrix
 from scipy.sparse.linalg import splu
+
+
+import scipy as sp
+import scipy.sparse as sparse
+import scipy.sparse.linalg as splinalg
+import inspect
+
 from petsc4py import PETSc
 
 import openmdao.api as om
@@ -37,8 +44,8 @@ class StatesComp(om.ImplicitComponent):
         self.options.declare('pde_problem', types=PDEProblem)
         self.options.declare('state_name', types=str)
         self.options.declare(
-            'linear_solver', default='scipy_splu', 
-            values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu'],
+            'linear_solver', default='petsc_cg_ilu', 
+            values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu', 'scipy_cg','petsc_cg_ilu'],
         )
         self.options.declare(
             'problem_type', default='nonlinear_problem', 
@@ -217,6 +224,10 @@ class StatesComp(om.ImplicitComponent):
 
         residual_form = pde_problem.states_dict[state_name]['residual_form']
         A, _ = df.assemble_system(self.derivative_form, - residual_form, pde_problem.bcs_list)
+        
+        def report(xk):
+            frame = inspect.currentframe().f_back
+            # print(frame.f_locals['resid']) 
 
         if linear_solver=='fenics_direct':
 
@@ -244,7 +255,21 @@ class StatesComp(om.ImplicitComponent):
             d_residuals[state_name] = lu.solve(d_outputs[state_name],trans='T')
 
 
-        elif linear_solver=='fenics_Krylov':
+        elif linear_solver=='scipy_cg':
+            for bc in pde_problem.bcs_list:
+                bc.apply(A)
+            Am = df.as_backend_type(A).mat()
+            ATm = Am.transpose()
+            ATm_csr = csr_matrix(ATm.getValuesCSR()[::-1], shape=Am.size)
+            # lu = splu(ATm_csr.tocsc())
+            b = d_outputs[state_name]
+            x, info = splinalg.cg(ATm_csr, b, tol=1e-8, callback = report)
+            print('the residual is:')
+            print(info)
+
+            d_residuals[state_name] = x
+
+        elif linear_solver=='fenics_krylov':
 
             rhs_ = df.Function(state_function.function_space())
             dR = df.Function(state_function.function_space())
@@ -262,6 +287,7 @@ class StatesComp(om.ImplicitComponent):
             prm["maximum_iterations"]=1000000
             prm["divergence_limit"] = 1e2
             solver.solve(AT,dR.vector(),rhs_.vector())
+            print('solve'+iter)
 
             d_residuals[state_name] =  dR.vector().get_local()
 
@@ -300,7 +326,43 @@ class StatesComp(om.ImplicitComponent):
             else:
                 ksp.solveTranspose(du,dR)
                 d_residuals[state_name] = dR.getValues(range(size))
-                
+
+        elif linear_solver=='petsc_cg_ilu':
+            ksp = PETSc.KSP().create() 
+            ksp.setType(PETSc.KSP.Type.CG)
+            ksp.setTolerances(rtol=5e-12)
+
+            for bc in pde_problem.bcs_list:
+                bc.apply(A)
+            Am = df.as_backend_type(A).mat()
+
+            ksp.setOperators(Am)
+
+            ksp.setFromOptions()
+            pc = ksp.getPC()
+            pc.setType("lu")
+
+            size = state_function.function_space().dim()
+
+            dR = PETSc.Vec().create()
+            dR.setSizes(size)
+            dR.setType('seq')
+            dR.setValues(range(size), d_residuals[state_name])
+            dR.setUp()
+
+            du = PETSc.Vec().create()
+            du.setSizes(size)
+            du.setType('seq')
+            du.setValues(range(size), d_outputs[state_name])
+            du.setUp()
+
+            if mode == 'fwd':
+                ksp.solve(dR,du)
+                d_outputs[state_name] = du.getValues(range(size))
+            else:
+                ksp.solveTranspose(du,dR)
+                d_residuals[state_name] = dR.getValues(range(size))
+           
 
 NUM_ELEMENTS_X = 240 #480
 NUM_ELEMENTS_Y = 80 # 160
