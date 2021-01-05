@@ -52,7 +52,7 @@ class StatesComp(om.ImplicitComponent):
             values=['linear_problem', 'nonlinear_problem', 'nonlinear_problem_load_stepping'],
         )
         self.options.declare(
-            'visualization', default='False', 
+            'visualization', default='True', 
             values=['True', 'False'],
         )
 
@@ -137,7 +137,7 @@ class StatesComp(om.ImplicitComponent):
         # df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form)
         if problem_type == 'linear_problem':
             df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form,
-                solver_parameters={"newton_solver":{"maximum_iterations":8, "error_on_nonconvergence":False}})
+                solver_parameters={"newton_solver":{"maximum_iterations":1, "error_on_nonconvergence":False}})
         elif problem_type == 'nonlinear_problem':
             problem = df.NonlinearVariationalProblem(residual_form, state_function, pde_problem.bcs_list, self.derivative_form)
             solver  = df.NonlinearVariationalSolver(problem)
@@ -195,7 +195,7 @@ class StatesComp(om.ImplicitComponent):
                 solver.solve()
 
         # option to store the visualization results
-        if visualization == 'True':
+        if (visualization == 'True') and (self.itr % 100 == 0):
             for argument_name, argument_function in iteritems(self.argument_functions_dict):
                 df.File('solutions_iterations_3d/{}_{}.pvd'.format(argument_name, self.itr)) << argument_function
 
@@ -294,7 +294,7 @@ class StatesComp(om.ImplicitComponent):
         elif linear_solver=='petsc_gmres_ilu':
             ksp = PETSc.KSP().create() 
             ksp.setType(PETSc.KSP.Type.GMRES)
-            ksp.setTolerances(rtol=5e-11)
+            ksp.setTolerances(rtol=5e-17)
 
             for bc in pde_problem.bcs_list:
                 bc.apply(A)
@@ -304,7 +304,7 @@ class StatesComp(om.ImplicitComponent):
 
             ksp.setFromOptions()
             pc = ksp.getPC()
-            pc.setType("ilu")
+            pc.setType("lu")
 
             size = state_function.function_space().dim()
 
@@ -330,7 +330,7 @@ class StatesComp(om.ImplicitComponent):
         elif linear_solver=='petsc_cg_ilu':
             ksp = PETSc.KSP().create() 
             ksp.setType(PETSc.KSP.Type.CG)
-            ksp.setTolerances(rtol=5e-12)
+            ksp.setTolerances(rtol=5e-15)
 
             for bc in pde_problem.bcs_list:
                 bc.apply(A)

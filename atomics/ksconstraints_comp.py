@@ -19,7 +19,7 @@ class KSConstraintsComp(ExplicitComponent):
         axis = self.options['axis']
 
         self.total_rank = len(self.options['shape'])
-        print('self.total_rank is:', self.total_rank)
+        # print('self.total_rank is:', self.total_rank)
         if self.total_rank == 1:
             shape = shape+(1,)
             self.total_rank = 2
@@ -31,8 +31,8 @@ class KSConstraintsComp(ExplicitComponent):
 
         in_shape = tuple(shape)
         out_shape = shape[:axis] + shape[axis+1:]
-        print('in_shape', in_shape)
-        print('out_shape', out_shape)
+        # print('in_shape', in_shape)
+        # print('out_shape', out_shape)
 
         self.add_input(in_name, shape=in_shape)
         self.add_output(out_name, shape=out_shape)
@@ -80,7 +80,7 @@ class KSConstraintsComp(ExplicitComponent):
         summation = np.sum(exponents, axis=axis)
         result = g_max + 1.0 / rho * np.log(summation)
         outputs[out_name] = result
-        print('The shape of the result is:', result)
+        # print('The max of the result is:', result)
 
         dsum_dg = rho * exponents
         dKS_dsum = 1.0 / (rho * np.einsum(

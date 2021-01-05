@@ -36,11 +36,9 @@ class PDEProblem(object):
             arguments=arguments,
         )
 
-    def add_field_output(self, name, function, expression, *arguments):
-        function.rename(name, name)
+    def add_field_output(self, name, form, *arguments):
         self.field_outputs_dict[name] = dict(
-            function=function,
-            expression=expression,
+            form=form,
             arguments=arguments,
         )
-        raise NotImplemented()
+        # raise NotImplemented()

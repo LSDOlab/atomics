@@ -8,7 +8,7 @@ from scipy import spatial
 import openmdao.api as om
 
 from atomics.api import PDEProblem, AtomicsGroup
-from atomics.pdes.thermo_mechanical_mix_2d_stress import get_residual_form
+from atomics.pdes.thermo_mechanical_mix_2d_stress_test import get_residual_form
 from atomics.general_filter_comp import GeneralFilterComp
 
 from atomics.extract_comp import ExtractComp
@@ -24,6 +24,7 @@ with a 2d linear plane stress model
 '''
 
 # parameters for box
+MESH_L  =  1.e-2
 LENGTH  =  20.0e-2
 WIDTH   =  20.0e-2
 HIGHT   =  5.e-2
@@ -85,8 +86,8 @@ f_t = df.Constant(( 0., -1.e6/AREA_SIDE))
 
 #-----------------Generate--mesh----------------
 with pygmsh.occ.Geometry() as geom:
-    geom.characteristic_length_min = 0.002
-    geom.characteristic_length_max = 0.002
+    geom.characteristic_length_min = 0.004
+    geom.characteristic_length_max = 0.004
     disk_dic = {}
     disks = []
 
@@ -251,7 +252,8 @@ displacements_function,temperature_function = df.split(mixed_function)
 
 v,T_hat = df.TestFunctions(mixed_fs)
 
-residual_form = get_residual_form(
+residual_form, von_Mises_form = get_residual_form(
+    mixed_function,
     displacements_function, 
     v, 
     density_function,
@@ -396,6 +398,38 @@ comp = KSConstraintsComp(
 prob.model.add_subsystem('KSConstraintsComp', comp, promotes=['*'])
 print('KSConstraintsComp')
 
+comp = KSConstraintsComp(
+    in_name='von_mises',
+    out_name='von_mises_max',
+    shape=(np.array(density_function_space.dofmap().dofs()).size,),
+    axis=0,
+    # rho=50.,
+    rho=5.,
+)
+prob.model.add_subsystem('KSConstraintsComp_stress', comp, promotes=['*'])
+print('KSConstraintsComp')
+
+# Add field-output-von_mises_stress to the PDE problem:
+# C = density_function/(1 + 8. * (1. - density_function))
+# E = K * C 
+# nu = 0.3
+# lambda_ = E * nu/(1. + nu)/(1 - 2 * nu)
+# mu = E / 2 / (1 + nu)
+# lambda_ = 2*mu*lambda_/(lambda_+2*mu)
+# w_ij = 0.5 * (df.grad(displacements_function) + df.grad(displacements_function).T) - ALPHA * df.Identity(d) * temperature_function
+# sigm = lambda_*df.div(displacements_function)*df.Identity(d) + 2*mu*w_ij 
+# s = sigm - (1./3)*df.tr(sigm)*df.Identity(d)  # deviatoric stress
+# von_Mises = df.sqrt(3./2*df.inner(s, s))
+# V = density_function_space
+# von_Mises = df.project(von_Mises, V)
+# von_Mises_form = (1/df.CellVolume(mesh)) * von_Mises * df.TestFunction(V) * df.dx
+pde_problem.add_field_output('von_mises', von_Mises_form, 'mixed_states','density')
+
+test_form = (1/df.CellVolume(mesh)) * density_function * df.TestFunction(density_function_space) * df.dx
+pde_problem.add_field_output('test_form', test_form, 'density')
+
+print("Add output-compliance-------")
+
 # comp = TemperatureComp(density_function_space=density_function_space)
 # prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
 
@@ -403,15 +437,16 @@ prob.model.add_design_var('density_unfiltered',upper=1., lower=1e-4)
 # prob.model.add_design_var('density',upper=1., lower=lower_bd)
 
 prob.model.add_objective('compliance')
-prob.model.add_constraint('avg_density',upper=0.70, linear=True)
-# prob.model.add_constraint('avg_density',upper=0.70, linear=False)
-prob.model.add_constraint('t_max',upper=55)
-prob.model.add_constraint('density',upper=1.,lower=1., indices=idx_array,linear=True)
+# prob.model.add_constraint('von_mises_max',upper=100000)
+prob.model.add_constraint('avg_density',upper=0.85)
+# prob.model.add_constraint('t_max',upper=1000)
+# prob.model.add_constraint('t_max',upper=55)
+prob.model.add_constraint('test_form',upper=1.-1e-8,lower=1., indices=idx_array,linear=True)
 
 prob.driver = driver = om.pyOptSparseDriver()
 driver.options['optimizer'] = 'SNOPT'
 driver.opt_settings['Verify level'] = 0
-driver.opt_settings['Major iterations limit'] = 10000
+driver.opt_settings['Major iterations limit'] = 60000
 driver.opt_settings['Minor iterations limit'] = 1000000
 driver.opt_settings['Iterations limit'] = 100000000
 driver.opt_settings['Major step limit'] = 2.0
@@ -424,8 +459,10 @@ prob.setup()
 prob.run_model()
 print('run_model')
 
+# prob.model.list_outputs()
 # prob.check_partials(compact_print=True)
-# print(prob['compliance']); exit()
+# print(prob['compliance'])
+# ; exit()
 
 prob.run_driver()
 

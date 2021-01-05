@@ -100,9 +100,9 @@ os.system('gmsh -2 test_2d.vtk -format msh2')
 os.system('dolfin-convert test_2d.msh mesh_2d.xml')
 mesh = df.Mesh("mesh_2d.xml")
 
-# import matplotlib.pyplot as plt
-# df.plot(mesh)
-# plt.show()
+import matplotlib.pyplot as plt
+df.plot(mesh)
+plt.show()
 
 '''
 3. Define traction bc subdomains
@@ -270,7 +270,7 @@ prob.model.add_subsystem('atomics_group', group, promotes=['*'])
 
 prob.model.add_design_var('density_unfiltered',upper=1, lower=1e-4)
 prob.model.add_objective('compliance')
-prob.model.add_constraint('avg_density',upper=0.45)
+prob.model.add_constraint('avg_density',upper=0.70)
 
 prob.driver = driver = om.pyOptSparseDriver()
 driver.options['optimizer'] = 'SNOPT'

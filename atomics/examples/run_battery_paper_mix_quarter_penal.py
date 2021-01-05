@@ -306,7 +306,7 @@ tree = spatial.cKDTree(coords)
 idx_list = []
 plt.figure(2)
 for i in [12, 13, 14 , 17, 18, 19, 22, 23, 24]:
-    idx = tree.query_ball_point(list(np.array([xv.flatten()[i], yv.flatten()[i]])), radius+2e-3)
+    idx = tree.query_ball_point(list(np.array([xv.flatten()[i], yv.flatten()[i]])), radius+1e-3)
     idx_list.extend(idx)
 nearest_points = coords[idx_list]
 plt.gca().set_aspect('equal', adjustable='box')
@@ -332,7 +332,7 @@ y.extend(y_line)
 plt.gca().set_aspect('equal', adjustable='box')
 
 for i in range(len(x)):
-    idx = tree.query_ball_point(list(np.array([x[i], y[i]])), 2e-3)
+    idx = tree.query_ball_point(list(np.array([x[i], y[i]])), 1e-3)
     idx_rec.extend(idx)
 nearest_points_rec = coords[idx_rec]
 plt.plot(nearest_points_rec[:,0],nearest_points_rec[:,1],'go')
@@ -403,7 +403,7 @@ prob.model.add_design_var('density_unfiltered',upper=1., lower=1e-4)
 # prob.model.add_design_var('density',upper=1., lower=lower_bd)
 
 prob.model.add_objective('compliance')
-prob.model.add_constraint('avg_density',upper=0.70, linear=True)
+prob.model.add_constraint('avg_density',upper=0.88, linear=True)
 # prob.model.add_constraint('avg_density',upper=0.70, linear=False)
 prob.model.add_constraint('t_max',upper=55)
 prob.model.add_constraint('density',upper=1.,lower=1., indices=idx_array,linear=True)
