@@ -154,7 +154,7 @@ class StatesComp(om.ImplicitComponent):
             solver.solve()
 
         elif problem_type == 'nonlinear_problem_load_stepping':
-            num_steps = 2
+            num_steps = 3
             state_function.vector().set_local(np.zeros((state_function.function_space().dim())))
             for i in range(num_steps):
                 v = df.TestFunction(state_function.function_space())

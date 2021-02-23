@@ -13,6 +13,7 @@ from atomics.general_filter_comp import GeneralFilterComp
 
 from atomics.extract_comp import ExtractComp
 from atomics.ksconstraints_comp import KSConstraintsComp
+from atomics.ksconstraints_min_comp import KSConstraintsMinComp
 
 '''
 This code tries to replicate the Kamapadi 2020 results
@@ -22,6 +23,11 @@ with a 2d linear plane stress model
 '''
 1. Define constants
 '''
+
+# objective = 'mass'
+objective = 'compliance'
+# objective = 'mass' or 'compliance'
+
 
 # parameters for box
 LENGTH  =  20.0e-2
@@ -85,8 +91,8 @@ f_t = df.Constant(( 0., -1.e6/AREA_SIDE))
 
 #-----------------Generate--mesh----------------
 with pygmsh.occ.Geometry() as geom:
-    geom.characteristic_length_min = 0.003
-    geom.characteristic_length_max = 0.003
+    geom.characteristic_length_min = 0.002
+    geom.characteristic_length_max = 0.002
     disk_dic = {}
     disks = []
 
@@ -305,14 +311,26 @@ mu = E / 2 / (1 + nu) #lame's parameters
 lambda_ = 2*mu*lambda_/(lambda_+2*mu)
 # Th = df.Constant(7)
 I = df.Identity(len(displacements_function))
+
+# w_ij = 0.5 * (df.grad(displacements_function) + df.grad(displacements_function).T) - ALPHA * I * temperature_function
+# sigm = lambda_*df.div(displacements_function)* I + 2*mu*w_ij 
+# s = sigm - (1./3)*df.tr(sigm)*I 
+# von_Mises = df.sqrt(3./2*df.inner(s, s))
+# von_Mises_form = (1/df.CellVolume(mesh)) * von_Mises * df.TestFunction(density_function_space) * df.dx
+
+T = df.TensorFunctionSpace(mesh, "CG", 1)
+# T.vector.set_local()
+
 w_ij = 0.5 * (df.grad(displacements_function) + df.grad(displacements_function).T) - ALPHA * I * temperature_function
 sigm = lambda_*df.div(displacements_function)* I + 2*mu*w_ij 
-s = sigm - (1./3)*df.tr(sigm)*I
-von_Mises = df.sqrt(3./2*df.inner(s, s))
+s = sigm - (1./3)*df.tr(sigm)*I 
+# von_Mises = df.tr(s)
+# von_Mises = df.tr(s)
+von_Mises = df.sqrt(3./2*df.inner(s/5e9, s/5e9) )
 von_Mises_form = (1/df.CellVolume(mesh)) * von_Mises * df.TestFunction(density_function_space) * df.dx
 pde_problem.add_field_output('von_Mises', von_Mises_form, 'mixed_states', 'density')
 
-
+x
 '''
 4. 3. Add bcs
 '''
@@ -348,19 +366,27 @@ idx_rec = []
 x_line = y_line = np.linspace(0, 0.1, num=100)
 x_0 = y_0 = np.zeros(100)
 x_1 = y_1 = np.ones(100) * 0.1
-x.extend(x_line)
+# x.extend(x_line)
+# x.extend(x_1)
+# x.extend(x_line)
+# x.extend(x_0)
+
+# y.extend(y_0)
+# y.extend(y_line)
+# y.extend(y_1)
+# y.extend(y_line)
+
+
 x.extend(x_1)
 x.extend(x_line)
-x.extend(x_0)
 
-y.extend(y_0)
 y.extend(y_line)
 y.extend(y_1)
-y.extend(y_line)
+
 plt.gca().set_aspect('equal', adjustable='box')
 
 for i in range(len(x)):
-    idx = tree.query_ball_point(list(np.array([x[i], y[i]])), 2e-3)
+    idx = tree.query_ball_point(list(np.array([x[i], y[i]])), 3e-3)
     idx_rec.extend(idx)
 nearest_points_rec = coords[idx_rec]
 plt.plot(nearest_points_rec[:,0],nearest_points_rec[:,1],'go')
@@ -419,7 +445,7 @@ comp = KSConstraintsComp(
     shape=(np.array(mixed_fs.sub(1).dofmap().dofs()).size,),
     axis=0,
     # rho=50.,
-    rho=10.,
+    rho=10,
 )
 prob.model.add_subsystem('KSConstraintsComp', comp, promotes=['*'])
 print('KSConstraintsComp')
@@ -430,21 +456,40 @@ comp = KSConstraintsComp(
     shape=(np.array(density_function_space.dofmap().dofs()).size,),
     axis=0,
     # rho=50.,
-    rho=100.,
+    rho=40.,
 )
 prob.model.add_subsystem('KSConstraintsstress', comp, promotes=['*'])
 
-# comp = TemperatureComp(density_function_space=density_function_space)
-# prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
+
 
 prob.model.add_design_var('density_unfiltered',upper=1., lower=1e-4)
-# prob.model.add_design_var('density',upper=1., lower=lower_bd)
 
-prob.model.add_objective('compliance')
-prob.model.add_constraint('avg_density',upper=0.70, linear=True)
-prob.model.add_constraint('von_Mises_max',upper=100)
-prob.model.add_constraint('t_max',upper=55)
-prob.model.add_constraint('density',upper=1.,lower=1., indices=idx_array,linear=True)
+
+# prob.model.add_objective('avg_density')
+# prob.model.add_constraint('von_Mises_max', upper=0.3)
+# prob.model.add_constraint('t_max', upper=50)
+# prob.model.add_constraint('density',upper=1.,lower=1.,
+#                              indices=idx_array, linear=True)
+
+if objective == 'mass':
+    prob.model.add_objective('avg_density')
+    prob.model.add_constraint('t_max', upper=50)
+    prob.model.add_constraint('density', upper=1.,lower=1.,
+                             indices=idx_array, linear=True)
+else:
+    prob.model.add_objective('compliance')
+    prob.model.add_constraint('avg_density', upper=0.80, linear=True)
+    prob.model.add_constraint('t_max', upper=50)
+    prob.model.add_constraint('density',upper=1.,lower=1.,
+                                indices=idx_array, linear=True)
+
+# prob.model.add_objective('compliance')
+# prob.model.add_constraint('von_Mises_max', upper=10)
+# prob.model.add_constraint('avg_density', upper=0.75, linear=True)
+# prob.model.add_constraint('t_max', upper=55)
+# prob.model.add_constraint('density',upper=1.,lower=1.,
+#                              indices=idx_array, linear=True)
+
 
 prob.driver = driver = om.pyOptSparseDriver()
 driver.options['optimizer'] = 'SNOPT'
@@ -459,54 +504,14 @@ driver.opt_settings['Major optimality tolerance'] =2.e-10
 
 prob.setup()
 
-prob.run_model()
-print('run_model')
-# check_partials_data = prob.check_partials(compact_print=False)
-
-# prob.check_partials(compact_print=True)
-# print(prob['compliance']); exit()
-
 prob.run_driver()
 
 displacements_function_val, temperature_function_val= mixed_function.split()
-
+'solutions/case_1/cantilever_beam/displacement.pvd'
 #save the solution vector
-df.File('solutions/displacements_function_val_t55_lrf.pvd') << displacements_function_val
-df.File('solutions/temperature_function_val_t55_lrf.pvd') << temperature_function_val
-
-df.File('solutions/density_function_t55_lrf.pvd') << density_function
-
-# df.File('solutions/displacement__quarter_9_75.pvd') << displacements_function_val
-# df.File('solutions/temperature__quarter_9_75.pvd') << temperature_function_val
+df.File('solutions/case_2/battter_pack_{}/displacements.pvd'.format(objective)) << displacements_function_val
+df.File('solutions/case_2/battter_pack_{}/temperature.pvd'.format(objective)) << temperature_function_val
+df.File('solutions/case_2/battter_pack_{}/density.pvd'.format(objective)) << density_function
 stiffness  = df.project(density_function/(1 + 8. * (1. - density_function)), density_function_space) 
-df.File('solutions/stiffness_t55_lrf.pvd') << stiffness
+df.File('solutions/case_2/battter_pack_{}/stiffness.pvd'.format(objective)) << stiffness
 
-check_partials_data = prob.check_partials(compact_print=True)
-
-# fd_approx = check_partials_data['atomics_group.von_Mises_field_outputs_comp'][('von_Mises', 'mixed_states')]['J_fd']
-# from_fenics = check_partials_data['atomics_group.von_Mises_field_outputs_comp'][('von_Mises', 'mixed_states')]['J_fwd']
-# non_zeros_fd = np.nonzeros(fd_approx)
-# non_zeros_from_fenics = np.nonzeros(from_fenics)
-
-
-# df.plot(density_function)
-
-# import matplotlib.pyplot as plt
-# plt.figure(1)
-# coords = density_function_space.tabulate_dof_coordinates()
-# plt.gca().set_aspect('equal', adjustable='box')
-# plt.plot(coords[:,0],coords[:,1],'ro')
-# plt.show()
-
-
-# plt.figure(2)
-# tree = spatial.cKDTree(coords)
-# idx_list = []
-# for i in [12, 13, 14 , 17, 18, 19, 22, 23, 24]:
-#     idx = tree.query_ball_point(list(np.array([xv.flatten()[i], yv.flatten()[i]])), radius+1e-3)
-#     idx_list.extend(idx)
-# nearest_points = coords[idx_list]
-# plt.gca().set_aspect('equal', adjustable='box')
-# plt.plot(nearest_points[:,0],nearest_points[:,1],'bo')
-# plt.show()
-# idx_array = np.asarray(idx_list) # (266,)

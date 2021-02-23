@@ -3,6 +3,7 @@ import pygmsh
 
 def get_residual_form(u, v, rho_e, phi_angle, k, alpha):
     C = rho_e/(1 + 8. * (1. - rho_e))
+    # C = rho_e**3
 
     E = k# C is the design variable, its values is from 0 to 1
 
@@ -11,7 +12,8 @@ def get_residual_form(u, v, rho_e, phi_angle, k, alpha):
     lambda_ = E * nu/(1. + nu)/(1 - 2 * nu)
     mu = E / 2 / (1 + nu) #lame's parameters
 
-    Th = df.Constant(5e1)
+    # Th = df.Constant(5e1)
+    Th = df.Constant(1.)
     # Th = df.Constant(5e0)
 
     w_ij = 0.5 * (df.grad(u) + df.grad(u).T)
@@ -56,7 +58,7 @@ if __name__ == '__main__':
     START_X = -2.5e-3
     START_Y = -2.5e-3
     START_Z = -2.5e-6
-    NUM_ELEMENTS_X = NUM_ELEMENTS_Y = 20
+    NUM_ELEMENTS_X = NUM_ELEMENTS_Y = 50
     NUM_ELEMENTS_Z = 4
     K = 5.e0
     ALPHA = 2.5e-3
@@ -93,22 +95,46 @@ if __name__ == '__main__':
 
     density_function_space = df.FunctionSpace(mesh, 'DG', 0)
     density_function = df.Function(density_function_space)
-    density_function.vector().set_local(np.ones(density_function_space.dim()))
+    density_val = np.ones(density_function_space.dim())
+    
+
+    density_function.vector().set_local(density_val)
 
     angle_function_space = df.FunctionSpace(mesh, 'DG', 0)
     angle_function = df.Function(angle_function_space)
     angle_val = np.zeros(angle_function_space.dim())
-    angle_val[0:400] = 0.
-    angle_val[400:800] = np.pi/6
-    angle_val[800:1200] = np.pi/3
-    angle_val[1200:1600] = np.pi/2
+    # angle_val[0:400] = 0.
+    # angle_val[400:800] = np.pi/6
+    # angle_val[800:1200] = np.pi/3
+    # angle_val[1200:1600] = np.pi/2
+
+    angle_val[0:100] = 0.
+    angle_val[400:500] = 0.
+    angle_val[800:900] = 0.
+    angle_val[1200:1300] = 0.
+
+    angle_val[100:200] = np.pi/4
+    angle_val[500:600] = np.pi/4
+    angle_val[900:1000] = np.pi/4
+    angle_val[1300:1400] = np.pi/4
+
+    angle_val[200:300] = np.pi/4 * 3
+    angle_val[600:700] = np.pi/4 * 3
+    angle_val[1000:1100] = np.pi/4 * 3
+    angle_val[1100:1200] = np.pi/4 * 3
+
+    angle_val[300:400] = np.pi
+    angle_val[700:800] = np.pi
+    angle_val[1100:1200] = np.pi
+    angle_val[1500:1600] = np.pi
+
     angle_function.vector().set_local(angle_val)
 
     displacements_function_space = df.VectorFunctionSpace(mesh, 'Lagrange', 1)
     displacements_function = df.Function(displacements_function_space)
     displacements_trial_function = df.TrialFunction(displacements_function_space)
     v = df.TestFunction(displacements_function_space)
-    K= 5.e9
+    K= 5.e6
     ALPHA = 2.5e-3
     residual_form = get_residual_form(
         displacements_function, 
@@ -164,9 +190,15 @@ if __name__ == '__main__':
                                 degree=1 )
     desired_disp = df.project(desired_disp, displacements_function_space )
 
-    df.File("test_LCE/u.pvd") << displacements_function
+    df.File("test_LCE/u20b.pvd") << displacements_function
     df.File("test_LCE/desired_u.pvd") << desired_disp
 
+    fFile = df.HDF5File(df.MPI.comm_world,"angle_scalar.h5","w")
+    fFile.write(angle_function,"/f")
+    fFile.close()
+    # fFile = df.HDF5File(df.MPI.comm_world,"eps_eq_proj_1000.h5","r")
+    # fFile.read(f2,"/f")
+    # fFile.close()
     # S = np.array([[-2., 0., 0. ],
     #                 [0. , 1., 0. ],
     #                 [0. , 0., 1. ]])

@@ -86,8 +86,8 @@ f_t = df.Constant(( 0., -1.e6/AREA_SIDE))
 
 #-----------------Generate--mesh----------------
 with pygmsh.occ.Geometry() as geom:
-    geom.characteristic_length_min = 0.004
-    geom.characteristic_length_max = 0.004
+    geom.characteristic_length_min = 0.003
+    geom.characteristic_length_max = 0.003
     disk_dic = {}
     disks = []
 
@@ -340,7 +340,7 @@ nearest_points_rec = coords[idx_rec]
 plt.plot(nearest_points_rec[:,0],nearest_points_rec[:,1],'go')
 
 # plt.plot([x_line, x_1, x_line, x_0],[y_0, y_line, y_1, y_line],'bo')
-plt.show()
+# plt.show() Here is where the show should be
 
 idx_list.extend(idx_rec)
 lower_bd = np.ones(coords[:,0].size)*1e-5
@@ -460,24 +460,24 @@ prob.run_model()
 print('run_model')
 
 # prob.model.list_outputs()
-# prob.check_partials(compact_print=True)
+prob.check_partials(compact_print=True)
 # print(prob['compliance'])
 # ; exit()
 
-prob.run_driver()
+# prob.run_driver()
 
-displacements_function_val, temperature_function_val= mixed_function.split()
+# displacements_function_val, temperature_function_val= mixed_function.split()
 
-#save the solution vector
-df.File('solutions/displacements_function_val_t55_lrf.pvd') << displacements_function_val
-df.File('solutions/temperature_function_val_t55_lrf.pvd') << temperature_function_val
+# #save the solution vector
+# df.File('solutions/displacements_function_val_t55_lrf.pvd') << displacements_function_val
+# df.File('solutions/temperature_function_val_t55_lrf.pvd') << temperature_function_val
 
-df.File('solutions/density_function_t55_lrf.pvd') << density_function
+# df.File('solutions/density_function_t55_lrf.pvd') << density_function
 
-# df.File('solutions/displacement__quarter_9_75.pvd') << displacements_function_val
-# df.File('solutions/temperature__quarter_9_75.pvd') << temperature_function_val
-stiffness  = df.project(density_function/(1 + 8. * (1. - density_function)), density_function_space) 
-df.File('solutions/stiffness_t55_lrf.pvd') << stiffness
+# # df.File('solutions/displacement__quarter_9_75.pvd') << displacements_function_val
+# # df.File('solutions/temperature__quarter_9_75.pvd') << temperature_function_val
+# stiffness  = df.project(density_function/(1 + 8. * (1. - density_function)), density_function_space) 
+# df.File('solutions/stiffness_t55_lrf.pvd') << stiffness
 
 # df.plot(density_function)
 

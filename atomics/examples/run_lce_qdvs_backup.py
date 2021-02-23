@@ -14,18 +14,19 @@ from atomics.general_filter_comp import GeneralFilterComp
 from atomics.extract_comp import ExtractComp
 from atomics.interpolant_comp import InterpolantComp
 from atomics.copy_comp import Copycomp
+from atomics.symmetric_angle_comp import SymmericAnglecomp
+from atomics.symmetric_rho_comp import SymmericRhocomp
 
 '''
 code for LCE topology optimization
 '''
 
-'''
-1. Define constants
-'''
-
 opt = 'optimization'
 # opt = 'simulation'
 
+'''
+1. Define constants
+'''
 # parameters for the film
 LENGTH  =  2.5e-3
 WIDTH   =  5e-3
@@ -151,16 +152,16 @@ pde_problem.add_bc(bc_displacements_z)
 prob = om.Problem()
 
 num_dof_density = pde_problem.inputs_dict['density']['function'].function_space().dim()
-bot_idx = np.arange(int(num_dof_density/4))
-top_idx = np.arange(int(num_dof_density/2)-int(num_dof_density/4), int(num_dof_density/2))
-ini_angle = np.zeros(int(num_dof_density/2))
+bot_idx = np.arange(int(num_dof_density/4/4))
+top_idx = np.arange(int(num_dof_density/2/4)-int(num_dof_density/4/4), int(num_dof_density/2/4))
+ini_angle = np.zeros(int(num_dof_density/2/4))
 ini_angle[bot_idx] = np.pi/2
 # Add IndepVarComp-density_unfiltered & angle
 comp = om.IndepVarComp()
 comp.add_output(
-    'density_unfiltered_layer', 
-    shape=int(density_function_space.dim()/4), 
-    val=np.ones(int(density_function_space.dim()/4)),
+    'density_unfiltered_layer_q', 
+    shape=int(density_function_space.dim()/4/4), 
+    val=np.ones((int(density_function_space.dim()/4/4))),
 )
 # comp.add_output(
 #     'density_unfiltered', 
@@ -168,13 +169,29 @@ comp.add_output(
 #     val=np.ones(int(density_function_space.dim())),
 # )
 comp.add_output(
-    'angle_t_b', 
+    'angle_t_b_q', 
     shape=ini_angle.shape, 
     val=ini_angle, #TO be fixed
     # val=np.random.random(num_dof_density) * 0.86,
 )
 prob.model.add_subsystem('indep_var_comp', comp, promotes=['*'])
 print('indep_var_comp')
+
+comp = SymmericRhocomp(
+    in_name='density_unfiltered_layer_q',
+    out_name='density_unfiltered_layer',
+    in_shape=int(density_function_space.dim()/16),
+    num_copies = 4,
+)
+prob.model.add_subsystem('sym_rho_comp', comp, promotes=['*'])
+
+comp = SymmericAnglecomp(
+    in_name='angle_t_b_q',
+    out_name='angle_t_b',
+    in_shape=int(ini_angle.size),
+    num_copies = 4,
+)
+prob.model.add_subsystem('sym_angle_comp', comp, promotes=['*'])
 
 # add copy comp
 comp = Copycomp(
@@ -189,7 +206,7 @@ prob.model.add_subsystem('copy_comp', comp, promotes=['*'])
 comp = InterpolantComp(
     in_name='angle_t_b',
     out_name='angle',
-    in_shape=ini_angle.size,
+    in_shape=int(density_function_space.dim()/2),
     num_pts = 4,
 )
 prob.model.add_subsystem('interpolant_comp', comp, promotes=['*'])
@@ -206,12 +223,13 @@ prob.model.add_subsystem('atomics_group', group, promotes=['*'])
 print('atomics_group')
 
 # prob.model.add_design_var('density_unfiltered',upper=1., lower=1e-4)
-prob.model.add_design_var('density_unfiltered_layer',upper=1., lower=1e-4)
-prob.model.add_design_var('angle_t_b', upper=np.pi, lower=0.)
+prob.model.add_design_var('density_unfiltered_layer_q',upper=1., lower=1e-4)
+prob.model.add_design_var('angle_t_b_q', upper=np.pi, lower=0.)
 
 prob.model.add_objective('error_norm')
 # prob.model.add_constraint('avg_density',upper=0.6, linear=True)
-prob.model.add_constraint('avg_density',upper=0.74, linear=True)
+# prob.model.add_constraint('avg_density',upper=0.74, linear=True)
+prob.model.add_constraint('avg_density',upper=0.4, linear=True)
 
 prob.driver = driver = om.pyOptSparseDriver()
 driver.options['optimizer'] = 'SNOPT'
@@ -226,7 +244,7 @@ driver.opt_settings['Major optimality tolerance'] =1.e-7
 
 prob.setup()
 
-prob.run_model()
+# prob.run_model()
 print('run_model')
 
 # prob.check_partials(compact_print=True)
@@ -235,11 +253,11 @@ print('run_model')
 prob.run_driver()
 
 #save the solution vector
-df.File('solutions/lce/disp{}.pvd'.format(NUM_ELEMENTS_X)) << displacements_function
+df.File('solutions{}t{}ramp/lce/disp{}_l140.pvd'.format(opt, 2, NUM_ELEMENTS_X)) << displacements_function
 
-df.File('solutions/lce/angle0.pvd') << angle_function
+df.File('solutions{}t{}ramp/lce/angle{}_l140.pvd'.format(opt, 2, NUM_ELEMENTS_X)) << angle_function
 
-stiffness  = df.project(density_function**3, density_function_space) 
-df.File('solutions/lce/stiffness0.pvd') << stiffness
-# df.File('solutions/lce/desired_disp.pvd') << df.project(desired_disp, displacements_function_space )
+stiffness  = df.project(density_function/(1 + 8. * (1. - density_function)), density_function_space) 
+df.File('solutions{}t{}ramp/lce/stiffness{}_l140.pvd'.format(opt, 2, NUM_ELEMENTS_X)) << stiffness
+# df.File('solutions{}/lce/desired_disp{}.pvd'.format(opt, NUM_ELEMENTS_X)) << df.project(desired_disp, displacements_function_space )
 

@@ -1,8 +1,12 @@
 import dolfin as df
 
 
-def get_residual_form(u, v, rho_e, E = 1):
-    C = rho_e/(1 + 8. * (1. - rho_e))
+def get_residual_form(u, v, rho_e, E = 1, method='SIMP'):
+    if method =='SIMP':
+        C = rho_e**3
+    else:
+        C = rho_e/(1 + 8. * (1. - rho_e))
+    
 
     E = 1. * C # C is the design variable, its values is from 0 to 1
 

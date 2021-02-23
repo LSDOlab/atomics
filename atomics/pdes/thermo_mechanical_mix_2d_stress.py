@@ -1,8 +1,11 @@
 import dolfin as df
 import pygmsh
 
-def get_residual_form(u, v, rho_e, T, T_hat, KAPPA, k, alpha, mode='plane_stress'):
-    C = rho_e/(1 + 8. * (1. - rho_e))
+def get_residual_form(u, v, rho_e, T, T_hat, KAPPA, k, alpha, mode='plane_stress', method='RAMP'):
+    if method=='RAMP':
+        C = rho_e/(1 + 8. * (1. - rho_e))
+    else:
+        C = rho_e**3
 
     E = k * C # C is the design variable, its values is from 0 to 1
 

@@ -5,7 +5,7 @@ import numpy as np
 import openmdao.api as om
 
 from atomics.api import PDEProblem, AtomicsGroup
-from atomics.pdes.elastic_cantilever_beam import get_residual_form
+from atomics.pdes.linear_elastic import get_residual_form
 
 # from cartesian_density_filter_comp import CartesianDensityFilterComp
 from atomics.general_filter_comp import GeneralFilterComp
@@ -16,6 +16,8 @@ np.random.seed(0)
 # Define the mesh and create the PDE problem
 NUM_ELEMENTS_X = 80
 NUM_ELEMENTS_Y = 40
+# NUM_ELEMENTS_X = 60
+# NUM_ELEMENTS_Y = 30
 LENGTH_X = 160.
 LENGTH_Y = 80.
 
@@ -124,7 +126,9 @@ driver.opt_settings['Iterations limit'] = 100000000
 driver.opt_settings['Major step limit'] = 2.0
 
 driver.opt_settings['Major feasibility tolerance'] = 1.0e-6
-driver.opt_settings['Major optimality tolerance'] =2.e-7
+driver.opt_settings['Major optimality tolerance'] =1.e-8
+
+
 
 prob.setup()
 prob.run_model()
@@ -135,5 +139,8 @@ prob.run_driver()
 
 
 #save the solution vector
-df.File('solutions/displacement.pvd') << displacements_function
-df.File('solutions/stiffness_gen_hyp.pvd') << density_function
+df.File('solutions/case_1/cantilever_beam/displacement.pvd') << displacements_function
+stiffness  = df.project(density_function**3, density_function_space) 
+# stiffness  = df.project(density_function/(1 + 8. * (1. - density_function)), density_function_space) 
+
+df.File('solutions/case_1/cantilever_beam/stiffness.pvd') << stiffness

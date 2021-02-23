@@ -85,8 +85,8 @@ f_t = df.Constant(( 0., -1.e6/AREA_SIDE))
 
 #-----------------Generate--mesh----------------
 with pygmsh.occ.Geometry() as geom:
-    geom.characteristic_length_min = 0.002
-    geom.characteristic_length_max = 0.002
+    geom.characteristic_length_min = 0.003 # 0.002
+    geom.characteristic_length_max = 0.003 # 0.002
     disk_dic = {}
     disks = []
 
@@ -424,23 +424,23 @@ prob.setup()
 prob.run_model()
 print('run_model')
 
-# prob.check_partials(compact_print=True)
+prob.check_partials(compact_print=True)
 # print(prob['compliance']); exit()
 
-prob.run_driver()
+# prob.run_driver()
 
 displacements_function_val, temperature_function_val= mixed_function.split()
 
-#save the solution vector
-df.File('solutions/displacements_function_val_t55_lrf.pvd') << displacements_function_val
-df.File('solutions/temperature_function_val_t55_lrf.pvd') << temperature_function_val
+# #save the solution vector
+# df.File('solutions/displacements_function_val_t55_lrf.pvd') << displacements_function_val
+# df.File('solutions/temperature_function_val_t55_lrf.pvd') << temperature_function_val
 
-df.File('solutions/density_function_t55_lrf.pvd') << density_function
+# df.File('solutions/density_function_t55_lrf.pvd') << density_function
 
-# df.File('solutions/displacement__quarter_9_75.pvd') << displacements_function_val
-# df.File('solutions/temperature__quarter_9_75.pvd') << temperature_function_val
-stiffness  = df.project(density_function/(1 + 8. * (1. - density_function)), density_function_space) 
-df.File('solutions/stiffness_t55_lrf.pvd') << stiffness
+# # df.File('solutions/displacement__quarter_9_75.pvd') << displacements_function_val
+# # df.File('solutions/temperature__quarter_9_75.pvd') << temperature_function_val
+# stiffness  = df.project(density_function/(1 + 8. * (1. - density_function)), density_function_space) 
+# df.File('solutions/stiffness_t55_lrf.pvd') << stiffness
 
 # df.plot(density_function)
 

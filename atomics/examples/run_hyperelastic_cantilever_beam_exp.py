@@ -180,7 +180,8 @@ f2 = df.Function(density_function_space)
 # fFile.close()
 
 #save the solution vector
-df.File('solutions/displacement.pvd') << displacements_function
-df.File('solutions/stiffness_hyper_load_stp.pvd') << density_function
-df.File('solutions/eps_eq_proj_1000.pvd') << eps_eq_proj
-df.File('solutions/detF_m_1000.pvd') << det_F_m_proj
+df.File('solutions/case_1/hyperelastic_cantilever_beam/displacement.pvd') << displacements_function
+stiffness  = df.project(density_function/(1 + 8. * (1. - density_function)), density_function_space) 
+df.File('solutions/case_1/hyperelastic_cantilever_beam/stiffness.pvd') << stiffness
+df.File('solutions/case_1/hyperelastic_cantilever_beam/eps_eq_proj_1000.pvd') << eps_eq_proj
+df.File('solutions/case_1/hyperelastic_cantilever_beam/detF_m_1000.pvd') << det_F_m_proj

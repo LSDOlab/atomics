@@ -139,6 +139,7 @@ class StatesComp(om.ImplicitComponent):
             df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form,
                 solver_parameters={"newton_solver":{"maximum_iterations":1, "error_on_nonconvergence":False}})
         elif problem_type == 'nonlinear_problem':
+            state_function.vector().set_local(np.zeros((state_function.function_space().dim())))
             problem = df.NonlinearVariationalProblem(residual_form, state_function, pde_problem.bcs_list, self.derivative_form)
             solver  = df.NonlinearVariationalSolver(problem)
             solver.parameters['nonlinear_solver']='snes' 
@@ -195,10 +196,16 @@ class StatesComp(om.ImplicitComponent):
                 solver.solve()
 
         # option to store the visualization results
-        if (visualization == 'True') and (self.itr % 100 == 0):
+        if (visualization == 'True') and (self.itr % 50 == 0):
             for argument_name, argument_function in iteritems(self.argument_functions_dict):
-                df.File('solutions_iterations_3d/{}_{}.pvd'.format(argument_name, self.itr)) << argument_function
+                # print(argument_name)
+                if argument_name== 'density':
 
+                    df.File('solutions_iterations_40ramp/{}_{}.pvd'.format(argument_name, self.itr)) << df.project(argument_function/(1 + 8. * (1. - argument_function)), argument_function.function_space())
+                    # df.File('solutions_iterations_40ramp/{}_{}.pvd'.format(argument_name, self.itr)) << df.project(argument_function**3, argument_function.function_space())
+                else:
+                    df.File('solutions_iterations_40ramp/{}_{}.pvd'.format(argument_name, self.itr)) << argument_function
+            df.File('solutions_iterations_40ramp/{}_{}.pvd'.format(state_name, self.itr)) << state_function
         self.L = -residual_form
 
         outputs[state_name] = state_function.vector().get_local()

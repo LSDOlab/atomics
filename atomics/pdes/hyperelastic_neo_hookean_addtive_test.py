@@ -1,9 +1,15 @@
 import dolfin as df
 import numpy as np
 
-def get_residual_form(u, v, rho_e,V_density, tractionBC, T, iteration_number,additive ='strain',k = 8.):
+def get_residual_form(u, v, rho_e,V_density, tractionBC, T, iteration_number,additive ='strain',k = 8., method ='RAMP'):
     df.dx = df.dx(metadata={"quadrature_degree":4}) 
-    stiffness = rho_e/(1 + 8. * (1. - rho_e))
+    # stiffness = rho_e/(1 + 8. * (1. - rho_e))
+
+    if method =='SIMP':
+        stiffness = rho_e**3
+    else:
+        stiffness = rho_e/(1 + 8. * (1. - rho_e))
+
     # print('the value of stiffness is:', rho_e.vector().get_local())
     # Kinematics
     d = len(u)
@@ -16,7 +22,7 @@ def get_residual_form(u, v, rho_e,V_density, tractionBC, T, iteration_number,add
     stiffen_pow=1.
     threshold_vol= 1.
 
-    eps_star= 0.2
+    eps_star= 0.05
     # print("eps_star--------")
 
     if additive == 'strain':
