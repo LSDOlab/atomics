@@ -3,7 +3,7 @@ import numpy as np
 from openmdao.core.explicitcomponent import ExplicitComponent
 
 
-class KSConstraintsComp(ExplicitComponent):
+class KSConstraintsMinComp(ExplicitComponent):
 
     def initialize(self):
         self.options.declare('shape', types=tuple)
@@ -68,7 +68,7 @@ class KSConstraintsComp(ExplicitComponent):
         if self.total_rank == 1:
             shape = shape+(1,)
             inputs[in_name] = inputs[in_name].reshape(-1,1)
-        con_val = inputs[in_name]
+        con_val = -inputs[in_name]
 
         g_max = np.max(con_val, axis=axis)
         g_diff = con_val - np.einsum(
@@ -78,7 +78,7 @@ class KSConstraintsComp(ExplicitComponent):
         )
         exponents = np.exp(rho * g_diff)
         summation = np.sum(exponents, axis=axis)
-        result = g_max + 1.0 / rho * np.log(summation)
+        result = -g_max - 1.0 / rho * np.log(summation)
         outputs[out_name] = result
         # print('The max of the result is:', result)
 
@@ -110,7 +110,7 @@ if __name__ == '__main__':
     comp.add_output('x', val=np.random.rand(*shape))
     prob.model.add_subsystem('ivc', comp, promotes=['*'])
 
-    comp = KSConstraintsComp(
+    comp = KSConstraintsMinComp(
         in_name='x',
         out_name='y',
         shape=shape,

@@ -284,6 +284,11 @@ compliance_form = df.dot(f_r, displacements_function) * dss(10) +\
 pde_problem.add_scalar_output('compliance', compliance_form, 'mixed_states')
 print("Add output-compliance-------")
 
+test_form = (1/df.CellVolume(mesh)) * density_function * df.TestFunction(density_function_space) * df.dx
+pde_problem.add_field_output('test_form', test_form, 'density')
+
+mixed_form = (1/df.CellVolume(mesh)) * temperature_function * df.TestFunction(density_function_space) * df.dx
+pde_problem.add_field_output('mixed_form', mixed_form, 'mixed_states')
 
 '''
 4. 3. Add bcs
@@ -406,7 +411,7 @@ prob.model.add_objective('compliance')
 prob.model.add_constraint('avg_density',upper=0.70, linear=True)
 # prob.model.add_constraint('avg_density',upper=0.70, linear=False)
 prob.model.add_constraint('t_max',upper=55)
-prob.model.add_constraint('density',upper=1.,lower=1., indices=idx_array,linear=True)
+prob.model.add_constraint('test_form',upper=1.,lower=1., indices=idx_array,linear=True)
 
 prob.driver = driver = om.pyOptSparseDriver()
 driver.options['optimizer'] = 'SNOPT'
@@ -424,10 +429,10 @@ prob.setup()
 prob.run_model()
 print('run_model')
 
-# prob.check_partials(compact_print=True)
+prob.check_partials(compact_print=True)
 # print(prob['compliance']); exit()
 
-prob.run_driver()
+# prob.run_driver()
 
 displacements_function_val, temperature_function_val= mixed_function.split()
 

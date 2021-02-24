@@ -52,18 +52,21 @@ class StatesComp(om.ImplicitComponent):
             values=['linear_problem', 'nonlinear_problem', 'nonlinear_problem_load_stepping'],
         )
         self.options.declare(
-            'visualization', default='False', 
+            'visualization', default='True', 
             values=['True', 'False'],
         )
 
     def setup(self):
         pde_problem = self.options['pde_problem']
         state_name = self.options['state_name']
+        print('------------------', state_name)
+
         state_function = pde_problem.states_dict[state_name]['function']
 
         self.itr = 0
         self.argument_functions_dict = argument_functions_dict = dict()
         for argument_name in pde_problem.states_dict[state_name]['arguments']:
+            print( '--------########---------------', argument_name)
             argument_functions_dict[argument_name] = pde_problem.inputs_dict[argument_name]['function']
 
         for argument_name, argument_function in iteritems(self.argument_functions_dict):
@@ -116,11 +119,6 @@ class StatesComp(om.ImplicitComponent):
         for argument_name, argument_function in iteritems(self.argument_functions_dict):
             density_func = argument_function
         mesh = state_function.function_space().mesh()
-        sub_domains = df.MeshFunction('size_t', mesh, mesh.topology().dim() - 1)
-        upper_edge = TractionBoundary()
-        upper_edge.mark(sub_domains, 6)
-        dss = df.Measure('ds')(subdomain_data=sub_domains)
-        tractionBC = dss(6)
 
         
         self.itr = self.itr + 1
@@ -136,9 +134,15 @@ class StatesComp(om.ImplicitComponent):
         df.set_log_active(True)
         # df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form)
         if problem_type == 'linear_problem':
-            df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form,
-                solver_parameters={"newton_solver":{"maximum_iterations":8, "error_on_nonconvergence":False}})
+            if state_name=='density':
+                print('this is a variational density filter')
+                df.solve(residual_form==0, state_function, J=self.derivative_form,
+                    solver_parameters={"newton_solver":{"maximum_iterations":1, "error_on_nonconvergence":False}})
+            else:
+                df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form,
+                    solver_parameters={"newton_solver":{"maximum_iterations":1, "error_on_nonconvergence":False}})
         elif problem_type == 'nonlinear_problem':
+            state_function.vector().set_local(np.zeros((state_function.function_space().dim())))
             problem = df.NonlinearVariationalProblem(residual_form, state_function, pde_problem.bcs_list, self.derivative_form)
             solver  = df.NonlinearVariationalSolver(problem)
             solver.parameters['nonlinear_solver']='snes' 
@@ -195,10 +199,16 @@ class StatesComp(om.ImplicitComponent):
                 solver.solve()
 
         # option to store the visualization results
-        if visualization == 'True':
+        if (visualization == 'True') and (self.itr % 50 == 0):
             for argument_name, argument_function in iteritems(self.argument_functions_dict):
-                df.File('solutions_iterations_3d/{}_{}.pvd'.format(argument_name, self.itr)) << argument_function
+                # print(argument_name)
+                if argument_name== 'density':
 
+                    df.File('solutions_iterations_40ramp/{}_{}.pvd'.format(argument_name, self.itr)) << df.project(argument_function/(1 + 8. * (1. - argument_function)), argument_function.function_space())
+                    # df.File('solutions_iterations_40ramp/{}_{}.pvd'.format(argument_name, self.itr)) << df.project(argument_function**3, argument_function.function_space())
+                else:
+                    df.File('solutions_iterations_40ramp/{}_{}.pvd'.format(argument_name, self.itr)) << argument_function
+            df.File('solutions_iterations_40ramp/{}_{}.pvd'.format(state_name, self.itr)) << state_function
         self.L = -residual_form
 
         outputs[state_name] = state_function.vector().get_local()
@@ -223,7 +233,11 @@ class StatesComp(om.ImplicitComponent):
         state_function = pde_problem.states_dict[state_name]['function']
 
         residual_form = pde_problem.states_dict[state_name]['residual_form']
-        A, _ = df.assemble_system(self.derivative_form, - residual_form, pde_problem.bcs_list)
+        if state_name=='density':
+            print('this is a variational density filter')
+            A, _ = df.assemble_system(self.derivative_form, - residual_form)
+        else:
+            A, _ = df.assemble_system(self.derivative_form, - residual_form, pde_problem.bcs_list)
         
         def report(xk):
             frame = inspect.currentframe().f_back
@@ -235,9 +249,9 @@ class StatesComp(om.ImplicitComponent):
             dR = df.Function(state_function.function_space())
 
             rhs_.vector().set_local(d_outputs[state_name])
-
-            for bc in pde_problem.bcs_list:
-                bc.apply(A)
+            if state_name!='density':
+                for bc in pde_problem.bcs_list:
+                    bc.apply(A)
             Am = df.as_backend_type(A).mat()
             ATm = Am.transpose()
             AT =  df.PETScMatrix(ATm)
@@ -246,8 +260,9 @@ class StatesComp(om.ImplicitComponent):
             d_residuals[state_name] =  dR.vector().get_local()
 
         elif linear_solver=='scipy_splu':
-            for bc in pde_problem.bcs_list:
-                bc.apply(A)
+            if state_name!='density':
+                for bc in pde_problem.bcs_list:
+                    bc.apply(A)
             Am = df.as_backend_type(A).mat()
             ATm = Am.transpose()
             ATm_csr = csr_matrix(ATm.getValuesCSR()[::-1], shape=Am.size)
@@ -256,8 +271,9 @@ class StatesComp(om.ImplicitComponent):
 
 
         elif linear_solver=='scipy_cg':
-            for bc in pde_problem.bcs_list:
-                bc.apply(A)
+            if state_name!='density':
+                for bc in pde_problem.bcs_list:
+                    bc.apply(A)
             Am = df.as_backend_type(A).mat()
             ATm = Am.transpose()
             ATm_csr = csr_matrix(ATm.getValuesCSR()[::-1], shape=Am.size)
@@ -275,9 +291,12 @@ class StatesComp(om.ImplicitComponent):
             dR = df.Function(state_function.function_space())
 
             rhs_.vector().set_local(d_outputs[state_name])
+            if state_name!='density':
+                for bc in pde_problem.bcs_list:
+                    bc.apply(A)           
 
-            for bc in pde_problem.bcs_list:
-                bc.apply(A)
+            # for bc in pde_problem.bcs_list:
+            #     bc.apply(A)
             Am = df.as_backend_type(A).mat()
             ATm = Am.transpose()
             AT =  df.PETScMatrix(ATm)
@@ -287,24 +306,25 @@ class StatesComp(om.ImplicitComponent):
             prm["maximum_iterations"]=1000000
             prm["divergence_limit"] = 1e2
             solver.solve(AT,dR.vector(),rhs_.vector())
-            print('solve'+iter)
+            # print('solve'+iter)
 
             d_residuals[state_name] =  dR.vector().get_local()
 
         elif linear_solver=='petsc_gmres_ilu':
             ksp = PETSc.KSP().create() 
             ksp.setType(PETSc.KSP.Type.GMRES)
-            ksp.setTolerances(rtol=5e-11)
+            ksp.setTolerances(rtol=5e-17)
 
-            for bc in pde_problem.bcs_list:
-                bc.apply(A)
+            if state_name!='density':
+                for bc in pde_problem.bcs_list:
+                    bc.apply(A)
             Am = df.as_backend_type(A).mat()
 
             ksp.setOperators(Am)
 
             ksp.setFromOptions()
             pc = ksp.getPC()
-            pc.setType("ilu")
+            pc.setType("lu")
 
             size = state_function.function_space().dim()
 
@@ -330,10 +350,11 @@ class StatesComp(om.ImplicitComponent):
         elif linear_solver=='petsc_cg_ilu':
             ksp = PETSc.KSP().create() 
             ksp.setType(PETSc.KSP.Type.CG)
-            ksp.setTolerances(rtol=5e-12)
+            ksp.setTolerances(rtol=5e-15)
 
-            for bc in pde_problem.bcs_list:
-                bc.apply(A)
+            if state_name!='density':
+                for bc in pde_problem.bcs_list:
+                    bc.apply(A)
             Am = df.as_backend_type(A).mat()
 
             ksp.setOperators(Am)
@@ -364,13 +385,13 @@ class StatesComp(om.ImplicitComponent):
                 d_residuals[state_name] = dR.getValues(range(size))
            
 
-NUM_ELEMENTS_X = 240 #480
-NUM_ELEMENTS_Y = 80 # 160
-LENGTH_X = 0.48
-LENGTH_Y = 0.16
-class TractionBoundary(df.SubDomain):
-    def inside(self, x, on_boundary):
-        return ((abs(x[1] - LENGTH_Y/2) < LENGTH_Y/NUM_ELEMENTS_Y + df.DOLFIN_EPS) and (abs(x[0] - LENGTH_X ) < df.DOLFIN_EPS*1.5e15))
+# NUM_ELEMENTS_X = 240 #480
+# NUM_ELEMENTS_Y = 80 # 160
+# LENGTH_X = 0.48
+# LENGTH_Y = 0.16
+# class TractionBoundary(df.SubDomain):
+#     def inside(self, x, on_boundary):
+#         return ((abs(x[1] - LENGTH_Y/2) < LENGTH_Y/NUM_ELEMENTS_Y + df.DOLFIN_EPS) and (abs(x[0] - LENGTH_X ) < df.DOLFIN_EPS*1.5e15))
 
 
 

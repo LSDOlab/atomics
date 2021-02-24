@@ -1,11 +1,8 @@
 import dolfin as df
 import pygmsh
 
-def get_residual_form(u, v, rho_e, T, T_hat, KAPPA, k, alpha, mode='plane_stress', method='RAMP'):
-    if method=='RAMP':
-        C = rho_e/(1 + 8. * (1. - rho_e))
-    else:
-        C = rho_e**3
+def get_residual_form(mixed_function, u, v, rho_e, T, T_hat, KAPPA, k, alpha, mode='plane_stress'):
+    C = rho_e/(1 + 8. * (1. - rho_e))
 
     E = k * C # C is the design variable, its values is from 0 to 1
 
@@ -19,6 +16,11 @@ def get_residual_form(u, v, rho_e, T, T_hat, KAPPA, k, alpha, mode='plane_stress
     if mode == 'plane_stress':
         lambda_ = 2*mu*lambda_/(lambda_+2*mu)
 
+    displacements_function,temperature_function = df.split(mixed_function)
+
+    u = displacements_function
+    T = temperature_function
+
     # Th = df.Constant(7)
     I = df.Identity(len(u))
     w_ij = 0.5 * (df.grad(u) + df.grad(u).T) - alpha * I * T
@@ -31,8 +33,24 @@ def get_residual_form(u, v, rho_e, T, T_hat, KAPPA, k, alpha, mode='plane_stress
     a = df.inner(sigm, v_ij) * df.dx + \
         df.dot(C*KAPPA* df.grad(T),  df.grad(T_hat)) * df.dx
     print("get a-------")
+    displacements_function_val, temperature_function_val=  displacements_function,temperature_function
+    # displacements_function_val, temperature_function_val= mixed_function.split()
     
-    return a
+    w_ij = 0.5 * (df.grad(displacements_function_val) + df.grad(displacements_function_val).T) - alpha * I * T
+    # print('form---von_Mises--------', displacements_function_val.vector().get_local())
+
+    sigm = lambda_*df.div(displacements_function_val)*df.Identity(d) + 2*mu*w_ij 
+    V = rho_e.function_space()
+    mesh = rho_e.function_space().mesh()
+    s = sigm - (1./3)*df.tr(sigm)*df.Identity(d)
+    von_Mises = df.sqrt(3./2*df.inner(s, s)) * 1 # convert to MPa
+    # von_Mises = df.sqrt(3./2*df.inner(s, s)) * 1e-6 # convert to MPa
+    # von_Mises = df.sqrt(3./2*df.inner(s, s)) * 1e-9 # convert to MPa
+    # von_Mises = df.project(von_Mises, V)
+    # print('form---von_Mises--------', von_Mises.vector().get_local())
+    von_Mises_form = (1/df.CellVolume(mesh)) * von_Mises * df.TestFunction(V) * df.dx
+    print('form---von_Mises_form--------', df.assemble(von_Mises_form).get_local())
+    return a, von_Mises_form
 
 
 if __name__ == '__main__':
@@ -200,7 +218,8 @@ if __name__ == '__main__':
     density_function = df.Function(density_function_space)
     density_function.vector().set_local(np.ones(density_function_space.dim())*0.999)
 
-    residual_form = get_residual_form(
+    residual_form,vom = get_residual_form(
+        mixed_function,
         displacements_function, 
         v, 
         density_function,
@@ -233,52 +252,13 @@ if __name__ == '__main__':
 
     displacements_function_val, temperature_function_val= mixed_function.split()
     
-    # df.File("mixed_displacements_2d.pvd") << displacements_function_val
-    # df.File("mixed_temperature_2d.pvd") << temperature_function_val
-
-    C = density_function/(1 + 8. * (1. - density_function))
-
-    E = K * C # C is the design variable, its values is from 0 to 1
-
-    nu = 0.3 # Poisson's ratio
-    # Th = Th - df.Constant(20.)
-
-
-    lambda_ = E * nu/(1. + nu)/(1 - 2 * nu)
-    mu = E / 2 / (1 + nu) #lame's parameters
-
-
-    lambda_ = 2*mu*lambda_/(lambda_+2*mu)
-
-    # Th = df.Constant(7)
-    I = df.Identity(len(displacements_function))
-    w_ij = 0.5 * (df.grad(displacements_function) + df.grad(displacements_function).T) - ALPHA * I * temperature_function
-    v_ij = 0.5 * (df.grad(v) + df.grad(v).T)
-
-    d = len(displacements_function)
-
-    def sigma(u):
-        sigm = lambda_*df.div(u)*df.Identity(d) + 2*mu*w_ij 
-        return sigm
-
-    import matplotlib
-    import matplotlib.pyplot as plt
-    # Plot stress
-    s = sigma(displacements_function) - (1./3)*df.tr(sigma(displacements_function))*df.Identity(d)  # deviatoric stress
-    von_Mises = df.sqrt(3./2*df.inner(s, s))
-
     
-    V = df.FunctionSpace(mesh, 'DG', 0)
-    von_Mises = df.project(von_Mises, V)
-    von_Mises_max = von_Mises.vector().get_local().max()
-    von_Mises_min = von_Mises.vector().get_local().min()
-    # der = df.derivative(von_Mises, mixed_function)
-    von_Mises_form = (1/df.CellVolume(mesh)) * von_Mises * df.TestFunction(V) * df.dx
-    von_Mises_val = df.assemble(von_Mises_form).get_local()
-    der = df.derivative(von_Mises_form, mixed_function)
+    von_Mises_val = df.assemble(vom).get_local()
+    der = df.derivative(vom, mixed_function)
     der_val = df.assemble(der).array()
-    df.plot(von_Mises, title='von Mises stress')
-    plt.show()
-    df.File("von_Mises.pvd") << von_Mises
+    # np.linalg.norm(der_val)
+    # df.plot(von_Mises, title='von Mises stress')
+    # plt.show()
+    # df.File("von_Mises.pvd") << von_Mises
 
-    derivative_petsc_sparse = df.as_backend_type(df.assemble(der)).mat()
+    # derivative_petsc_sparse = df.as_backend_type(df.assemble(der)).mat()

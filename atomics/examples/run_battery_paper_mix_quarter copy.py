@@ -1,3 +1,4 @@
+
 import dolfin as df
 import meshio
 import numpy as np
@@ -24,6 +25,7 @@ with a 2d linear plane stress model
 '''
 
 # parameters for box
+MESH_L  =  1.e-2
 LENGTH  =  20.0e-2
 WIDTH   =  20.0e-2
 HIGHT   =  5.e-2
@@ -44,16 +46,7 @@ y = np.linspace(first_cell_y, end_cell_y, num_cell_y)
 xv, yv = np.meshgrid(x, y)
 radius       =  0.01
 axis_cell    = [0.0, 0.0, HIGHT]
-A_cell = np.pi * (radius)**2
-A_whole = (LENGTH * WIDTH)
-cell_A_ratio = A_cell*(num_cell_x*num_cell_y)/A_whole
 
-A_cell_quart = A_cell*(num_cell_x*num_cell_y) / 4
-A_whole_quart = (LENGTH * WIDTH)/4
-
-A_actual = 4.5e-3
-A_now = A_whole_quart - A_cell_quart
-ratio_act = A_actual / A_now
 # constants for temperature field
 KAPPA = 235
 AREA_CYLINDER = 2 * np.pi * radius * HIGHT
@@ -85,15 +78,15 @@ f_t = df.Constant(( 0., -1.e6/AREA_SIDE))
 
 #-----------------Generate--mesh----------------
 with pygmsh.occ.Geometry() as geom:
-    geom.characteristic_length_min = 0.002
-    geom.characteristic_length_max = 0.002
+    geom.characteristic_length_min = 0.001
+    geom.characteristic_length_max = 0.001
     disk_dic = {}
     disks = []
 
     rectangle = geom.add_rectangle([START_X, START_Y, 0.], LENGTH, WIDTH)
     for i in range(num_cells):
         name = 'disk' + str(i)
-        disk_dic[name] = geom.add_disk([xv.flatten()[i], yv.flatten()[i], 0.], radius)
+        disk_dic[name] = geom.add_disk([xv.flatten()[i], yv.flatten()[i], 0.], 0.01)
         disks.append(disk_dic[name])
 
     rectangle_1 = geom.add_rectangle([START_X, START_Y, 0.], LENGTH, WIDTH/2)
@@ -320,15 +313,15 @@ idx_rec = []
 x_line = y_line = np.linspace(0, 0.1, num=100)
 x_0 = y_0 = np.zeros(100)
 x_1 = y_1 = np.ones(100) * 0.1
-x.extend(x_line)
+# x.extend(x_line)
 x.extend(x_1)
 x.extend(x_line)
-x.extend(x_0)
+# x.extend(x_0)
 
-y.extend(y_0)
+# y.extend(y_0)
 y.extend(y_line)
 y.extend(y_1)
-y.extend(y_line)
+# y.extend(y_line)
 plt.gca().set_aspect('equal', adjustable='box')
 
 for i in range(len(x)):
