@@ -1,7 +1,0 @@
-/tmp/tmps6hn_s19/dolfin_expression_cba0dc8ccbda065d4a916c846cc93696.cpp: In member function ‘virtual void dolfin::dolfin_expression_cba0dc8ccbda065d4a916c846cc93696::eval(Eigen::Ref<Eigen::Matrix<double, -1, 1> >, Eigen::Ref<const Eigen::Matrix<double, -1, 1> >) const’:
-/tmp/tmps6hn_s19/dolfin_expression_cba0dc8ccbda065d4a916c846cc93696.cpp:61:39: error: ‘s’ was not declared in this scope
-   61 |           values[0] = sqrt(3./2*inner(s, s));
-      |                                       ^
-/tmp/tmps6hn_s19/dolfin_expression_cba0dc8ccbda065d4a916c846cc93696.cpp:61:33: error: ‘inner’ was not declared in this scope
-   61 |           values[0] = sqrt(3./2*inner(s, s));
-      |                                 ^~~~~

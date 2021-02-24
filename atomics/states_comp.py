@@ -59,14 +59,14 @@ class StatesComp(om.ImplicitComponent):
     def setup(self):
         pde_problem = self.options['pde_problem']
         state_name = self.options['state_name']
-        print('------------------', state_name)
+        # print('------------------', state_name)
 
         state_function = pde_problem.states_dict[state_name]['function']
 
         self.itr = 0
         self.argument_functions_dict = argument_functions_dict = dict()
         for argument_name in pde_problem.states_dict[state_name]['arguments']:
-            print( '--------########---------------', argument_name)
+            # print( '--------########---------------', argument_name)
             argument_functions_dict[argument_name] = pde_problem.inputs_dict[argument_name]['function']
 
         for argument_name, argument_function in iteritems(self.argument_functions_dict):

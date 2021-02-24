@@ -95,7 +95,7 @@ class StatesFilterComp(om.ImplicitComponent):
 
     
     def linearize(self, inputs, outputs, partials):
-        print('linearize')
+        # print('linearize')
         residual_form = self.options['residual'](self.unfiltered_density, 
                                                     self.filtered_density)
         J = df.derivative(residual_form, self.filtered_density)
@@ -154,7 +154,7 @@ class StatesFilterComp(om.ImplicitComponent):
                 d_residuals['density'] = dR.getValues(range(size))
                 print('d_residual[density]', d_residuals['density'])
         elif option==2:
-            print('option 2')
+            # print('option 2')
 
             rhs_ = df.Function(self.function_space)
             dR = df.Function(self.function_space)
