@@ -6,9 +6,11 @@ import openmdao.api as om
 
 from atomics.api import PDEProblem, AtomicsGroup
 from atomics.pdes.linear_elastic import get_residual_form
+from atomics.pdes.variational_filter import get_residual_form_variational_filter
+from atomics.states_comp_filter import StatesFilterComp
 
 # from cartesian_density_filter_comp import CartesianDensityFilterComp
-from atomics.general_filter_comp import GeneralFilterComp
+# from atomics.general_filter_comp import GeneralFilterComp
 
 
 np.random.seed(0)
@@ -31,7 +33,7 @@ mesh = df.RectangleMesh.create(
 # here traction force is applied on the middle of the right edge
 class TractionBoundary(df.SubDomain):
     def inside(self, x, on_boundary):
-        return ((abs(x[1] - LENGTH_Y/2) < LENGTH_Y/NUM_ELEMENTS_Y + df.DOLFIN_EPS) and (abs(x[0] - LENGTH_X ) < df.DOLFIN_EPS*1.5e15))
+        return ((abs(x[1] - LENGTH_Y/2) < LENGTH_Y/NUM_ELEMENTS_Y + df.DOLFIN_EPS) and (abs(x[0] - LENGTH_X ) < df.DOLFIN_EPS))
 
 # Define the traction boundary
 sub_domains = df.MeshFunction('size_t', mesh, mesh.topology().dim() - 1)
@@ -46,8 +48,20 @@ pde_problem = PDEProblem(mesh)
 # Add input to the PDE problem:
 # name = 'density', function = density_function (function is the solution vector here)
 density_function_space = df.FunctionSpace(mesh, 'DG', 0)
+density_unfiltered_function = df.Function(density_function_space)
 density_function = df.Function(density_function_space)
+# pde_problem.add_input('density', density_function)
+# pde_problem.add_input('density_unfiltered', density_unfiltered_function)
 pde_problem.add_input('density', density_function)
+
+# density_function = df.Function(density_function_space)
+
+# residual_form_filter = get_residual_form_variational_filter(
+#     density_unfiltered_function, 
+#     density_function,
+#     C=4.3e-1
+# )
+# pde_problem.add_state('density', density_function, residual_form_filter,'density_unfiltered')
 
 # Add states to the PDE problem (line 58):
 # name = 'displacements', function = displacements_function (function is the solution vector here)
@@ -60,7 +74,9 @@ residual_form = get_residual_form(
     displacements_function, 
     v, 
     density_function,
+    method='RAMP'
 )
+
 
 residual_form -= df.dot(f, v) * dss(6)
 pde_problem.add_state('displacements', displacements_function, residual_form, 'density')
@@ -85,6 +101,7 @@ pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0
 prob = om.Problem()
 
 num_dof_density = pde_problem.inputs_dict['density']['function'].function_space().dim()
+# num_dof_density = pde_problem.inputs_dict['density']['function'].function_space().dim()
 
 comp = om.IndepVarComp()
 comp.add_output(
@@ -93,6 +110,10 @@ comp.add_output(
     val=np.random.random(num_dof_density) * 0.86,
 )
 prob.model.add_subsystem('indep_var_comp', comp, promotes=['*'])
+
+comp = StatesFilterComp(residual=get_residual_form_variational_filter, 
+                        function_space=density_function_space)
+prob.model.add_subsystem('StatesFilterComp', comp, promotes=['*'])
 
 # comp = CartesianDensityFilterComp(
 #     length_x=LENGTH_X,
@@ -104,11 +125,11 @@ prob.model.add_subsystem('indep_var_comp', comp, promotes=['*'])
 # )
 # prob.model.add_subsystem('density_filter_comp', comp, promotes=['*'])
 
-comp = GeneralFilterComp(density_function_space=density_function_space)
-prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
+# comp = GeneralFilterComp(density_function_space=density_function_space)
+# prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
 
 
-group = AtomicsGroup(pde_problem=pde_problem)
+group = AtomicsGroup(pde_problem=pde_problem, problem_type='linear_problem')
 prob.model.add_subsystem('atomics_group', group, promotes=['*'])
 
 prob.model.add_design_var('density_unfiltered',upper=1, lower=1e-4)
@@ -133,13 +154,15 @@ prob.setup()
 prob.run_model()
 # print(prob['compliance']); exit()
 
-# prob.run_driver()
-prob.check_partials(compact_print=True)
+prob.run_driver()
+# prob.check_partials(compact_print=True)
+# prob.check_totals(compact_print=True)
 
 
 #save the solution vector
-df.File('solutions/case_1/cantilever_beam/displacement.pvd') << displacements_function
+df.File('solutions/other_examples/cantilever_beam_variational_filter/displacement.pvd') << displacements_function
 stiffness  = df.project(density_function**3, density_function_space) 
+
 # stiffness  = df.project(density_function/(1 + 8. * (1. - density_function)), density_function_space) 
 
-df.File('solutions/case_1/cantilever_beam/stiffness.pvd') << stiffness
+df.File('solutions/other_examples/cantilever_beam_variational_filter/stiffness.pvd') << stiffness
