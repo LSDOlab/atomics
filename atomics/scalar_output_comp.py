@@ -67,8 +67,8 @@ class ScalarOutputsComp(om.ExplicitComponent):
         self._set_values(inputs)
 
         form = pde_problem.scalar_outputs_dict[scalar_output_name]['form']
-        print('output:-----------')
-        print( df.assemble(form))
+        # print('output:-----------')
+        # print( df.assemble(form))
 
 
         outputs[scalar_output_name] = df.assemble(form)
