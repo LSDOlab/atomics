@@ -18,6 +18,7 @@ Documentation
 
    _src_docs/getting_started
    _src_docs/api
+   _src_docs/solution
    _src_docs/methods
    _src_docs/pdes
    _src_docs/examples

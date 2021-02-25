@@ -1,5 +1,5 @@
-Example Run scripts and outputs
-================================
+Examples library
+================
 
 .. toctree::
   :maxdepth: 1
