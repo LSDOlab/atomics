@@ -22,3 +22,5 @@
 *optimization_output.txt*
 .idea
 *get_layout.py
+*test_lce_heat_transfer.py
+*thermo_mechanical_uniform_temp_test.py
