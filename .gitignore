@@ -6,10 +6,10 @@
 *write_data*
 *~
 *.pyc
-*.html
+# *.html
 *.out
 *DS_Store*
-*_build*
+# *_build*
 .vscode/
 *.stl
 *.csv
