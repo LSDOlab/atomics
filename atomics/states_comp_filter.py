@@ -35,13 +35,15 @@ class StatesFilterComp(om.ImplicitComponent):
         self.options.declare('residual')
         self.options.declare('function_space')
 
+        self.options.declare('filter_strength', default=7e-1)
         self.options.declare('option', default=2)
 
     
     def setup(self):
 
-        self.fea = self.options['residual']
         self.function_space = self.options['function_space']
+        self.filter_strength = self.options['filter_strength']
+        
         self.v = df.TestFunction(self.options['function_space'])
 
         self.add_input('density_unfiltered', shape=self.function_space.dim() )
@@ -58,7 +60,8 @@ class StatesFilterComp(om.ImplicitComponent):
     def compute_derivative(self, arg_name, arg_function):
         
         residual_form = self.options['residual'](self.unfiltered_density, 
-                                                    self.filtered_density)
+                                                    self.filtered_density,
+                                                    C=self.filter_strength)
         derivative_form = df.derivative(residual_form, arg_function)
         derivative_petsc_sparse = df.as_backend_type(df.assemble(derivative_form)).mat()
         derivative_csr = csr_matrix(derivative_petsc_sparse.getValuesCSR()[::-1], shape=derivative_petsc_sparse.size)
@@ -71,7 +74,8 @@ class StatesFilterComp(om.ImplicitComponent):
         self.filtered_density.vector().set_local(outputs['density'])
 
         residual_form = self.options['residual'](self.unfiltered_density, 
-                                                    self.filtered_density)
+                                                    self.filtered_density,
+                                                    C=self.filter_strength)
         residuals['density'] = df.assemble(residual_form).get_local()
 
     
@@ -81,7 +85,8 @@ class StatesFilterComp(om.ImplicitComponent):
         self.filtered_density.vector().set_local(outputs['density'])
 
         residual_form = self.options['residual'](self.unfiltered_density, 
-                                                    self.filtered_density)
+                                                    self.filtered_density,
+                                                    C=self.filter_strength)
         J = df.derivative(residual_form, self.filtered_density)
 
         df.set_log_active(False)
@@ -97,7 +102,8 @@ class StatesFilterComp(om.ImplicitComponent):
     def linearize(self, inputs, outputs, partials):
         # print('linearize')
         residual_form = self.options['residual'](self.unfiltered_density, 
-                                                    self.filtered_density)
+                                                    self.filtered_density,
+                                                    C=self.filter_strength)
         J = df.derivative(residual_form, self.filtered_density)
 
         self.A, b = df.assemble_system(J, - residual_form)

@@ -9,9 +9,6 @@ from atomics.pdes.linear_elastic import get_residual_form
 from atomics.pdes.variational_filter import get_residual_form_variational_filter
 from atomics.states_comp_filter import StatesFilterComp
 
-# from cartesian_density_filter_comp import CartesianDensityFilterComp
-# from atomics.general_filter_comp import GeneralFilterComp
-
 
 np.random.seed(0)
 
@@ -50,22 +47,9 @@ pde_problem = PDEProblem(mesh)
 density_function_space = df.FunctionSpace(mesh, 'DG', 0)
 density_unfiltered_function = df.Function(density_function_space)
 density_function = df.Function(density_function_space)
-# pde_problem.add_input('density', density_function)
-# pde_problem.add_input('density_unfiltered', density_unfiltered_function)
 pde_problem.add_input('density', density_function)
 
-# density_function = df.Function(density_function_space)
 
-# residual_form_filter = get_residual_form_variational_filter(
-#     density_unfiltered_function, 
-#     density_function,
-#     C=4.3e-1
-# )
-# pde_problem.add_state('density', density_function, residual_form_filter,'density_unfiltered')
-
-# Add states to the PDE problem (line 58):
-# name = 'displacements', function = displacements_function (function is the solution vector here)
-# residual_form = get_residual_form(u, v, rho_e) from atomics.pdes.thermo_mechanical_uniform_temp
 # *inputs = density (can be multiple, here 'density' is the only input)
 displacements_function_space = df.VectorFunctionSpace(mesh, 'Lagrange', 1)
 displacements_function = df.Function(displacements_function_space)
@@ -92,9 +76,7 @@ pde_problem.add_scalar_output('compliance', compliance_form, 'displacements')
 
 # Add boundary conditions to the PDE problem:
 pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0, 0.0)), '(abs(x[0]-0.) < DOLFIN_EPS)'))
-# pde_problem.add_bc(df.DirichletBC(displacements_function_space, df.Constant((0.0, 0.0)), '(abs(x[0]-0.06) < DOLFIN_EPS)'))
 
-# num_dof_density = V_density.dim()
 
 # Define the OpenMDAO problem and model
 
@@ -112,21 +94,11 @@ comp.add_output(
 prob.model.add_subsystem('indep_var_comp', comp, promotes=['*'])
 
 comp = StatesFilterComp(residual=get_residual_form_variational_filter, 
-                        function_space=density_function_space)
+                            function_space=density_function_space,
+                            filter_strength=7.e-1
+                        )
 prob.model.add_subsystem('StatesFilterComp', comp, promotes=['*'])
 
-# comp = CartesianDensityFilterComp(
-#     length_x=LENGTH_X,
-#     length_y=LENGTH_Y,
-#     num_nodes_x=NUM_ELEMENTS_X + 1,
-#     num_nodes_y=NUM_ELEMENTS_Y + 1,
-#     num_dvs=num_dof_density, 
-#     radius=2. * LENGTH_Y / NUM_ELEMENTS_Y,
-# )
-# prob.model.add_subsystem('density_filter_comp', comp, promotes=['*'])
-
-# comp = GeneralFilterComp(density_function_space=density_function_space)
-# prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
 
 
 group = AtomicsGroup(pde_problem=pde_problem, problem_type='linear_problem')
@@ -148,8 +120,6 @@ driver.opt_settings['Major step limit'] = 2.0
 driver.opt_settings['Major feasibility tolerance'] = 1.0e-6
 driver.opt_settings['Major optimality tolerance'] =1.e-8
 
-
-
 prob.setup()
 prob.run_model()
 # print(prob['compliance']); exit()
@@ -158,11 +128,11 @@ prob.run_driver()
 # prob.check_partials(compact_print=True)
 # prob.check_totals(compact_print=True)
 
-
 #save the solution vector
+if method =='SIMP':
+    penalized_density  = df.project(density_function**3, density_function_space) 
+else:
+    penalized_density  = df.project(density_function/(1 + 8. * (1. - density_function)), density_function_space) 
+
 df.File('solutions/other_examples/cantilever_beam_variational_filter/displacement.pvd') << displacements_function
-stiffness  = df.project(density_function**3, density_function_space) 
-
-# stiffness  = df.project(density_function/(1 + 8. * (1. - density_function)), density_function_space) 
-
-df.File('solutions/other_examples/cantilever_beam_variational_filter/stiffness.pvd') << stiffness
+df.File('solutions/other_examples/cantilever_beam_variational_filter/penalized_density.pvd') << penalized_density
