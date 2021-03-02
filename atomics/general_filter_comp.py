@@ -10,10 +10,12 @@ from openmdao.api import ExplicitComponent
 class GeneralFilterComp(ExplicitComponent):
     def initialize(self):
         self.options.declare('density_function_space')
+        self.options.declare('num_element_filtered', default=2)
 
    
     def setup(self):
         density_function_space = self.options['density_function_space']
+        num_element_filtered = self.options['num_element_filtered']
         NUM_ELEMENTS = density_function_space.dim()
 
 
@@ -29,7 +31,7 @@ class GeneralFilterComp(ExplicitComponent):
         mesh_size_max = density_function_space.mesh().hmax()
         mesh_size_min = density_function_space.mesh().hmin()
 
-        radius = 2 * ((mesh_size_max + mesh_size_min) /2)
+        radius = num_element_filtered * ((mesh_size_max + mesh_size_min) /2)
         # 1.414 is because the hmax is defined as the 
         # greatest distance between any two vertices (sqrt(2))
 
@@ -84,7 +86,7 @@ class GeneralFilterComp(ExplicitComponent):
 #     comp.add_output('density_unfiltered', shape=600, val=scaler_value)
 #     group.add_subsystem('input', comp, promotes=['*'])
 
-#     comp = GeneralFilterComp(density_function_space=density_function_space)
+#     comp = GeneralFilterComp(density_function_space=density_function_space, num_element_filtered=3)
 #     group.add_subsystem('GeneralFilterComp', comp, promotes=['*'])
 #     prob = Problem()
 #     prob.model = group
