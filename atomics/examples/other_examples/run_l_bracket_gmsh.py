@@ -90,7 +90,8 @@ comp.add_output(
 )
 prob.model.add_subsystem('indep_var_comp', comp, promotes=['*'])
 
-comp = GeneralFilterComp(density_function_space=density_function_space)
+# add the filter and specifying the filter radius--num_element_filtered=2
+comp = GeneralFilterComp(density_function_space=density_function_space, num_element_filtered=2)
 prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
 
 group = AtomicsGroup(pde_problem=pde_problem)
