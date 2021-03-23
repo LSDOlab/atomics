@@ -1,4 +1,8 @@
 class PDEProblem(object):
+    '''
+    PDEProblem is a class containing the mesh and the dictionaries of
+    the boundary conditions, inputs, states, and outputs.
+    '''
 
     def __init__(self, mesh):
         self.mesh = mesh
@@ -7,7 +11,6 @@ class PDEProblem(object):
         self.states_dict = dict()
         self.scalar_outputs_dict = dict()
         self.field_outputs_dict = dict()
-
         self.bcs_list = list()
 
     def add_bc(self, bc):
@@ -41,4 +44,3 @@ class PDEProblem(object):
             form=form,
             arguments=arguments,
         )
-        # raise NotImplemented()

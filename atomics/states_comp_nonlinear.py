@@ -20,17 +20,23 @@ from atomics.pdes.hyperelastic_neo_hookean_addtive_test import get_residual_form
 
 class StatesComp(om.ImplicitComponent):
     """
-    The implicit component that wraps the FEniCS PDE solver.
-    This component calls the set_fea.py that solves a linear elastic 
-    problem.
+    The implicit component that wraps the FEniCS PDE solver
+    for a hyperelastic problem, where we need to update the
+    residual form every iteration.
     Parameters
     ----------
-    rho_e[self.fea.dvs] : numpy array
-        density
+    ``linear_solver`` solver for the total derivatives
+    values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu', 'scipy_cg','petsc_cg_ilu']
+
+    ``problem_type`` solver for the FEA problem
+    values=['linear_problem', 'nonlinear_problem', 'nonlinear_problem_load_stepping']
+
+    ``visualization`` whether to save the iteration histories
+    values=['True', 'False'],
     Returns
     -------
-    displacements[self.fea.num_dof] : numpy array
-        nodel displacement vector
+    outputs['state_name'] : numpy array
+        states
     """
 
     def initialize(self):

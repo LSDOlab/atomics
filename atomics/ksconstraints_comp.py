@@ -4,6 +4,26 @@ from openmdao.core.explicitcomponent import ExplicitComponent
 
 
 class KSConstraintsComp(ExplicitComponent):
+    """
+    KSConstraintsComp is an stock OpenMDAO components
+    to approaximate the maximum value of a matrix given its axis.
+    KSConstraintsComp is often used as an aggregated constraint.
+    Parameters
+    ----------
+    shape : tuple
+       shape of the input variable
+    axis : int
+        axis to take the maximum
+    out_name : str
+        the shape of the output variable
+    in_name : str
+        the shape of the input variable
+    rho : float
+        constraint Aggregation Factor
+    Returns
+    -------
+    outputs[out_name] : numpy array
+    """
 
     def initialize(self):
         self.options.declare('shape', types=tuple)
@@ -27,12 +47,8 @@ class KSConstraintsComp(ExplicitComponent):
         if self.options['axis'] < 0:
             self.options['axis'] += self.total_rank
 
-
-
         in_shape = tuple(shape)
         out_shape = shape[:axis] + shape[axis+1:]
-        # print('in_shape', in_shape)
-        # print('out_shape', out_shape)
 
         self.add_input(in_name, shape=in_shape)
         self.add_output(out_name, shape=out_shape)
@@ -80,7 +96,6 @@ class KSConstraintsComp(ExplicitComponent):
         summation = np.sum(exponents, axis=axis)
         result = g_max + 1.0 / rho * np.log(summation)
         outputs[out_name] = result
-        # print('The max of the result is:', result)
 
         dsum_dg = rho * exponents
         dKS_dsum = 1.0 / (rho * np.einsum(
@@ -96,31 +111,3 @@ class KSConstraintsComp(ExplicitComponent):
         in_name = self.options['in_name']
         out_name = self.options['out_name']
         partials[out_name, in_name] = self.dKS_dg.flatten()
-
-
-if __name__ == '__main__':
-    from openmdao.api import Problem, IndepVarComp
-
-    shape = (10,)
-    axis = 0
-
-    prob = Problem()
-
-    comp = IndepVarComp()
-    comp.add_output('x', val=np.random.rand(*shape))
-    prob.model.add_subsystem('ivc', comp, promotes=['*'])
-
-    comp = KSConstraintsComp(
-        in_name='x',
-        out_name='y',
-        shape=shape,
-        axis=axis,
-        rho=100.,
-    )
-    prob.model.add_subsystem('comp', comp, promotes=['*'])
-
-    prob.setup()
-    prob.run_model()
-    prob.check_partials(compact_print=True)
-    print(prob['x'], 'x')
-    print(prob['y'], 'y')

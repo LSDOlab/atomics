@@ -8,9 +8,26 @@ from openmdao.api import ExplicitComponent
 
 
 class GeneralFilterComp(ExplicitComponent):
+    """
+    GeneralFilterComp calculates the filtered densities
+    with its derivatives.
+    The filter radius is N times the average element size.
+    Parameters
+    ----------
+    density_function_space   
+       The FEniCS function space of the density variables
+    num_element_filtered : float
+        the filter radius 
+        (the number multiplied by the average element size)
+    Returns
+    -------
+    outputs[density] numpy array
+        filtered densities
+    """
+
     def initialize(self):
         self.options.declare('density_function_space')
-        self.options.declare('num_element_filtered', default=2)
+        self.options.declare('num_element_filtered', default=2.)
 
    
     def setup(self):
@@ -32,8 +49,6 @@ class GeneralFilterComp(ExplicitComponent):
         mesh_size_min = density_function_space.mesh().hmin()
 
         radius = num_element_filtered * ((mesh_size_max + mesh_size_min) /2)
-        # 1.414 is because the hmax is defined as the 
-        # greatest distance between any two vertices (sqrt(2))
 
         weight_ij = []
         col = []
@@ -60,48 +75,4 @@ class GeneralFilterComp(ExplicitComponent):
 
     def compute(self, inputs, outputs):
         outputs['density'] = self.weight_mtx.dot(inputs['density_unfiltered'])
-
-
-# if __name__ == '__main__':
-#     import dolfin as df
-#     from openmdao.api import Problem, Group
-#     from openmdao.api import IndepVarComp
-#     group = Group()
-
-#     NUM_ELEMENTS_X = 30
-#     NUM_ELEMENTS_Y = 20
-#     LENGTH_X = .06
-#     LENGTH_Y = .04
-
-#     mesh = df.RectangleMesh.create(
-#         [df.Point(0.0, 0.0), df.Point(LENGTH_X, LENGTH_Y)],
-#         [NUM_ELEMENTS_X, NUM_ELEMENTS_Y],
-#         df.CellType.Type.quadrilateral,
-#     )
-
-#     density_function_space = df.FunctionSpace(mesh, 'DG', 0)
-#     scaler_value = np.zeros((NUM_ELEMENTS_X*NUM_ELEMENTS_Y))
-#     scaler_value[300:340] = 1.
-#     comp = IndepVarComp()
-#     comp.add_output('density_unfiltered', shape=600, val=scaler_value)
-#     group.add_subsystem('input', comp, promotes=['*'])
-
-#     comp = GeneralFilterComp(density_function_space=density_function_space, num_element_filtered=3)
-#     group.add_subsystem('GeneralFilterComp', comp, promotes=['*'])
-#     prob = Problem()
-#     prob.model = group
-#     prob.setup()
-#     prob.run_model()
-#     prob.check_partials(compact_print=True)
-#     prob.check_partials(compact_print=False)
-
-#     import matplotlib.pyplot as plt
-
-#     fig, (ax0, ax1) = plt.subplots(nrows=1, ncols=2, sharex=True)
-#     ax0.set_title('density_unfiltered')
-#     ax0.imshow(prob['density_unfiltered'].reshape(NUM_ELEMENTS_X, NUM_ELEMENTS_Y), cmap='hot', interpolation='nearest')
-#     ax1.set_title('density_filtered')
-#     ax1.imshow(prob['density'].reshape(NUM_ELEMENTS_X, NUM_ELEMENTS_Y), cmap='hot', interpolation='nearest')
-#     plt.show()
-
 

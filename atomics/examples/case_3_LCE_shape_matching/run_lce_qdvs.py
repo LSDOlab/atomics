@@ -13,7 +13,7 @@ from atomics.general_filter_comp import GeneralFilterComp
 
 from atomics.extract_comp import ExtractComp
 from atomics.interpolant_comp import InterpolantComp
-from atomics.copy_comp import Copycomp
+from atomics.copy_comp import CopyComp
 from atomics.symmetric_angle_comp import SymmericAnglecomp
 from atomics.symmetric_rho_comp import SymmericRhocomp
 
@@ -192,7 +192,7 @@ comp = SymmericAnglecomp(
 prob.model.add_subsystem('sym_angle_comp', comp, promotes=['*'])
 
 # add copy comp
-comp = Copycomp(
+comp = CopyComp(
     in_name='density_unfiltered_layer',
     out_name='density_unfiltered',
     in_shape=int(density_function_space.dim()/4),

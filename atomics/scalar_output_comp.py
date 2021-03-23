@@ -10,10 +10,19 @@ from atomics.pde_problem import PDEProblem
 
 class ScalarOutputsComp(om.ExplicitComponent):
     """
-    Calculates the outputs (constraints/objective).
+    ScalarOutputsComp wraps up a the scalar output (constraints/objective)
+    from a FEniCS form.
     Parameters
     ----------
-    input_name[pde_problem.states_dict[output_name]['inputs']] : numpy array
+    pde_problem PDEProblem
+        PDEProblem is a class containing the mesh and the dictionaries of
+        the boundary conditions, inputs, states, and outputs.
+    scalar_output_name : str
+        the name of the scalar output
+    Returns
+    -------
+    outputs[scalar_output_name] numpy array   
+        the scalar output
     Returns
     -------
     Output_name

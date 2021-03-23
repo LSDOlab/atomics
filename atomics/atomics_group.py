@@ -7,7 +7,27 @@ from atomics.scalar_output_comp import ScalarOutputsComp
 from atomics.field_output_comp import FieldOutputsComp
 
 class AtomicsGroup(om.Group):
+    """
+    The AtomicsGroup is a OpenMDAO Group object that wraps the assembly of OpenMDAO components.
+    Within ``AtomicsGroup``, the users can choose the ``pde_problem``, 
+    ``linear_solver`` (for the solution total derivatives), the`` problem_type``, 
+    and whether to turn on the ``visualization`` option.
+    problem.
+    Parameters
+    ----------
+    ``linear_solver``   solver for the total derivatives
+    default='petsc_cg_ilu', 
+    values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu', 'scipy_cg','petsc_cg_ilu']
 
+    ``problem_type``    solver for the FEA problem
+    default='nonlinear_problem', 
+    values=['linear_problem', 'nonlinear_problem', 'nonlinear_problem_load_stepping']
+
+    ``visualization``    whether to save the iteration histories
+    default='False', 
+    values=['True', 'False'],
+    """
+    
     def initialize(self):
         self.options.declare('pde_problem', types=PDEProblem)
         self.options.declare(

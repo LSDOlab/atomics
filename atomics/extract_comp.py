@@ -4,6 +4,24 @@ from openmdao.core.explicitcomponent import ExplicitComponent
 
 
 class ExtractComp(ExplicitComponent):
+    """
+    ExtractComp is a stock component implemented in OpenMDAO
+    to extract some data from a vector
+    Parameters
+    ----------
+    in_name : str
+        the name of the variable to extract from
+    out_name : str
+        the output variable name
+    in_shape : int
+        the shape of the input variable
+    partial_dof : numpy array
+        The indices of the extracted data in inputs[in_name] vector
+    Returns
+    -------
+    outputs[out_name] : numpy array
+        the inputs[in_name] the vector of the extracted data
+    """
 
     def initialize(self):
         self.options.declare('in_name', types=str)
@@ -32,41 +50,3 @@ class ExtractComp(ExplicitComponent):
         partial_dof = self.options['partial_dof']
 
         outputs[out_name] = inputs[in_name][partial_dof.astype(int)]
-
-
-if __name__ == '__main__':
-    from openmdao.api import Problem, IndepVarComp
-    from ksconstraints_comp import KSConstraintsComp
-    in_data = np.loadtxt('test_t.out')
-    partial_dof = np.loadtxt('ind.out')
-    shape = (10,)
-    axis = 0
-
-    prob = Problem()
-
-    comp = IndepVarComp()
-    comp.add_output('x', val=in_data)
-    prob.model.add_subsystem('ivc', comp, promotes=['*'])
-
-    comp = ExtractComp(
-        in_name='x',
-        out_name='y',
-        in_shape=in_data.size,
-        partial_dof=partial_dof,
-    )
-    prob.model.add_subsystem('ExtractComp', comp, promotes=['*'])
-
-    comp = KSConstraintsComp(
-        in_name='y',
-        out_name='y_max',
-        shape=(partial_dof.size,),
-        axis=0,
-        rho=50.,
-    )
-    prob.model.add_subsystem('KSConstraintsComp', comp, promotes=['*'])
-
-    prob.setup()
-    prob.run_model()
-    prob.check_partials(compact_print=True)
-    print(prob['x'], 'x')
-    print(prob['y'], 'y')

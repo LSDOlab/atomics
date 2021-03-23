@@ -4,6 +4,23 @@ from openmdao.core.explicitcomponent import ExplicitComponent
 
 
 class InterpolantComp(ExplicitComponent):
+    """
+    InterpolantComp is an stock OpenMDAO components
+    for linear interpolations.
+    Parameters
+    ----------
+    in_name : str
+        the name of the input variable
+    out_name : str
+        the name of the output variable
+    in_shape : int
+        the shape of the input variable
+    num_pts : int
+        number of the total points after interpolation
+    Returns
+    -------
+    outputs[out_name] : numpy array
+    """
 
     def initialize(self):
         self.options.declare('in_name', types=str)

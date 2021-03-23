@@ -13,7 +13,6 @@ from atomics.general_filter_comp import GeneralFilterComp
 
 from atomics.extract_comp import ExtractComp
 from atomics.ksconstraints_comp import KSConstraintsComp
-from atomics.ksconstraints_min_comp import KSConstraintsMinComp
 
 
 '''

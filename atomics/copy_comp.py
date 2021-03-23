@@ -3,7 +3,25 @@ import numpy as np
 from openmdao.core.explicitcomponent import ExplicitComponent
 
 
-class Copycomp(ExplicitComponent):
+class CopyComp(ExplicitComponent):
+    """
+    CopyComp is a stock component implemented in OpenMDAO
+    to make copies of a variable and concatenate with itself.
+    Parameters
+    ----------
+    in_name : str
+        the name of the variable we want to copy
+    out_name : str
+        the output variable name
+    in_shape : int
+        the shape of the input variable
+    num_copies : int
+        number of copies
+    Returns
+    -------
+    outputs[out_name] : numpy array
+        the inputs[in_name] vector concatenated with its copies
+    """
 
     def initialize(self):
         self.options.declare('in_name', types=str)
@@ -32,33 +50,3 @@ class Copycomp(ExplicitComponent):
         num_copies = self.options['num_copies']
         
         outputs[out_name] = np.tile(inputs[in_name], num_copies)
-
-if __name__ == '__main__':
-    from openmdao.api import Problem, IndepVarComp
-
-    in_shape = 5
-    in_data = np.random.random(in_shape)
-    num_copies = 3
-
-
-    prob = Problem()
-
-    comp = IndepVarComp()
-    comp.add_output('x', val=in_data)
-    prob.model.add_subsystem('ivc', comp, promotes=['*'])
-
-    comp = Copycomp(
-        in_name='x',
-        out_name='y',
-        in_shape=in_shape,
-        num_copies = num_copies,
-    )
-    prob.model.add_subsystem('Copycomp', comp, promotes=['*'])
-
-
-    prob.setup()
-    prob.run_model()
-    prob.check_partials(compact_print=True)
-    prob.check_partials(compact_print=False)
-    print(prob['x'], 'x')
-    print(prob['y'], 'y')

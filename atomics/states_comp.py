@@ -27,17 +27,26 @@ from atomics.pde_problem import PDEProblem
 
 class StatesComp(om.ImplicitComponent):
     """
-    The implicit component that wraps the FEniCS PDE solver.
-    This component calls the set_fea.py that solves a linear elastic 
+    StatesComp is a OpenMDAO  implicit component, which wraps the FEniCS PDE solver.
+    The total derivatives are also calculated in StatesComp.
     problem.
+    The users do not need to modify StatesComp ideally. 
+    The same settings can be modified in AtomicsGroup() 
+    from the run file.
     Parameters
     ----------
-    rho_e[self.fea.dvs] : numpy array
-        density
+    ``linear_solver`` solver for the total derivatives
+    values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu', 'scipy_cg','petsc_cg_ilu']
+
+    ``problem_type`` solver for the FEA problem
+    values=['linear_problem', 'nonlinear_problem', 'nonlinear_problem_load_stepping']
+
+    ``visualization`` whether to save the iteration histories
+    values=['True', 'False'],
     Returns
     -------
-    displacements[self.fea.num_dof] : numpy array
-        nodel displacement vector
+    outputs['state_name'] : numpy array
+        states
     """
 
     def initialize(self):
@@ -383,22 +392,3 @@ class StatesComp(om.ImplicitComponent):
             else:
                 ksp.solveTranspose(du,dR)
                 d_residuals[state_name] = dR.getValues(range(size))
-           
-
-# NUM_ELEMENTS_X = 240 #480
-# NUM_ELEMENTS_Y = 80 # 160
-# LENGTH_X = 0.48
-# LENGTH_Y = 0.16
-# class TractionBoundary(df.SubDomain):
-#     def inside(self, x, on_boundary):
-#         return ((abs(x[1] - LENGTH_Y/2) < LENGTH_Y/NUM_ELEMENTS_Y + df.DOLFIN_EPS) and (abs(x[0] - LENGTH_X ) < df.DOLFIN_EPS*1.5e15))
-
-
-
-if __name__ == '__main__':   
-    pass
-# self.T = df.Constant(...)
-# self.residual_form = get_residual_form(..., self.T, ...)
-# ...
-
-# self.T.assign(...) 

@@ -14,27 +14,31 @@ from matplotlib import pyplot as plt
 
 import ufl
 from atomics.pdes.variational_filter import get_residual_form_variational_filter
-# import cProfile, pstats, io
 
 class StatesFilterComp(om.ImplicitComponent):
     """
-    The implicit component that wraps a FEniCS filter that soomthing 
-    the density basic on the size of the elements
+    The implicit component that wraps a variational filter 
+    to soomth the densities.
 
     Parameters
     ----------
-    density_unfiltered[self.fea.num_var] : numpy array
-        unfiltered density
+    residual : FEniCS form
+        the residual form
+    function_space : FEniCS function space
+        function space of the densities
+    filter_strength : float
+        strength of the filter
+    option : int
+        the option for solving the derivatives
     Returns
     -------
-    density[self.fea.num_var] : numpy array
+    outputs['density'] : numpy array
         filtered density
     """
 
     def initialize(self):
         self.options.declare('residual')
         self.options.declare('function_space')
-
         self.options.declare('filter_strength', default=7e-1)
         self.options.declare('option', default=2)
 

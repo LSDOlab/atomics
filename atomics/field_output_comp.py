@@ -13,14 +13,20 @@ from atomics.pde_problem import PDEProblem
 
 class FieldOutputsComp(om.ExplicitComponent):
     """
-    Calculates the field outputs.
+    FieldOutputsComp wraps up a the field (a scalar on each element) output 
+    (used as constraints/objective) from a FEniCS form.
     Parameters
     ----------
-    input_name[pde_problem.field_outputs_dict[output_name]['inputs']] : numpy array
+    pde_problem   PDEProblem
+        PDEProblem is a class containing the dictionaries of
+        the boundary conditions, inputs, states, and outputs.
+    field_output_name : str
+        the name of the field output
     Returns
     -------
-    Output_name
+    outputs[field_output_name] numpy array
     """
+
     def initialize(self):
         self.options.declare('pde_problem', types=PDEProblem)
         self.options.declare('field_output_name', types=str)
@@ -29,7 +35,6 @@ class FieldOutputsComp(om.ExplicitComponent):
         pde_problem = self.options['pde_problem']
         field_output_name = self.options['field_output_name']
         form = pde_problem.field_outputs_dict[field_output_name]['form']
-        # print(df.assemble(form).get_local())
 
         self.argument_functions_dict = argument_functions_dict = dict()
         for argument_name in pde_problem.field_outputs_dict[field_output_name]['arguments']:
@@ -42,12 +47,8 @@ class FieldOutputsComp(om.ExplicitComponent):
                 raise Exception()
 
         for argument_name, argument_function in iteritems(self.argument_functions_dict):
-            # print('----------------------',argument_name)
             self.add_input(argument_name, shape=argument_functions_dict[argument_name].function_space().dim())
         self.add_output(field_output_name, shape=df.assemble(form).get_local().shape) 
-
-        # dR_dstate = self.compute_derivative(field_output_name, field_output_function)
-        # self.declare_partials(state_name, state_name, rows=dR_dstate.row, cols=dR_dstate.col)
 
         for argument_name, argument_function in iteritems(self.argument_functions_dict):
             dR_dinput = self.compute_derivative(argument_name, argument_function)
@@ -72,9 +73,7 @@ class FieldOutputsComp(om.ExplicitComponent):
 
         for argument_name, argument_function in iteritems(self.argument_functions_dict):
             argument_function.vector().set_local(inputs[argument_name])
-            # print([argument_name])
-            # print(np.linalg.norm(inputs[argument_name]))
-        
+
     def compute(self, inputs, outputs):
         pde_problem = self.options['pde_problem']
         field_output_name = self.options['field_output_name']
