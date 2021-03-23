@@ -1,5 +1,6 @@
 Getting started
 ===============
+For a detailed tutorial of ATOMiCS (automated topology optimization using OpenMDAO and FEniCS), please check our online documentations (https://jiy352.github.io/atomics/).
 
 Installing
 ----------
