@@ -1,5 +1,3 @@
-# atomics
-
 Getting started
 ===============
 
@@ -7,7 +5,7 @@ Installing
 ----------
 To install ATOMiCS and run topology optimization problems, you need to follow these steps:
 
-1.  Install `FEniCS <https://fenicsproject.org/download/>`_ partial differential equation (PDE) solver. 
+1.  Install FEniCS partial differential equation (PDE) solver from https://fenicsproject.org/download/. 
 
   - For MAC users, the anaconda installation method is recommend.
     For Ubuntu users, please just install according to the Ubuntu installation guidline.
@@ -19,9 +17,8 @@ To install ATOMiCS and run topology optimization problems, you need to follow th
 
 3. Install ``ATOMiCS``:
 
-  -``git clone `` `this repository <https://github.com/LSDOlab/atomics>`_,
-  navigate to the atomics directory. 
+  -``git clone`` this repository, navigate to the atomics directory. 
   Then, and use the command ``pip install -e .`` to install ATOMiCS.
 
-Other recommandation, while the ``scipy`` optimizer in OpenMDAO works for some small scale problems, we recommend `IPOPT <https://github.com/coin-or/Ipopt/>`_ or a `SNOPT <http://ccom.ucsd.edu/~optimizers/downloads/>`_.
+Other recommandation, while the ``scipy`` optimizer in OpenMDAO works for some small scale problems, we recommend `IPOPT` (https://github.com/coin-or/Ipopt/) or `SNOPT` (http://ccom.ucsd.edu/~optimizers/downloads/).
 Note that ``SNOPT`` is a commercial optimizer.
