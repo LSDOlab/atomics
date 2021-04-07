@@ -1,8 +1,6 @@
 *.egg-info*
-*work*
+
 *__pycache__*
-*.pdf
-*.png
 *write_data*
 *~
 *.pyc
