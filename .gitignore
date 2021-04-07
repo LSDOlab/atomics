@@ -1,8 +1,6 @@
 *.egg-info*
 *work*
 *__pycache__*
-*.pdf
-*.png
 *write_data*
 *~
 *.pyc
@@ -22,4 +20,3 @@
 *optimization_output.txt*
 .idea
 *get_layout.py
-
