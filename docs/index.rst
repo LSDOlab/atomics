@@ -3,11 +3,11 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to atomics's documentation!
+Welcome to ATOMiCS's documentation!
 ===================================
-Hi, this is atomics 0.1. An open-source density-based topology optimization tool.
-It is built on top of the `OpenMDAO framework <https://github.com/openmdao/blue>`_, which is described and documented `here <http://openmdao.org/twodocs/versions/latest>`_.
-The solution approach to the PDE problem are wrapped from `FEniCS Project <https://fenicsproject.org/>`_, the documentation is `here <https://fenicsproject.org/docs/dolfin/latest/python/>`_.
+Hi, this is ATOMiCS 0.1 (\ **a**\utomated  **t**\opology  **o**\ptimization  in Open\ **M**\DAO using FEn\ **iCS**\ ). It is an open-source density-based topology optimization toolbox.
+ATOMiCS is built on top of the `OpenMDAO framework <https://github.com/openmdao/blue>`_, which is described and documented `here <http://openmdao.org/twodocs/versions/latest>`_.
+The solution approach to the PDE problems and the partial derivative computations are wrapped from `FEniCS Project <https://fenicsproject.org/>`_ documented `here <https://fenicsproject.org/olddocs/dolfin/latest/python/>`_.
 
 Documentation
 -------------
@@ -17,11 +17,12 @@ Documentation
    :titlesonly:
 
    _src_docs/getting_started
-   _src_docs/api
    _src_docs/solution
+   _src_docs/examples
    _src_docs/methods
    _src_docs/pdes
-   _src_docs/examples
+   _src_docs/api
+
 
 Indices and tables
 ==================
