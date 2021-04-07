@@ -17,7 +17,7 @@ To install ATOMiCS and run topology optimization problems, users need to follow 
 
 3. Install ``ATOMiCS``:
 
-  -``git clone `` `this repository <https://github.com/LSDOlab/atomics>`_,
+  -Clone `this repository <https://github.com/LSDOlab/atomics>`_,
   navigate to the atomics directory. 
   Then, and use the command ``pip install -e .`` to install ATOMiCS.
 
