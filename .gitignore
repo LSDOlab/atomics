@@ -1,5 +1,5 @@
 *.egg-info*
-*work*
+
 *__pycache__*
 *write_data*
 *~
