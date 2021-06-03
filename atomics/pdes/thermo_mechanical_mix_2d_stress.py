@@ -21,7 +21,7 @@ def get_residual_form(u, v, rho_e, T, T_hat, KAPPA, k, alpha, mode='plane_stress
 
     # Th = df.Constant(7)
     I = df.Identity(len(u))
-    w_ij = 0.5 * (df.grad(u) + df.grad(u).T) - alpha * I * T
+    w_ij = 0.5 * (df.grad(u) + df.grad(u).T) - C * alpha * I * T
     v_ij = 0.5 * (df.grad(v) + df.grad(v).T)
 
     d = len(u)
