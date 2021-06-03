@@ -1,7 +1,7 @@
 import dolfin as df
 import pygmsh
 
-def get_residual_form(u, v, rho_e, T, T_hat, KAPPA, k, alpha, mode='plane_stress', method='RAMP'):
+def get_residual_form(u, v, rho_e, T, T_hat, KAPPA, k, alpha, mode='plane_stress', method='RAMP', T_r=df.Constant(20.)):
     if method=='RAMP':
         C = rho_e/(1 + 8. * (1. - rho_e))
     else:
@@ -21,7 +21,7 @@ def get_residual_form(u, v, rho_e, T, T_hat, KAPPA, k, alpha, mode='plane_stress
 
     # Th = df.Constant(7)
     I = df.Identity(len(u))
-    w_ij = 0.5 * (df.grad(u) + df.grad(u).T) - C * alpha * I * T
+    w_ij = 0.5 * (df.grad(u) + df.grad(u).T) - C * alpha * I * (T - T_r)
     v_ij = 0.5 * (df.grad(v) + df.grad(v).T)
 
     d = len(u)
