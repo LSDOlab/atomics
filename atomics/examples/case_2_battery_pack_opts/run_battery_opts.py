@@ -69,10 +69,10 @@ q_quart = df.Constant((POWER/AREA_CYLINDER))
 K = 69e9
 # K = 69e6
 ALPHA = 13e-6
-f_l = df.Constant(( 1.e6/AREA_SIDE, 0.)) 
-f_r = df.Constant((-1.e6/AREA_SIDE, 0.)) 
-f_b = df.Constant(( 0.,  1.e6/AREA_SIDE)) 
-f_t = df.Constant(( 0., -1.e6/AREA_SIDE))
+f_l = df.Constant(( 1.e6/HIGHT, 0.)) 
+f_r = df.Constant((-1.e6/HIGHT, 0.)) 
+f_b = df.Constant(( 0.,  1.e6/HIGHT)) 
+f_t = df.Constant(( 0., -1.e6/HIGHT))
 
 
 
@@ -307,20 +307,10 @@ lambda_ = 2*mu*lambda_/(lambda_+2*mu)
 # Th = df.Constant(7)
 I = df.Identity(len(displacements_function))
 
-# w_ij = 0.5 * (df.grad(displacements_function) + df.grad(displacements_function).T) - ALPHA * I * temperature_function
-# sigm = lambda_*df.div(displacements_function)* I + 2*mu*w_ij 
-# s = sigm - (1./3)*df.tr(sigm)*I 
-# von_Mises = df.sqrt(3./2*df.inner(s, s))
-# von_Mises_form = (1/df.CellVolume(mesh)) * von_Mises * df.TestFunction(density_function_space) * df.dx
-
-T = df.TensorFunctionSpace(mesh, "CG", 1)
-# T.vector.set_local()
-
-w_ij = 0.5 * (df.grad(displacements_function) + df.grad(displacements_function).T) - ALPHA * I * temperature_function
+T_r = 20
+w_ij = 0.5 * (df.grad(displacements_function) + df.grad(displacements_function).T) - C * ALPHA * I * (temperature_function - T_r)
 sigm = lambda_*df.div(displacements_function)* I + 2*mu*w_ij 
 s = sigm - (1./3)*df.tr(sigm)*I 
-# von_Mises = df.tr(s)
-# von_Mises = df.tr(s)
 von_Mises = df.sqrt(3./2*df.inner(s/5e9, s/5e9) )
 von_Mises_form = (1/df.CellVolume(mesh)) * von_Mises * df.TestFunction(density_function_space) * df.dx
 pde_problem.add_field_output('von_Mises', von_Mises_form, 'mixed_states', 'density')
