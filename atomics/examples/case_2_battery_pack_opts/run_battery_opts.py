@@ -301,15 +301,6 @@ lambda_ = 2*mu*lambda_/(lambda_+2*mu)
 # Th = df.Constant(7)
 I = df.Identity(len(displacements_function))
 
-# w_ij = 0.5 * (df.grad(displacements_function) + df.grad(displacements_function).T) - ALPHA * I * temperature_function
-# sigm = lambda_*df.div(displacements_function)* I + 2*mu*w_ij 
-# s = sigm - (1./3)*df.tr(sigm)*I 
-# von_Mises = df.sqrt(3./2*df.inner(s, s))
-# von_Mises_form = (1/df.CellVolume(mesh)) * von_Mises * df.TestFunction(density_function_space) * df.dx
-
-T = df.TensorFunctionSpace(mesh, "CG", 1)
-# T.vector.set_local()
-
 w_ij = 0.5 * (df.grad(displacements_function) + df.grad(displacements_function).T) -\
      C * ALPHA * I * (temperature_function-df.Constant(20.))
 sigm = lambda_*df.div(displacements_function)* I + 2*mu*w_ij 
@@ -461,13 +452,6 @@ else:
     prob.model.add_constraint('t_max', upper=55)
     prob.model.add_constraint('density',upper=1.,lower=1.,
                                 indices=idx_array, linear=True)
-
-# prob.model.add_objective('compliance')
-# prob.model.add_constraint('von_Mises_max', upper=10)
-# prob.model.add_constraint('avg_density', upper=0.75, linear=True)
-# prob.model.add_constraint('t_max', upper=55)
-# prob.model.add_constraint('density',upper=1.,lower=1.,
-#                              indices=idx_array, linear=True)
 
 
 prob.driver = driver = om.pyOptSparseDriver()

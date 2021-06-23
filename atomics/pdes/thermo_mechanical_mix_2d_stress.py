@@ -1,7 +1,7 @@
 import dolfin as df
 import pygmsh
 
-def get_residual_form(u, v, rho_e, T, T_hat, KAPPA, k, alpha, mode='plane_stress', method='RAMP'):
+def get_residual_form(u, v, rho_e, T, T_hat, KAPPA, k, alpha, mode='plane_stress', method='RAMP', T_r=df.Constant(20.)):
     if method=='RAMP':
         p =8
         C = rho_e/(1 + p * (1. - rho_e))
