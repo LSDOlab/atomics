@@ -1,4 +1,5 @@
 import dolfin as df
+from dolfin.function.constant import Constant
 import meshio
 import numpy as np
 import pygmsh
@@ -55,6 +56,7 @@ A_whole_quart = (LENGTH * WIDTH)/4
 A_actual = 4.5e-3
 A_now = A_whole_quart - A_cell_quart
 ratio_act = A_actual / A_now
+# 0.5599449298835663
 # constants for temperature field
 KAPPA = 235
 AREA_CYLINDER = 2 * np.pi * radius * HIGHT
@@ -67,27 +69,19 @@ q_quart = df.Constant((POWER/AREA_CYLINDER))
 
 # constants for thermoelastic model
 K = 69e9
-# K = 69e6
 ALPHA = 13e-6
-f_l = df.Constant(( 1.e6/AREA_SIDE, 0.)) 
-f_r = df.Constant((-1.e6/AREA_SIDE, 0.)) 
-f_b = df.Constant(( 0.,  1.e6/AREA_SIDE)) 
-f_t = df.Constant(( 0., -1.e6/AREA_SIDE))
-
-
-
-# f_l = df.Constant(( 0., 0.)) 
-# f_r = df.Constant((0., 0.)) 
-# f_b = df.Constant(( 0.,  0.)) 
-# f_t = df.Constant(( 0., 0.))
+f_l = df.Constant(( 1.e6/HIGHT, 0.)) 
+f_r = df.Constant((-1.e6/HIGHT, 0.)) 
+f_b = df.Constant(( 0.,  1.e6/HIGHT)) 
+f_t = df.Constant(( 0., -1.e6/HIGHT))
 '''
 2. Define mesh
 '''
 
 #-----------------Generate--mesh----------------
 with pygmsh.occ.Geometry() as geom:
-    geom.characteristic_length_min = 0.002
-    geom.characteristic_length_max = 0.002
+    geom.characteristic_length_min = 0.003
+    geom.characteristic_length_max = 0.003
     disk_dic = {}
     disks = []
 
@@ -316,16 +310,18 @@ I = df.Identity(len(displacements_function))
 T = df.TensorFunctionSpace(mesh, "CG", 1)
 # T.vector.set_local()
 
-w_ij = 0.5 * (df.grad(displacements_function) + df.grad(displacements_function).T) - ALPHA * I * temperature_function
+w_ij = 0.5 * (df.grad(displacements_function) + df.grad(displacements_function).T) -\
+     C * ALPHA * I * (temperature_function-df.Constant(20.))
 sigm = lambda_*df.div(displacements_function)* I + 2*mu*w_ij 
 s = sigm - (1./3)*df.tr(sigm)*I 
 # von_Mises = df.tr(s)
 # von_Mises = df.tr(s)
-von_Mises = df.sqrt(3./2*df.inner(s/5e9, s/5e9) )
+scalar_ = 1e3
+von_Mises = df.sqrt(3./2*df.inner(s/scalar_, s/scalar_) )
 von_Mises_form = (1/df.CellVolume(mesh)) * von_Mises * df.TestFunction(density_function_space) * df.dx
 pde_problem.add_field_output('von_Mises', von_Mises_form, 'mixed_states', 'density')
 
-x
+
 '''
 4. 3. Add bcs
 '''
@@ -370,13 +366,13 @@ y.extend(y_1)
 plt.gca().set_aspect('equal', adjustable='box')
 
 for i in range(len(x)):
-    idx = tree.query_ball_point(list(np.array([x[i], y[i]])), 3e-3)
+    idx = tree.query_ball_point(list(np.array([x[i], y[i]])), 2e-3)
     idx_rec.extend(idx)
 nearest_points_rec = coords[idx_rec]
 plt.plot(nearest_points_rec[:,0],nearest_points_rec[:,1],'go')
 
 # plt.plot([x_line, x_1, x_line, x_0],[y_0, y_line, y_1, y_line],'bo')
-plt.show()
+# plt.show()
 
 idx_list.extend(idx_rec)
 lower_bd = np.ones(coords[:,0].size)*1e-5
@@ -393,13 +389,13 @@ lower_bd[idx_array] = 1.
 prob = om.Problem()
 
 num_dof_density = pde_problem.inputs_dict['density']['function'].function_space().dim()
-
+np.random.seed(0)
 comp = om.IndepVarComp()
 comp.add_output(
     'density_unfiltered', 
     shape=num_dof_density, 
-    val=np.ones(num_dof_density),
-    # val=np.random.random(num_dof_density) * 0.86,
+    val=np.ones(num_dof_density)*0.65,
+    # val=np.random.random(num_dof_density)*0.95,
 )
 prob.model.add_subsystem('indep_var_comp', comp, promotes=['*'])
 
@@ -429,7 +425,7 @@ comp = KSConstraintsComp(
     shape=(np.array(mixed_fs.sub(1).dofmap().dofs()).size,),
     axis=0,
     # rho=50.,
-    rho=10,
+    rho=20,
 )
 prob.model.add_subsystem('KSConstraintsComp', comp, promotes=['*'])
 print('KSConstraintsComp')
@@ -440,11 +436,13 @@ comp = KSConstraintsComp(
     shape=(np.array(density_function_space.dofmap().dofs()).size,),
     axis=0,
     # rho=50.,
-    rho=40.,
+    rho=20.,
 )
 prob.model.add_subsystem('KSConstraintsstress', comp, promotes=['*'])
 
-
+volume = df.assemble(df.Constant(1.) * df.dx(domain=mesh))
+avg_density_form_p = density_function/(1 + 8. * (1. - density_function)) / (df.Constant(1. * volume)) * df.dx(domain=mesh)
+pde_problem.add_scalar_output('avg_density_p', avg_density_form_p, 'density')
 
 prob.model.add_design_var('density_unfiltered',upper=1., lower=1e-4)
 
@@ -454,12 +452,13 @@ prob.model.add_design_var('density_unfiltered',upper=1., lower=1e-4)
 if objective == 'mass':
     prob.model.add_objective('avg_density')
     prob.model.add_constraint('t_max', upper=50)
+    # prob.model.add_constraint('von_Mises_max',upper=1.e8/scalar_,scaler=1)
     prob.model.add_constraint('density', upper=1.,lower=1.,
                              indices=idx_array, linear=True)
 else:
     prob.model.add_objective('compliance')
-    prob.model.add_constraint('avg_density', upper=0.80, linear=True)
-    prob.model.add_constraint('t_max', upper=50)
+    prob.model.add_constraint('avg_density_p', upper=0.51, linear=True)
+    prob.model.add_constraint('t_max', upper=55)
     prob.model.add_constraint('density',upper=1.,lower=1.,
                                 indices=idx_array, linear=True)
 
@@ -474,17 +473,21 @@ else:
 prob.driver = driver = om.pyOptSparseDriver()
 driver.options['optimizer'] = 'SNOPT'
 driver.opt_settings['Verify level'] = 0
-driver.opt_settings['Major iterations limit'] = 10000
+driver.opt_settings['Major iterations limit'] = 1500
 driver.opt_settings['Minor iterations limit'] = 1000000
 driver.opt_settings['Iterations limit'] = 100000000
 driver.opt_settings['Major step limit'] = 2.0
-
 driver.opt_settings['Major feasibility tolerance'] = 1.0e-5
-driver.opt_settings['Major optimality tolerance'] =2.e-10
+driver.opt_settings['Major optimality tolerance'] =5.e-9
 
 prob.setup()
 
-prob.run_driver()
+if False:
+    prob.run_model()
+    # prob.check_partials(compact_print=True)
+else:
+    # pass
+    prob.run_driver()
 
 displacements_function_val, temperature_function_val= mixed_function.split()
 'solutions/case_1/cantilever_beam/displacement.pvd'

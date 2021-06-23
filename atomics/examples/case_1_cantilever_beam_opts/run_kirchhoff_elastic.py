@@ -2,7 +2,7 @@ import dolfin as df
 import numpy as np
 import openmdao.api as om
 from atomics.api import PDEProblem, AtomicsGroup
-from atomics.pdes.linear_elastic import get_residual_form
+from atomics.pdes.st_kirchhoff import get_residual_form
 from atomics.general_filter_comp import GeneralFilterComp
 
 
@@ -93,7 +93,7 @@ comp = om.IndepVarComp()
 comp.add_output(
     'density_unfiltered', 
     shape=num_dof_density, 
-    val=np.random.random(num_dof_density) * 0.86,
+    val=np.ones(num_dof_density),
 )
 prob.model.add_subsystem('indep_var_comp', comp, promotes=['*'])
 
@@ -104,9 +104,9 @@ prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
 group = AtomicsGroup(pde_problem=pde_problem)
 prob.model.add_subsystem('atomics_group', group, promotes=['*'])
 
-prob.model.add_design_var('density_unfiltered',upper=1, lower=1e-4)
+prob.model.add_design_var('density_unfiltered',upper=1, lower=1e-3)
 prob.model.add_objective('compliance')
-prob.model.add_constraint('avg_density',upper=0.40)
+prob.model.add_constraint('avg_density',upper=0.50)
 
 # set up the optimizer
 prob.driver = driver = om.pyOptSparseDriver()
@@ -119,15 +119,12 @@ driver.opt_settings['Iterations limit'] = 100000000
 driver.opt_settings['Major step limit'] = 2.0
 
 driver.opt_settings['Major feasibility tolerance'] = 1.0e-6
-driver.opt_settings['Major optimality tolerance'] =1.e-8
+driver.opt_settings['Major optimality tolerance'] =1.e-10
 
 prob.setup()
-
-if False:
-    prob.run_model()
-    prob.check_partials(compact_print=True)
-else:
-    prob.run_driver()
+prob.run_model()
+# print(prob['compliance']); exit()
+prob.run_driver()
 
 
 #save the solution vector
@@ -136,5 +133,5 @@ if method =='SIMP':
 else:
     penalized_density  = df.project(density_function/(1 + 8. * (1. - density_function)), density_function_space) 
 
-df.File('solutions/case_1/cantilever_beam/displacement.pvd') << displacements_function
-df.File('solutions/case_1/cantilever_beam/penalized_density.pvd') << penalized_density
+df.File('solutions/case_1/cantilever_beam_kirchhoff/displacement.pvd') << displacements_function
+df.File('solutions/case_1/cantilever_beam_kirchhoff/penalized_density.pvd') << penalized_density

@@ -35,7 +35,7 @@ class StatesComp(om.ImplicitComponent):
     from the run file.
     Parameters
     ----------
-    ``linear_solver`` solver for the total derivatives
+    ``linear_solver_`` solver for the total derivatives
     values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu', 'scipy_cg','petsc_cg_ilu']
 
     ``problem_type`` solver for the FEA problem
@@ -53,7 +53,7 @@ class StatesComp(om.ImplicitComponent):
         self.options.declare('pde_problem', types=PDEProblem)
         self.options.declare('state_name', types=str)
         self.options.declare(
-            'linear_solver', default='petsc_cg_ilu', 
+            'linear_solver_', default='petsc_cg_ilu', 
             values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu', 'scipy_cg','petsc_cg_ilu'],
         )
         self.options.declare(
@@ -68,14 +68,11 @@ class StatesComp(om.ImplicitComponent):
     def setup(self):
         pde_problem = self.options['pde_problem']
         state_name = self.options['state_name']
-        # print('------------------', state_name)
-
         state_function = pde_problem.states_dict[state_name]['function']
 
         self.itr = 0
         self.argument_functions_dict = argument_functions_dict = dict()
         for argument_name in pde_problem.states_dict[state_name]['arguments']:
-            # print( '--------########---------------', argument_name)
             argument_functions_dict[argument_name] = pde_problem.inputs_dict[argument_name]['function']
 
         for argument_name, argument_function in iteritems(self.argument_functions_dict):
@@ -113,13 +110,18 @@ class StatesComp(om.ImplicitComponent):
     def apply_nonlinear(self, inputs, outputs, residuals):
         pde_problem = self.options['pde_problem']
         state_name = self.options['state_name']
+        state_function = pde_problem.states_dict[state_name]['function']
 
         residual_form = pde_problem.states_dict[state_name]['residual_form']
 
         self._set_values(inputs, outputs)
-        residuals[state_name] = df.assemble(residual_form).get_local()
+        residual_vector = df.assemble(residual_form)
+        for bc in pde_problem.bcs_list:
+            bc.apply(residual_vector, state_function.vector())
+        residuals[state_name] = residual_vector.get_local()
 
     def solve_nonlinear(self, inputs, outputs):
+
         pde_problem = self.options['pde_problem']
         state_name = self.options['state_name']
         problem_type = self.options['problem_type']
@@ -127,9 +129,7 @@ class StatesComp(om.ImplicitComponent):
         state_function = pde_problem.states_dict[state_name]['function']
         for argument_name, argument_function in iteritems(self.argument_functions_dict):
             density_func = argument_function
-        mesh = state_function.function_space().mesh()
 
-        
         self.itr = self.itr + 1
 
         state_function = pde_problem.states_dict[state_name]['function']
@@ -139,9 +139,7 @@ class StatesComp(om.ImplicitComponent):
         self._set_values(inputs, outputs)
 
         self.derivative_form = df.derivative(residual_form, state_function)
-        # df.set_log_level(df.LogLevel.ERROR)
         df.set_log_active(True)
-        # df.solve(residual_form==0, state_function, bcs=pde_problem.bcs_list, J=self.derivative_form)
         if problem_type == 'linear_problem':
             if state_name=='density':
                 print('this is a variational density filter')
@@ -163,7 +161,7 @@ class StatesComp(om.ImplicitComponent):
             solver.parameters["snes_solver"]["relative_tolerance"]=5e-100
             solver.parameters["snes_solver"]["absolute_tolerance"]=5e-50
 
-            # solver.parameters["snes_solver"]["linear_solver"]["maximum_iterations"]=1000
+            # solver.parameters["snes_solver"]["linear_solver_"]["maximum_iterations"]=1000
             solver.parameters["snes_solver"]["error_on_nonconvergence"] = False
             solver.solve()
 
@@ -203,39 +201,51 @@ class StatesComp(om.ImplicitComponent):
                 solver.parameters["snes_solver"]["relative_tolerance"]=1e-15
                 solver.parameters["snes_solver"]["absolute_tolerance"]=1e-15
 
-                # solver.parameters["snes_solver"]["linear_solver"]["maximum_iterations"]=1000
+                # solver.parameters["snes_solver"]["linear_solver_"]["maximum_iterations"]=1000
                 solver.parameters["snes_solver"]["error_on_nonconvergence"] = False
                 solver.solve()
 
         # option to store the visualization results
         if (visualization == 'True') and (self.itr % 50 == 0):
             for argument_name, argument_function in iteritems(self.argument_functions_dict):
-                # print(argument_name)
                 if argument_name== 'density':
 
                     df.File('solutions_iterations_40ramp/{}_{}.pvd'.format(argument_name, self.itr)) << df.project(argument_function/(1 + 8. * (1. - argument_function)), argument_function.function_space())
-                    # df.File('solutions_iterations_40ramp/{}_{}.pvd'.format(argument_name, self.itr)) << df.project(argument_function**3, argument_function.function_space())
                 else:
                     df.File('solutions_iterations_40ramp/{}_{}.pvd'.format(argument_name, self.itr)) << argument_function
             df.File('solutions_iterations_40ramp/{}_{}.pvd'.format(state_name, self.itr)) << state_function
         self.L = -residual_form
 
         outputs[state_name] = state_function.vector().get_local()
+        self._set_values(inputs, outputs)
 
     def linearize(self, inputs, outputs, partials):
         pde_problem = self.options['pde_problem']
         state_name = self.options['state_name']
         state_function = pde_problem.states_dict[state_name]['function']
+        residual_form = pde_problem.states_dict[state_name]['residual_form']
 
-        self.dR_dstate = self.compute_derivative(state_name, state_function)
-        partials[state_name,state_name] = self.dR_dstate.data
+        self._set_values(inputs, outputs)
+        derivative_form = df.derivative(residual_form, state_function)
+        derivative_assembled = df.assemble(derivative_form)
+        for bc in pde_problem.bcs_list:
+            bc.apply(derivative_assembled)
+        derivative_petsc_sparse = df.as_backend_type(derivative_assembled).mat()
+        derivative_csr = csr_matrix(derivative_petsc_sparse.getValuesCSR()[::-1], shape=derivative_petsc_sparse.size)
 
+        partials[state_name,state_name] = derivative_csr.tocoo().data
+ 
         for argument_name, argument_function in iteritems(self.argument_functions_dict):
-            dR_dinput = self.compute_derivative(state_name, argument_function)
-            partials[state_name, argument_name] = dR_dinput.data
-
+            derivative_form_arg = df.derivative(residual_form, argument_function)
+            derivative_form_arg_assembled = df.assemble(derivative_form_arg)
+            for bc in pde_problem.bcs_list:
+                bc.apply(derivative_form_arg_assembled)
+            derivative_petsc_sparse_arg = df.as_backend_type(derivative_form_arg_assembled).mat()
+            derivative_csr_arg = csr_matrix(derivative_petsc_sparse_arg.getValuesCSR()[::-1], shape=derivative_petsc_sparse_arg.size)
+            partials[state_name, argument_name] =derivative_csr_arg.tocoo().data
+        
     def solve_linear(self, d_outputs, d_residuals, mode):
-        linear_solver = self.options['linear_solver']
+        linear_solver_ = self.options['linear_solver_']
         pde_problem = self.options['pde_problem']
         state_name = self.options['state_name']
 
@@ -250,9 +260,8 @@ class StatesComp(om.ImplicitComponent):
         
         def report(xk):
             frame = inspect.currentframe().f_back
-            # print(frame.f_locals['resid']) 
 
-        if linear_solver=='fenics_direct':
+        if linear_solver_=='fenics_direct':
 
             rhs_ = df.Function(state_function.function_space())
             dR = df.Function(state_function.function_space())
@@ -268,7 +277,7 @@ class StatesComp(om.ImplicitComponent):
             df.solve(AT,dR.vector(),rhs_.vector()) 
             d_residuals[state_name] =  dR.vector().get_local()
 
-        elif linear_solver=='scipy_splu':
+        elif linear_solver_=='scipy_splu':
             if state_name!='density':
                 for bc in pde_problem.bcs_list:
                     bc.apply(A)
@@ -279,7 +288,7 @@ class StatesComp(om.ImplicitComponent):
             d_residuals[state_name] = lu.solve(d_outputs[state_name],trans='T')
 
 
-        elif linear_solver=='scipy_cg':
+        elif linear_solver_=='scipy_cg':
             if state_name!='density':
                 for bc in pde_problem.bcs_list:
                     bc.apply(A)
@@ -294,7 +303,7 @@ class StatesComp(om.ImplicitComponent):
 
             d_residuals[state_name] = x
 
-        elif linear_solver=='fenics_krylov':
+        elif linear_solver_=='fenics_krylov':
 
             rhs_ = df.Function(state_function.function_space())
             dR = df.Function(state_function.function_space())
@@ -304,8 +313,6 @@ class StatesComp(om.ImplicitComponent):
                 for bc in pde_problem.bcs_list:
                     bc.apply(A)           
 
-            # for bc in pde_problem.bcs_list:
-            #     bc.apply(A)
             Am = df.as_backend_type(A).mat()
             ATm = Am.transpose()
             AT =  df.PETScMatrix(ATm)
@@ -319,7 +326,7 @@ class StatesComp(om.ImplicitComponent):
 
             d_residuals[state_name] =  dR.vector().get_local()
 
-        elif linear_solver=='petsc_gmres_ilu':
+        elif linear_solver_=='petsc_gmres_ilu':
             ksp = PETSc.KSP().create() 
             ksp.setType(PETSc.KSP.Type.GMRES)
             ksp.setTolerances(rtol=5e-17)
@@ -356,7 +363,7 @@ class StatesComp(om.ImplicitComponent):
                 ksp.solveTranspose(du,dR)
                 d_residuals[state_name] = dR.getValues(range(size))
 
-        elif linear_solver=='petsc_cg_ilu':
+        elif linear_solver_=='petsc_cg_ilu':
             ksp = PETSc.KSP().create() 
             ksp.setType(PETSc.KSP.Type.CG)
             ksp.setTolerances(rtol=5e-15)

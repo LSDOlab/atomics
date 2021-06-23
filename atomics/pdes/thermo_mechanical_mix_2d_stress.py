@@ -3,7 +3,8 @@ import pygmsh
 
 def get_residual_form(u, v, rho_e, T, T_hat, KAPPA, k, alpha, mode='plane_stress', method='RAMP'):
     if method=='RAMP':
-        C = rho_e/(1 + 8. * (1. - rho_e))
+        p =8
+        C = rho_e/(1 + p * (1. - rho_e))
     else:
         C = rho_e**3
 
@@ -21,7 +22,8 @@ def get_residual_form(u, v, rho_e, T, T_hat, KAPPA, k, alpha, mode='plane_stress
 
     # Th = df.Constant(7)
     I = df.Identity(len(u))
-    w_ij = 0.5 * (df.grad(u) + df.grad(u).T) - alpha * I * T
+    T_0 = df.Constant(20.)
+    w_ij = 0.5 * (df.grad(u) + df.grad(u).T) - C * alpha * I * (T-T_0)
     v_ij = 0.5 * (df.grad(v) + df.grad(v).T)
 
     d = len(u)

@@ -25,7 +25,7 @@ class StatesComp(om.ImplicitComponent):
     residual form every iteration.
     Parameters
     ----------
-    ``linear_solver`` solver for the total derivatives
+    ``linear_solver_`` solver for the total derivatives
     values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu', 'scipy_cg','petsc_cg_ilu']
 
     ``problem_type`` solver for the FEA problem
@@ -43,7 +43,7 @@ class StatesComp(om.ImplicitComponent):
         self.options.declare('pde_problem', types=PDEProblem)
         self.options.declare('state_name', types=str)
         self.options.declare(
-            'linear_solver', default='scipy_splu', 
+            'linear_solver_', default='scipy_splu', 
             values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu'],
         )
         self.options.declare(
@@ -148,14 +148,14 @@ class StatesComp(om.ImplicitComponent):
         elif problem_type == 'nonlinear_problem':
             problem = df.NonlinearVariationalProblem(residual_form, state_function, pde_problem.bcs_list, self.derivative_form)
             solver  = df.NonlinearVariationalSolver(problem)
-            solver.parameters['nonlinear_solver']='snes' 
+            solver.parameters['nonlinear_solver_']='snes' 
             solver.parameters["snes_solver"]["line_search"] = 'bt' 
-            solver.parameters["snes_solver"]["linear_solver"]='mumps' # "cg" "gmres"
+            solver.parameters["snes_solver"]["linear_solver_"]='mumps' # "cg" "gmres"
             solver.parameters["snes_solver"]["maximum_iterations"]=500
             solver.parameters["snes_solver"]["relative_tolerance"]=5e-13
             solver.parameters["snes_solver"]["absolute_tolerance"]=5e-13
 
-            # solver.parameters["snes_solver"]["linear_solver"]["maximum_iterations"]=1000
+            # solver.parameters["snes_solver"]["linear_solver_"]["maximum_iterations"]=1000
             solver.parameters["snes_solver"]["error_on_nonconvergence"] = False
             solver.solve()
 
@@ -188,14 +188,14 @@ class StatesComp(om.ImplicitComponent):
                         ) 
                 problem = df.NonlinearVariationalProblem(residual_form, state_function, pde_problem.bcs_list, self.derivative_form)
                 solver  = df.NonlinearVariationalSolver(problem)
-                solver.parameters['nonlinear_solver']='snes' 
+                solver.parameters['nonlinear_solver_']='snes' 
                 solver.parameters["snes_solver"]["line_search"] = 'bt' 
-                solver.parameters["snes_solver"]["linear_solver"]='mumps' # "cg" "gmres"
+                solver.parameters["snes_solver"]["linear_solver_"]='mumps' # "cg" "gmres"
                 solver.parameters["snes_solver"]["maximum_iterations"]=500
                 solver.parameters["snes_solver"]["relative_tolerance"]=1e-15
                 solver.parameters["snes_solver"]["absolute_tolerance"]=1e-15
 
-                # solver.parameters["snes_solver"]["linear_solver"]["maximum_iterations"]=1000
+                # solver.parameters["snes_solver"]["linear_solver_"]["maximum_iterations"]=1000
                 solver.parameters["snes_solver"]["error_on_nonconvergence"] = False
                 solver.solve()
 
@@ -221,7 +221,7 @@ class StatesComp(om.ImplicitComponent):
             partials[state_name, argument_name] = dR_dinput.data
 
     def solve_linear(self, d_outputs, d_residuals, mode):
-        linear_solver = self.options['linear_solver']
+        linear_solver_ = self.options['linear_solver_']
         pde_problem = self.options['pde_problem']
         state_name = self.options['state_name']
 
@@ -248,7 +248,7 @@ class StatesComp(om.ImplicitComponent):
             
         A, _ = df.assemble_system(self.derivative_form, - residual_form, pde_problem.bcs_list)
 
-        if linear_solver=='fenics_direct':
+        if linear_solver_=='fenics_direct':
 
             rhs_ = df.Function(state_function.function_space())
             dR = df.Function(state_function.function_space())
@@ -264,7 +264,7 @@ class StatesComp(om.ImplicitComponent):
             df.solve(AT,dR.vector(),rhs_.vector()) 
             d_residuals[state_name] =  dR.vector().get_local()
 
-        elif linear_solver=='scipy_splu':
+        elif linear_solver_=='scipy_splu':
             for bc in pde_problem.bcs_list:
                 bc.apply(A)
             Am = df.as_backend_type(A).mat()
@@ -274,7 +274,7 @@ class StatesComp(om.ImplicitComponent):
             d_residuals[state_name] = lu.solve(d_outputs[state_name],trans='T')
 
 
-        elif linear_solver=='fenics_Krylov':
+        elif linear_solver_=='fenics_Krylov':
 
             rhs_ = df.Function(state_function.function_space())
             dR = df.Function(state_function.function_space())
@@ -295,7 +295,7 @@ class StatesComp(om.ImplicitComponent):
 
             d_residuals[state_name] =  dR.vector().get_local()
 
-        elif linear_solver=='petsc_gmres_ilu':
+        elif linear_solver_=='petsc_gmres_ilu':
             ksp = PETSc.KSP().create() 
             ksp.setType(PETSc.KSP.Type.GMRES)
             ksp.setTolerances(rtol=5e-11)

@@ -10,12 +10,12 @@ class AtomicsGroup(om.Group):
     """
     The AtomicsGroup is a OpenMDAO Group object that wraps the assembly of OpenMDAO components.
     Within ``AtomicsGroup``, the users can choose the ``pde_problem``, 
-    ``linear_solver`` (for the solution total derivatives), the`` problem_type``, 
+    ``linear_solver_`` (for the solution total derivatives), the`` problem_type``, 
     and whether to turn on the ``visualization`` option.
     problem.
     Parameters
     ----------
-    ``linear_solver``   solver for the total derivatives
+    ``linear_solver_``   solver for the total derivatives
     default='petsc_cg_ilu', 
     values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu', 'scipy_cg','petsc_cg_ilu']
 
@@ -31,7 +31,7 @@ class AtomicsGroup(om.Group):
     def initialize(self):
         self.options.declare('pde_problem', types=PDEProblem)
         self.options.declare(
-            'linear_solver', default='petsc_cg_ilu', 
+            'linear_solver_', default='petsc_cg_ilu', 
             values=['fenics_direct', 'scipy_splu', 'fenics_krylov', 'petsc_gmres_ilu', 'scipy_cg','petsc_cg_ilu'],
         )
         self.options.declare(
@@ -45,7 +45,7 @@ class AtomicsGroup(om.Group):
 
     def setup(self):
         pde_problem = self.options['pde_problem']
-        linear_solver = self.options['linear_solver']
+        linear_solver_ = self.options['linear_solver_']
         problem_type = self.options['problem_type']
         visualization = self.options['visualization']
 
@@ -54,7 +54,7 @@ class AtomicsGroup(om.Group):
             comp = StatesComp(
                 pde_problem=pde_problem,
                 state_name=state_name,
-                linear_solver=linear_solver,
+                linear_solver_=linear_solver_,
                 problem_type=problem_type,
                 visualization=visualization
             )
