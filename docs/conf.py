@@ -6,7 +6,7 @@ import sys
 
 # -- General configuration ------------------------------------------------
 import sphinx_rtd_theme
-from openmdao.docutils import do_monkeypatch, embed_code, embed_options
+# from openmdao.docutils import do_monkeypatch, embed_code, embed_options
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -22,7 +22,7 @@ package_path = os.path.abspath('../..')
 os.environ['PYTHONPATH'] = ':'.join(
     (package_path, os.environ.get('PYTHONPATH', '')))
 
-do_monkeypatch()
+# do_monkeypatch()
 
 # If your documentation needs a minimal Sphinx version, state it here.
 #
@@ -39,8 +39,8 @@ extensions = [
     # 'sphinx.ext.coverage',
     'sphinx.ext.mathjax',
     'numpydoc',
-    'embed_code',
-    'embed_n2',
+    # 'embed_code',
+    # 'embed_n2',
     # 'embed_options',
     'sphinx_rtd_theme',
     # 'jupyter_sphinx.execute',
