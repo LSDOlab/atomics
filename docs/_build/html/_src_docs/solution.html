@@ -1,0 +1,436 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Steps for solving a topology optimization problem in ATOMiCS &mdash; atomics 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/thebelab.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script type="text/javascript" src="../_static/thebelab-helper.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script type="text/javascript" src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Examples library" href="examples.html" />
+    <link rel="prev" title="Getting started" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> atomics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Steps for solving a topology optimization problem in ATOMiCS</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="methods.html">Density-based methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pdes.html">PDE library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">Developer API</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">atomics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Steps for solving a topology optimization problem in ATOMiCS</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/_src_docs/solution.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="steps-for-solving-a-topology-optimization-problem-in-atomics">
+<span id="step-label"></span><h1>Steps for solving a topology optimization problem in ATOMiCS<a class="headerlink" href="#steps-for-solving-a-topology-optimization-problem-in-atomics" title="Permalink to this headline">¶</a></h1>
+<p>The users just need to modify the <code class="docutils literal notranslate"><span class="pre">run_files</span></code> (see <a class="reference internal" href="examples.html#exp-label"><span class="std std-ref">Examples library</span></a>) to perform a topology optimization.
+We present an introduction to the settings of the <code class="docutils literal notranslate"><span class="pre">run_files</span></code> below.</p>
+<div class="section" id="define-the-mesh">
+<h2>1. Define the mesh<a class="headerlink" href="#define-the-mesh" title="Permalink to this headline">¶</a></h2>
+<p>ATOMiCS supports FEniCS built-in meshes as well as external mesh of <code class="docutils literal notranslate"><span class="pre">.vtk</span></code> or <code class="docutils literal notranslate"><span class="pre">.stl</span></code> type from <code class="docutils literal notranslate"><span class="pre">GMSH</span></code>, <code class="docutils literal notranslate"><span class="pre">pygmsh</span></code> or other mesh generation tools.</p>
+<blockquote>
+<div><p>1.1 FEniCS built-in meshes:</p>
+<blockquote>
+<div><p>The documentations for FEniCS built-in meshes can be found <a class="reference external" href="https://fenicsproject.org/olddocs/dolfin/latest/python/demos/built-in-meshes/demo_built-in-meshes.py.html">here</a>.</p>
+</div></blockquote>
+<p>1.2. External mesh:</p>
+<blockquote>
+<div><p>We use <code class="docutils literal notranslate"><span class="pre">meshio</span></code> to convert the external mesh to the formats that FEniCS accepts (<code class="docutils literal notranslate"><span class="pre">.vtk</span></code> or <code class="docutils literal notranslate"><span class="pre">.stl</span></code> for now). <code class="docutils literal notranslate"><span class="pre">GMSH</span></code> can be installed from <a class="reference external" href="https://gmsh.info/">here</a>.</p>
+<p>An example mesh generated from <code class="docutils literal notranslate"><span class="pre">GMSH</span></code> GUI is shown below:</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../_images/doc_gmsh_example1.png"><img alt="../_images/doc_gmsh_example1.png" src="../_images/doc_gmsh_example1.png" style="width: 228.4px; height: 252.0px;" /></a>
+</div>
+<p><a class="reference external" href="https://comphysblog.wordpress.com/2018/08/15/fenics-2d-electrostatics-with-imported-mesh-and-boundaries/">Here</a> is one of the GMSH tutorials you can find online.
+One important thing to note is that you need to try to generate meshes that are close to the same size
+to make the filter to work properly.
+This can be done in a couple of ways in GMSH.
+One way to do it is <code class="docutils literal notranslate"><span class="pre">Mesh-&gt;Transfinite-&gt;line/curve</span></code> and tune the number of points on different sides.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="../_images/mesh_size.png"><img alt="../_images/mesh_size.png" src="../_images/mesh_size.png" style="width: 571.2px; height: 418.8px;" /></a>
+</div>
+<p>After generating the mesh, we need to export the mesh into <code class="docutils literal notranslate"><span class="pre">.vtk</span></code> or <code class="docutils literal notranslate"><span class="pre">.stl</span></code> format (<code class="docutils literal notranslate"><span class="pre">ctrl+e</span></code> for <code class="docutils literal notranslate"><span class="pre">GMSH</span></code>) in the same folder as your <code class="docutils literal notranslate"><span class="pre">run_file</span></code>.
+Then, we use meshio to convert the file to <code class="docutils literal notranslate"><span class="pre">.vtk</span></code> or <code class="docutils literal notranslate"><span class="pre">.stl</span></code> format using the code below (see <a class="reference internal" href="examples/other_exp_folder/other_1_gmsh.html#exp-gmsh-label"><span class="std std-ref">Topology optimization using external mesh</span></a>)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># import the mesh file generated from your external tool</span>
+<span class="kn">import</span> <span class="nn">meshio</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">file_name</span><span class="o">&gt;</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">meshio</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+    <span class="n">filename</span><span class="p">,</span>
+    <span class="n">file_format</span><span class="o">=&lt;</span><span class="n">file_format</span><span class="o">&gt;</span> <span class="c1"># &quot;vtk&quot; or &quot;stl&quot; are tested</span>
+<span class="p">)</span>
+
+<span class="c1"># convert the mesh into xml</span>
+<span class="n">meshio</span><span class="o">.</span><span class="n">write_points_cells</span><span class="p">(</span>
+    <span class="o">&lt;</span><span class="n">out_file_name</span><span class="o">&gt;</span><span class="p">,</span> <span class="c1"># &quot;fenics_mesh_l_bracket.xml&quot;</span>
+    <span class="n">mesh</span><span class="o">.</span><span class="n">points</span><span class="p">,</span>
+    <span class="n">mesh</span><span class="o">.</span><span class="n">cells</span><span class="p">,</span>
+    <span class="p">)</span>
+
+<span class="c1"># set the mesh as input to the topology optimization problem</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span><span class="o">&lt;</span><span class="n">out_file_name</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">GMSH</span></code> and <code class="docutils literal notranslate"><span class="pre">pygmsh</span></code> may automatically generate 3D mesh even if you set it to 2D.
+You can varify this by using <code class="docutils literal notranslate"><span class="pre">d=len(displacements_function)</span></code>.
+if d=3, you may want to convert this to 2D using the code below instead (see <a class="reference internal" href="examples/case_studies/case_2.html#exp-case2-label"><span class="std std-ref">Case study II: battery pack topology optimizations</span></a>).
+(Importing <code class="docutils literal notranslate"><span class="pre">os</span></code> may cause some error for <code class="docutils literal notranslate"><span class="pre">openmado</span> <span class="pre">n2</span> <span class="pre">file_name.py</span></code> for visualizing the code structure.
+If that happens, you can generate the mesh in a seperate python file. Then, just use the last line of code in the run file.)</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;name.vtk&#39;</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">meshio</span><span class="o">.</span><span class="n">read</span><span class="p">(</span>
+    <span class="n">filename</span><span class="p">,</span>
+    <span class="n">file_format</span><span class="o">=</span><span class="s2">&quot;vtk&quot;</span>
+<span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;gmsh -2 name.vtk -format msh2&#39;</span><span class="p">)</span>
+<span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;dolfin-convert name.msh name.xml&#39;</span><span class="p">)</span>
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span><span class="s2">&quot;name.xml&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div></blockquote>
+</div></blockquote>
+</div>
+<div class="section" id="setting-the-boundary-conditions">
+<h2>2. Setting the boundary conditions<a class="headerlink" href="#setting-the-boundary-conditions" title="Permalink to this headline">¶</a></h2>
+<p>We use <code class="docutils literal notranslate"><span class="pre">FEniCS</span></code> built-in functions to define boundary conditions for the topology optimization problems.
+Below is a quick demonstration using a simple 2D square.</p>
+<blockquote>
+<div><div class="figure align-center">
+<a class="reference internal image-reference" href="../_images/bd_demo.png"><img alt="../_images/bd_demo.png" src="../_images/bd_demo.png" style="width: 254.1px; height: 219.1px;" /></a>
+</div>
+</div></blockquote>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">LeftBoundary</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">SubDomain</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">inside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">on_boundary</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="p">)</span><span class="o">&lt;</span> <span class="n">df</span><span class="o">.</span><span class="n">DOLFIN_EPS</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">RightBoundary</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">SubDomain</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">inside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">on_boundary</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">L</span><span class="p">)</span><span class="o">&lt;</span> <span class="n">df</span><span class="o">.</span><span class="n">DOLFIN_EPS</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">BottomBoundary</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">SubDomain</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">inside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">on_boundary</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="p">)</span><span class="o">&lt;</span> <span class="n">df</span><span class="o">.</span><span class="n">DOLFIN_EPS</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">TopBoundary</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">SubDomain</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">inside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">on_boundary</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">W</span><span class="p">)</span><span class="o">&lt;</span> <span class="n">df</span><span class="o">.</span><span class="n">DOLFIN_EPS</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The functions above captures the left, right, bottom, and top boundary, respectively.
+FEniCS uses <code class="docutils literal notranslate"><span class="pre">x[0]</span></code>, <code class="docutils literal notranslate"><span class="pre">x[1]</span></code>, `` x[2]`` to represent <code class="docutils literal notranslate"><span class="pre">x</span></code>, <code class="docutils literal notranslate"><span class="pre">y</span></code>, and <code class="docutils literal notranslate"><span class="pre">z</span></code>.</p>
+<p>Then, the users can add the boundary conditions to the problem using the code below:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">bc_left</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">DirichletBC</span><span class="p">(</span><span class="n">function_space</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">((</span><span class="mf">0.0</span><span class="p">)),</span> <span class="n">LeftBoundary</span><span class="p">())</span>
+<span class="n">bc_bottom</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">DirichletBC</span><span class="p">(</span><span class="n">function_space</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">((</span><span class="mf">0.0</span><span class="p">)),</span> <span class="n">BottomBoundary</span><span class="p">())</span>
+
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_bc</span><span class="p">(</span><span class="n">bc_left</span><span class="p">)</span>
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_bc</span><span class="p">(</span><span class="n">bc_bottom</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that the <code class="docutils literal notranslate"><span class="pre">function_space.sub(0)</span></code> here represents the x component of the function space.
+If the <code class="docutils literal notranslate"><span class="pre">function_space</span></code> is for a displacements field, the <code class="docutils literal notranslate"><span class="pre">bc_bottom</span></code> is a sliding boundary condition to constrain the x displacements meaning the structure can only slide in y direction on the bottom boundary of the square.
+While the <code class="docutils literal notranslate"><span class="pre">bc_left</span></code> is a clamped boundary meaning all the displacements on the left boundary are set to zeros.</p>
+</div>
+<div class="section" id="select-a-filter">
+<h2>3. Select a filter<a class="headerlink" href="#select-a-filter" title="Permalink to this headline">¶</a></h2>
+<p>The users can choose between a linear direct filter implemented in OpenMDAO and a FEniCS variational filter.
+For now, we recommand the linear direct filter.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">atomics.general_filter_comp</span> <span class="kn">import</span> <span class="n">GeneralFilterComp</span>
+<span class="kn">from</span> <span class="nn">atomics.pdes.variational_filter</span> <span class="kn">import</span> <span class="n">get_residual_form_variational_filter</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="select-a-penalization-scheme">
+<h2>4. Select a penalization scheme<a class="headerlink" href="#select-a-penalization-scheme" title="Permalink to this headline">¶</a></h2>
+<p>The users can choose between SIMP and RAMP method by specifying the <code class="docutils literal notranslate"><span class="pre">&lt;method_name&gt;</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">residual_form</span> <span class="o">=</span> <span class="n">get_residual_form</span><span class="p">(</span>
+    <span class="o">...</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=&lt;</span><span class="n">method_name</span><span class="o">&gt;</span>
+    <span class="c1"># &lt;method_name&gt; can be &#39;SIMP&#39; or &#39;RAMP&#39;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="solve-for-the-states">
+<h2>5. Solve for the states<a class="headerlink" href="#solve-for-the-states" title="Permalink to this headline">¶</a></h2>
+<p>First, on the top of the <code class="docutils literal notranslate"><span class="pre">run_file</span></code>, the users need to import the corresponding PDE.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">atomics.pdes.</span><span class="o">&lt;</span><span class="n">pde_name</span><span class="o">&gt;</span> <span class="kn">import</span> <span class="nn">get_residual_form</span>
+</pre></div>
+</div>
+<p>Then, we need to specify the inputs for <code class="docutils literal notranslate"><span class="pre">get_residual_form</span></code>. The users can do a <code class="docutils literal notranslate"><span class="pre">ctrl+click</span></code> to see what variables should be specified.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">residual_form</span> <span class="o">=</span> <span class="n">get_residual_form</span><span class="p">(</span>
+    <span class="o">...</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="select-solvers-for-the-fea-problem-and-the-adjoint-equation">
+<h2>6. Select solvers for the FEA problem and the adjoint equation<a class="headerlink" href="#select-solvers-for-the-fea-problem-and-the-adjoint-equation" title="Permalink to this headline">¶</a></h2>
+<p>This setting can be modified by changing the options in <code class="docutils literal notranslate"><span class="pre">AtomicsGroup</span></code> in the <code class="docutils literal notranslate"><span class="pre">run_file</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">group</span> <span class="o">=</span> <span class="n">AtomicsGroup</span><span class="p">(</span><span class="n">pde_problem</span><span class="o">=</span><span class="n">pde_problem</span><span class="p">,</span>
+                     <span class="n">linear_solver</span><span class="o">=&lt;</span><span class="n">solver_name</span><span class="o">&gt;</span><span class="p">,</span>
+                     <span class="n">problem_type</span><span class="o">=&lt;</span><span class="n">prob_type</span><span class="o">&gt;</span><span class="p">,</span>
+                     <span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>There are currently six options (<code class="docutils literal notranslate"><span class="pre">fenics_direct</span></code>, <code class="docutils literal notranslate"><span class="pre">scipy_splu</span></code>, <code class="docutils literal notranslate"><span class="pre">fenics_krylov</span></code>, <code class="docutils literal notranslate"><span class="pre">fenics_krylov</span></code>, <code class="docutils literal notranslate"><span class="pre">petsc_gmres_ilu</span></code>, <code class="docutils literal notranslate"><span class="pre">scipy_cg</span></code>, <code class="docutils literal notranslate"><span class="pre">petsc_cg_ilu</span></code>) for solving the total derivatives in <code class="docutils literal notranslate"><span class="pre">AtomicsGroup</span></code> <code class="docutils literal notranslate"><span class="pre">linear_solver</span></code>.
+We define three type of problems (<code class="docutils literal notranslate"><span class="pre">problem_type</span></code>) in <code class="docutils literal notranslate"><span class="pre">AtomicsGroup</span></code>: <code class="docutils literal notranslate"><span class="pre">linear_problem</span></code>, <code class="docutils literal notranslate"><span class="pre">nonlinear_problem</span></code>, <code class="docutils literal notranslate"><span class="pre">nonlinear_problem_load_stepping</span></code>.
+Our default options are <code class="docutils literal notranslate"><span class="pre">petsc_cg_ilu</span></code> and <code class="docutils literal notranslate"><span class="pre">nonlinear_problem</span></code> for robustness and better precision for the total detivatives (if your <code class="docutils literal notranslate"><span class="pre">petsc</span></code> version is compatible).
+But for small scale linear problem (or incompatibility of the <code class="docutils literal notranslate"><span class="pre">petsc</span></code>), we recommand <code class="docutils literal notranslate"><span class="pre">fenics_direct</span></code> (a direct solver) as the linear solver to solve the total derivatives, and choosing <code class="docutils literal notranslate"><span class="pre">linear_problem</span></code> as the <code class="docutils literal notranslate"><span class="pre">problem_type</span></code>.</p>
+</div>
+<div class="section" id="define-outputs">
+<h2>7. Define outputs<a class="headerlink" href="#define-outputs" title="Permalink to this headline">¶</a></h2>
+<p>There are two types of outputs: scalar output (a scalar on the entire mesh) and field output (a scalar on each element). The users need to define the <code class="docutils literal notranslate"><span class="pre">output_form</span></code>, and then add the output to the <code class="docutils literal notranslate"><span class="pre">pde_problem</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">output_form</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_scalar_output</span><span class="p">(</span><span class="o">&lt;</span><span class="n">output_name</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">output_form</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">argument_name</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">output_form</span> <span class="o">=</span> <span class="o">...</span>
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_field_output</span><span class="p">(</span><span class="o">&lt;</span><span class="n">output_name</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">output_form</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">&lt;</span><span class="n">argument_name</span><span class="o">&gt;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="visualization">
+<h2>8. Visualization<a class="headerlink" href="#visualization" title="Permalink to this headline">¶</a></h2>
+<p>We recommand using <code class="docutils literal notranslate"><span class="pre">ParaView</span></code> for the visualization of the optimizaiton results.
+The users need to save the solution (at the end of the <code class="docutils literal notranslate"><span class="pre">run_file</span></code>).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1">#save the solution vector</span>
+<span class="k">if</span> <span class="n">method</span> <span class="o">==</span><span class="s1">&#39;SIMP&#39;</span><span class="p">:</span>
+    <span class="n">penalized_density</span>  <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">density_function</span><span class="o">**</span><span class="mi">3</span><span class="p">,</span> <span class="n">density_function_space</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">penalized_density</span>  <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">density_function</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">8.</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">density_function</span><span class="p">)),</span>
+                                    <span class="n">density_function_space</span><span class="p">)</span>
+
+<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/displacement.pvd&#39;</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">displacements_function</span>
+<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/penalized_density.pvd&#39;</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">penalized_density</span>
+</pre></div>
+</div>
+<p>Then, the users can open the <code class="docutils literal notranslate"><span class="pre">.pvd</span></code> file using <a class="reference external" href="https://www.paraview.org/download/">Paraview</a>.</p>
+<p>Advanced user may visualize the iteration histories by turning on the <cite>visualization</cite> option to <cite>True</cite> in the <code class="docutils literal notranslate"><span class="pre">run_file</span></code> (<code class="docutils literal notranslate"><span class="pre">group</span> <span class="pre">=</span> <span class="pre">AtomicsGroup(...,</span> <span class="pre">visualization=True)</span></code>).
+We recommand Paraview-Python for genenerating the script to take a screenshot for each <code class="docutils literal notranslate"><span class="pre">.pvd</span></code> file. Then, using the script below to generate a video.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="kn">import</span> <span class="n">call</span>
+
+<span class="k">def</span> <span class="nf">make_mov</span><span class="p">(</span><span class="n">png_filename</span><span class="p">,</span> <span class="n">movie_filename</span><span class="p">):</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;ffmpeg -i {} -q:v 1 -vcodec mpeg4 {}.avi&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">png_filename</span><span class="p">,</span> <span class="n">movie_filename</span><span class="p">)</span>
+    <span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s1">&#39;ffmpeg -i {}.avi -acodec libmp3lame -ab 384 {}.mov&#39;</span>\
+            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">movie_filename</span><span class="p">,</span> <span class="n">movie_filename</span><span class="p">)</span>
+    <span class="n">call</span><span class="p">(</span><span class="n">cmd</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>
+
+<span class="k">def</span> <span class="nf">make_mp4</span><span class="p">(</span><span class="n">png_filename</span><span class="p">,</span> <span class="n">movie_filename</span><span class="p">):</span>
+    <span class="c1"># real time 130fps; two times slower 65fps; four times lower 37.5fps</span>
+    <span class="n">bashCommand</span> <span class="o">=</span> <span class="s2">&quot;ffmpeg -f image2 -r 65 -i {} -vcodec libx264 -y {}.mp4&quot;</span>\
+                    <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">png_filename</span><span class="p">,</span> <span class="n">movie_filename</span><span class="p">)</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">bashCommand</span><span class="o">.</span><span class="n">split</span><span class="p">(),</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+    <span class="n">output</span><span class="p">,</span> <span class="n">error</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+
+<span class="n">png_filename</span> <span class="o">=</span> <span class="s1">&#39;density_&#39;</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="si">%1d</span><span class="s1">.png&#39;</span>
+<span class="n">movie_filename</span> <span class="o">=</span> <span class="s1">&#39;mov&#39;</span>
+<span class="n">make_mov</span><span class="p">(</span><span class="n">png_filename</span><span class="p">,</span> <span class="n">movie_filename</span><span class="p">)</span>
+<span class="n">make_mp4</span><span class="p">(</span><span class="n">png_filename</span><span class="p">,</span> <span class="n">movie_filename</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="examples.html" class="btn btn-neutral float-right" title="Examples library" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2020, LSDO Lab, UCSD.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
