@@ -6,7 +6,7 @@
 Welcome to ATOMiCS's documentation!
 ===================================
 Hi, this is ATOMiCS 0.1 (\ **a**\utomated  **t**\opology  **o**\ptimization  in Open\ **M**\DAO using FEn\ **iCS**\ ). It is an open-source density-based topology optimization toolbox.
-ATOMiCS is built on top of the `OpenMDAO framework <https://github.com/openmdao/blue>`_, which is described and documented `here <http://openmdao.org/twodocs/versions/latest>`_.
+ATOMiCS is built on top of the `OpenMDAO framework <https://github.com/openmdao/blue>`_, which is described and documented `here <https://openmdao.org/newdocs/versions/latest>`_.
 The solution approach to the PDE problems and the partial derivative computations are wrapped from `FEniCS Project <https://fenicsproject.org/>`_ documented `here <https://fenicsproject.org/olddocs/dolfin/latest/python/>`_.
 
 Documentation
@@ -21,6 +21,7 @@ Documentation
    _src_docs/examples
    _src_docs/methods
    _src_docs/pdes
+   _src_docs/extension
    _src_docs/api
 
 
