@@ -1,17 +1,16 @@
-Define a new PDE
+Defining a new PDE
 ----------------------
 ATOmiCS wraps ``FEniCS`` for the solution of the PDEs.
 The input for FEniCS is the variational (weak) form.
 Thus, to implement a physics problem that is not included in ATOmiCS,
-the users need to implement the variational form using FEniCS unifed form language (UFL) and add it to ATOmiCS pde folder
+the users need to implement the variational form using FEniCS unified form language (UFL) and add it to the ATOmiCS PDE folder
 (``atomics/atomics/pdes``).
-We demonstration this process using an example that adds a st. Venant–Kirchoff model
-to ATOmiCS pde folder, and run a cantilever beam optimization with the new PDE. 
+We demonstrate this process using an example that adds the st. Venant--Kirchhoff model to the ATOmiCS the PDE folder.
 
-    1.1 Derive the vatiational form
+    1.1 Derive the variational form
 
-        St. Venant–Kirchoff model is a type of simple hyperelastic problem.
-        The vatiational form of these hyperelastic problem can be derived
+        St. Venant--Kirchhoff model is a type of simple hyperelastic problem.
+        The variational form of this kind of hyperelastic problem can be derived
         by minimizing the potential energy on domain :math:`\Omega`
         
         .. math::
@@ -19,7 +18,7 @@ to ATOmiCS pde folder, and run a cantilever beam optimization with the new PDE.
             - \int_{\Omega} b \cdot u \, {\rm d} x
             - \int_{\partial\Omega} t \cdot u \, {\rm d} s,
 
-        where :math:`\psi` is the strain energy density for st. Venant–Kirchoff model;
+        where :math:`\psi` is the strain energy density for st. Venant--Kirchhoff model;
         :math:`b` and :math:`t` are the body and the traction force, respectively;
         :math:`u` is the displacements function.
 
@@ -30,7 +29,7 @@ to ATOmiCS pde folder, and run a cantilever beam optimization with the new PDE.
             D_{v} \Psi = \left.
             \frac{d \Psi(u + \epsilon v)}{d\epsilon} \right|_{\epsilon = 0}=0.
 
-        We compute the :math:`\psi(u)` according to the st. Venant–Kirchoff model.
+        We compute the :math:`\psi(u)` according to the st. Venant--Kirchhoff model.
         We consider the deformation gradient 
         
         .. math::
@@ -109,7 +108,7 @@ to ATOmiCS pde folder, and run a cantilever beam optimization with the new PDE.
             + \int_{\partial\Omega} t \cdot u \, {\rm d} s,
 
         and the subdomain
-        where they are applied on subject to change across different problems. 
+        where they are applied on subject to are problem specific. 
         We define this term in the  ``run_file``.
         The user can refer to :ref:`step-label` on how to define a subdomain.
 

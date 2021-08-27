@@ -1,14 +1,14 @@
-Implementing a customized computation for preprocessing or postprocession or outputs
+Implementing a customized computation for preprocessing, postprocessing or outputs
 ------------------------------------------------------------------------------------------------
 
 This subsection explains how to implement a new customized computation.
-There are three types computations we defined in ATOmiCS toolbox:
+There are three types of computations we defined in the ATOmiCS toolbox:
 
    1) The computation that can be directly implemented using OpenMDAO
         An example can be the interpolation component for case study 3 in the paper.
-        In order to formulate this kind of components, the user need to refer to OpenMDAO documentation for the `explicit component <https://openmdao.org/newdocs/versions/latest/features/core_features/working_with_components/explicit_component.html>`_.
+        In order to formulate this kind of component, the user needs to refer to OpenMDAO documentation for the `explicit component <https://openmdao.org/newdocs/versions/latest/features/core_features/working_with_components/explicit_component.html>`_.
         
-        We summarize briefly this process in this documentation.
+        We briefly summarize this process in this documentation.
         Defining a customized explicit component requires writing
         a python class inherited from OpenMDAO ``ExplicitComponent`` 
         There are four main functions inside the class:
@@ -30,9 +30,9 @@ There are three types computations we defined in ATOmiCS toolbox:
             output_form = ...
             pde_problem.add_scalar_output(<output_name>, <output_form>, <argument_names>)
 
-        The ``<output_name>`` is the name of the customized output that the user defined;
+        The ``<output_name>`` is the name of the customized output;
         ``<output_form>`` is the form expressing the output using FEniCS UFL;
-        ``<argument_names>`` are the name list of arguments that the user want to take derivative with respect to.
+        ``<argument_names>`` are the name list of arguments that the user wants to take derivatives with respect to.
 
    3) The computation that combines OpenMDAO and FEniCS and outputs a scalar on each vertex
 
@@ -41,6 +41,6 @@ There are three types computations we defined in ATOmiCS toolbox:
         output_form = ...
         pde_problem.add_field_output(<output_name>, <output_form>, <argument_names>)
 
-    The ``<output_name>`` is the name of the customized output that the user defined;
+    The ``<output_name>`` is the name of the customized output;
     ``<output_form>`` is the form expressing the output using FEniCS UFL;
-    ``<argument_names>`` are the name list of arguments that the user want to take derivative with respect to.
+    ``<argument_names>`` are the name list of arguments that the user wants to take derivatives with respect to.
