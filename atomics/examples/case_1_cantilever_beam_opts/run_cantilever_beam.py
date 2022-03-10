@@ -138,3 +138,15 @@ else:
 
 df.File('solutions/case_1/cantilever_beam/displacement.pvd') << displacements_function
 df.File('solutions/case_1/cantilever_beam/penalized_density.pvd') << penalized_density
+
+
+#------------ Plot Geometry --------------------------------
+from matplotlib import cm, pyplot as plt
+plt.close()
+ax = plt.subplot()
+ax.contourf(penalized_density.vector().get_local().reshape(NUM_ELEMENTS_Y,NUM_ELEMENTS_X),[0,0.01],extent = [.0,LENGTH_X,.0,LENGTH_Y],\
+    cmap=cm.get_cmap('bone'))
+    # cmap=-cm.gray)
+ax.set_aspect('equal', 'box')
+plt.show()
+plt.savefig('densities' + '.pdf', bbox_inches='tight')

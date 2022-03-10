@@ -116,7 +116,7 @@ prob.driver = driver = om.pyOptSparseDriver()
 driver.options['optimizer'] = 'SNOPT'
 driver.opt_settings['Verify level'] = 0
 
-driver.opt_settings['Major iterations limit'] = 100000
+driver.opt_settings['Major iterations limit'] = 3
 driver.opt_settings['Minor iterations limit'] = 100000
 driver.opt_settings['Iterations limit'] = 100000000
 driver.opt_settings['Major step limit'] = 2.0
@@ -127,7 +127,7 @@ driver.opt_settings['Major optimality tolerance'] =1.3e-9
 prob.setup()
 prob.run_model()
 # prob.check_partials(compact_print=True)
-prob.run_driver()
+# prob.run_driver()
 
 eps = df.sym(df.grad(displacements_function))
 eps_dev = eps - 1/3 * df.tr(eps) * df.Identity(2)
@@ -154,3 +154,16 @@ stiffness  = df.project(density_function/(1 + 8. * (1. - density_function)), den
 df.File('solutions/case_1/hyperelastic_cantilever_beam/stiffness.pvd') << stiffness
 df.File('solutions/case_1/hyperelastic_cantilever_beam/eps_eq_proj_1000.pvd') << eps_eq_proj
 df.File('solutions/case_1/hyperelastic_cantilever_beam/detF_m_1000.pvd') << det_F_m_proj
+
+
+
+#------------ Plot Geometry --------------------------------
+from matplotlib import cm, pyplot as plt
+plt.close()
+ax = plt.subplot()
+ax.contourf(stiffness.vector().get_local().reshape(NUM_ELEMENTS_Y,NUM_ELEMENTS_X),[0,0.01],extent = [.0,LENGTH_X,.0,LENGTH_Y],\
+    cmap=cm.get_cmap('bone'))
+    # cmap=-cm.gray)
+ax.set_aspect('equal', 'box')
+plt.show()
+plt.savefig('densities' + '.pdf', bbox_inches='tight')
