@@ -11,11 +11,8 @@ from atomics.general_filter_comp import GeneralFilterComp
 np.random.seed(0)
 
 # Define the mesh and create the PDE problem
-# NUM_ELEMENTS_X = 120
-# NUM_ELEMENTS_Y = 30
-
-NUM_ELEMENTS_X = 40
-NUM_ELEMENTS_Y = 10
+NUM_ELEMENTS_X = 120
+NUM_ELEMENTS_Y = 30
 LENGTH_X = 4.8  # 0.12
 LENGTH_Y = 1.6  # 0.03
 
@@ -108,7 +105,7 @@ prob.model.add_subsystem('indep_var_comp', comp, promotes=['*'])
 comp = GeneralFilterComp(density_function_space=density_function_space)
 prob.model.add_subsystem('general_filter_comp', comp, promotes=['*'])
 
-group = AtomicsGroup(pde_problem=pde_problem)
+group = AtomicsGroup(pde_problem=pde_problem, problem_type='nonlinear_problem')
 prob.model.add_subsystem('atomics_group', group, promotes=['*'])
 
 prob.model.add_design_var('density_unfiltered', upper=1, lower=5e-3)
@@ -119,7 +116,8 @@ prob.driver = driver = om.pyOptSparseDriver()
 driver.options['optimizer'] = 'SNOPT'
 driver.opt_settings['Verify level'] = 0
 
-driver.opt_settings['Major iterations limit'] = 60
+driver.opt_settings['Major iterations limit'] = 100000
+driver.opt_settings['Major iterations limit'] = 35
 driver.opt_settings['Minor iterations limit'] = 100000
 driver.opt_settings['Iterations limit'] = 100000000
 driver.opt_settings['Major step limit'] = 2.0
@@ -162,16 +160,3 @@ df.File('solutions/case_1/hyperelastic_cantilever_beam/eps_eq_proj_1000.pvd'
         ) << eps_eq_proj
 df.File('solutions/case_1/hyperelastic_cantilever_beam/detF_m_1000.pvd'
         ) << det_F_m_proj
-
-#------------ Plot Geometry --------------------------------
-from matplotlib import cm, pyplot as plt
-
-plt.close()
-ax = plt.subplot()
-ax.contourf(stiffness.vector().get_local().reshape(NUM_ELEMENTS_Y,NUM_ELEMENTS_X),[0,0.01],extent = [.0,LENGTH_X,.0,LENGTH_Y],\
-    cmap=cm.get_cmap('bone'))
-# cmap=-cm.gray)
-ax.set_aspect('equal', 'box')
-# plt.show()
-plt.savefig('densities' + '.pdf', bbox_inches='tight')
-plt.show()
