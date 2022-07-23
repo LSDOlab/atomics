@@ -4,7 +4,7 @@ import numpy as np
 
 def get_residual_form(u,
                       v,
-                      rho,
+                      rho_e,
                       V_density,
                       tractionBC,
                       T,
@@ -15,8 +15,7 @@ def get_residual_form(u,
 
     df.dx = df.dx(metadata={"quadrature_degree": 4})
     # stiffness = rho_e/(1 + 8. * (1. - rho_e))
-    beta_ = 5
-    rho_e = 1 - df.exp(-beta_ * rho) + rho * df.exp(-beta_)
+
     if method == 'SIMP':
         stiffness = rho_e**3
     else:
@@ -123,8 +122,8 @@ def get_residual_form(u,
     psi = (mu / 2) * (Ic - 3) - mu * df.ln(J) + (lambda_ / 2) * (df.ln(J))**2
     # print('the length of psi is:',len(psi.vector()))
     if additive == 'strain':
-        pass
-        # psi += phi_add
+        psi += 0
+        psi += phi_add
     B = df.Constant((0.0, 0.0))
 
     # Total potential energy

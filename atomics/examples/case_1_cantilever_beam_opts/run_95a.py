@@ -19,8 +19,13 @@ NUM_ELEMENTS_Y = 30
 LENGTH_X = 4.8  # 0.12
 LENGTH_Y = 1.6  # 0.03
 
-LENGTH_X = 0.12
-LENGTH_Y = 0.03
+# LENGTH_X = 0.12
+# LENGTH_Y = 0.03
+
+LENGTH_X = 0.06
+LENGTH_Y = 0.02
+
+# 1 cm =1e-2 meter 10 N-> 1000N
 
 mesh = df.RectangleMesh.create(
     [df.Point(0.0, 0.0), df.Point(LENGTH_X, LENGTH_Y)],
@@ -35,7 +40,7 @@ class TractionBoundary(df.SubDomain):
     def inside(self, x, on_boundary):
         return ((abs(x[1] - LENGTH_Y / 2) <
                  LENGTH_Y / NUM_ELEMENTS_Y + df.DOLFIN_EPS)
-                and (abs(x[0] - LENGTH_X) < df.DOLFIN_EPS * 1.5e15))
+                and (abs(x[0] - LENGTH_X) < df.DOLFIN_EPS * 1.e7))
 
 
 # Define the traction boundary
@@ -44,10 +49,12 @@ upper_edge = TractionBoundary()
 upper_edge.mark(sub_domains, 6)
 dss = df.Measure('ds')(subdomain_data=sub_domains)
 tractionBC = dss(6)
-f = df.Constant((0.0, -9.e-1))
+F = -5
+f = df.Constant((0.0, F / (LENGTH_Y / NUM_ELEMENTS_Y * 2) * 100))
 
 # f = df.Constant((0.0, -9.e-1))
-k = 10
+k = 2.6e7
+# k = 7.87e7
 # k = 3e9
 
 # f = df.Constant((0.0, -120/ (8.*LENGTH_Y/NUM_ELEMENTS_Y ) ))
@@ -70,7 +77,8 @@ displacements_function_space = df.VectorFunctionSpace(mesh, 'Lagrange', 1)
 displacements_function = df.Function(displacements_function_space)
 v = df.TestFunction(displacements_function_space)
 residual_form = get_residual_form(displacements_function, v, density_function,
-                                  density_function_space, tractionBC, f, 1)
+                                  density_function_space, tractionBC, f, 1,
+                                  'strain', k)
 
 pde_problem.add_state('displacements', displacements_function, residual_form,
                       'density')
@@ -113,22 +121,22 @@ prob.model.add_subsystem('atomics_group', group, promotes=['*'])
 
 prob.model.add_design_var('density_unfiltered', upper=1, lower=5e-3)
 prob.model.add_objective('compliance')
-prob.model.add_constraint('avg_density', upper=0.40)
+prob.model.add_constraint('avg_density', upper=0.45)
 
 prob.driver = driver = om.pyOptSparseDriver()
 driver.options['optimizer'] = 'SNOPT'
 driver.opt_settings['Verify level'] = 0
 
-driver.opt_settings['Major iterations limit'] = 60
+driver.opt_settings['Major iterations limit'] = 300
 driver.opt_settings['Minor iterations limit'] = 100000
 driver.opt_settings['Iterations limit'] = 100000000
-driver.opt_settings['Major step limit'] = 2.0
+driver.opt_settings['Major step limit'] = 0.2
 
 driver.opt_settings['Major feasibility tolerance'] = 1.0e-5
 driver.opt_settings['Major optimality tolerance'] = 1.3e-9
 
 prob.setup()
-prob.run_model()
+# prob.run_model()
 # prob.check_partials(compact_print=True)
 prob.run_driver()
 
@@ -152,16 +160,13 @@ fFile.close()
 f2 = df.Function(density_function_space)
 
 #save the solution vector
-df.File('solutions/case_1/hyperelastic_cantilever_beam/displacement.pvd'
-        ) << displacements_function
+df.File('solutions/case_1/95a/displacement.pvd') << displacements_function
 stiffness = df.project(density_function / (1 + 8. * (1. - density_function)),
                        density_function_space)
-df.File(
-    'solutions/case_1/hyperelastic_cantilever_beam/stiffness.pvd') << stiffness
-df.File('solutions/case_1/hyperelastic_cantilever_beam/eps_eq_proj_1000.pvd'
-        ) << eps_eq_proj
-df.File('solutions/case_1/hyperelastic_cantilever_beam/detF_m_1000.pvd'
-        ) << det_F_m_proj
+df.File('solutions/case_1/95a/density_function.pvd') << density_function
+df.File('solutions/case_1/95a/stiffness.pvd') << stiffness
+df.File('solutions/case_1/95a/eps_eq_proj_1000.pvd') << eps_eq_proj
+df.File('solutions/case_1/95a/detF_m_1000.pvd') << det_F_m_proj
 
 #------------ Plot Geometry --------------------------------
 from matplotlib import cm, pyplot as plt
