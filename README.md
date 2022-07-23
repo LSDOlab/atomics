@@ -24,17 +24,25 @@ Installing
 ----------
 To install ATOMiCS and run topology optimization problems, you need to follow these steps:
 
-1.  Install FEniCS 2019.1.0 partial differential equation (PDE) solver from https://fenicsproject.org/download/archive/. 
+1.  Install FEniCS 2019.1.0 partial differential equation (PDE) solver from [here](https://fenicsproject.org/download/archive/). 
 
   - For MAC users, the anaconda installation method is recommend.
     For Ubuntu users, please just install according to the Ubuntu installation guidline.
     For Windows users (haven't tested), please try the method of installing Ubuntu subsystem.
 
-2. Install ``OpenMDAO``:
+
+2.  Install a specific version of FEniCS ufl from [here](https://github.com/FEniCS/ufl/tree/2021.1.0), if you meet this error:
+
+  '''
+  ImportError: cannot import name 'cellname2facetname' from 'ufl.cell'
+  '''
+
+
+3. Install ``OpenMDAO``:
 
  - The installation of OpenMDAO: ``pip install 'openmdao[all]'``
 
-3. Install ``ATOMiCS``:
+4. Install ``ATOMiCS``:
 
   - ``git clone`` this repository, navigate to the atomics directory. 
   Then, and use the command ``pip install -e .`` to install ATOMiCS.
