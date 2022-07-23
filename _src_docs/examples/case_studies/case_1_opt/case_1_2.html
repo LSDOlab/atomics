@@ -1,0 +1,437 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Case study I: nonlinear elastic cantilever beam topology optimization &mdash; atomics 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/thebelab.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/thebelab-helper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+    <link rel="next" title="Case study II: battery pack topology optimizations" href="../case_2.html" />
+    <link rel="prev" title="Case study I: linear elastic cantilever beam topology optimization" href="case_1_1.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> atomics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../solution.html">Steps for solving a topology optimization problem in ATOMiCS</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../../examples.html">Examples library</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../../case_studies.html">Case studies</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="../case_1.html">Case study I: cantilever beam problems</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="case_1_1.html">Case study I: linear elastic cantilever beam topology optimization</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Case study I: nonlinear elastic cantilever beam topology optimization</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../case_2.html">Case study II: battery pack topology optimizations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../case_3.html">Case study III: liquid crystal elastomer shape matching</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../other_examples.html">Other examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../methods.html">Density-based methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../pdes.html">PDE library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extension.html">Advanced user guide—extensions for ATOmiCS toolbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../extension.html#indices-and-tables">Indices and tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">Developer API</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">atomics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../examples.html">Examples library</a> &raquo;</li>
+        
+          <li><a href="../../case_studies.html">Case studies</a> &raquo;</li>
+        
+          <li><a href="../case_1.html">Case study I: cantilever beam problems</a> &raquo;</li>
+        
+      <li>Case study I: nonlinear elastic cantilever beam topology optimization</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../../../_sources/_src_docs/examples/case_studies/case_1_opt/case_1_2.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="case-study-i-nonlinear-elastic-cantilever-beam-topology-optimization">
+<h1>Case study I: nonlinear elastic cantilever beam topology optimization<a class="headerlink" href="#case-study-i-nonlinear-elastic-cantilever-beam-topology-optimization" title="Permalink to this headline">¶</a></h1>
+<p>The variational form for the nonlinear elastic problem is derived by minimize the strain energy <span class="math notranslate nohighlight">\(\Pi\)</span> such that</p>
+<div class="math notranslate nohighlight">
+\[\Pi = \int_{\Omega} \psi(u) \, {\rm d} x
+- \int_{\Omega} B \cdot u \, {\rm d} x
+- \int_{\partial\Omega} T \cdot u \, {\rm d} s  ,\]</div>
+<p>where the <span class="math notranslate nohighlight">\(\sigma\)</span>, <span class="math notranslate nohighlight">\(v\)</span> are the stress tenser and the test functions.</p>
+<p>The code can be downloaded from
+<a class="reference external" href="https://github.com/LSDOlab/atomics/blob/master/atomics/examples/case_1_cantilever_beam_opts/run_hyperelastic_cantilever_beam_exp.py">here</a></p>
+<section id="code">
+<h2>1. Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<p>We explain the code in detail in this section.</p>
+<section id="import">
+<h3>1.1. Import<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h3>
+<p>First, import <code class="docutils literal notranslate"><span class="pre">dolfin</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, <code class="docutils literal notranslate"><span class="pre">openmdao</span></code>, <code class="docutils literal notranslate"><span class="pre">atomics.api</span></code>, <code class="docutils literal notranslate"><span class="pre">atomics.pde</span></code>, and <code class="docutils literal notranslate"><span class="pre">atomics.filter</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dolfin</span> <span class="k">as</span> <span class="nn">df</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">openmdao.api</span> <span class="k">as</span> <span class="nn">om</span>
+
+<span class="kn">from</span> <span class="nn">atomics.api</span> <span class="kn">import</span> <span class="n">PDEProblem</span><span class="p">,</span> <span class="n">AtomicsGroup</span>
+<span class="kn">from</span> <span class="nn">atomics.pdes.neo_hookean_addtive</span> <span class="kn">import</span> <span class="n">get_residual_form</span>
+<span class="kn">from</span> <span class="nn">atomics.general_filter_comp</span> <span class="kn">import</span> <span class="n">GeneralFilterComp</span>
+</pre></div>
+</div>
+</section>
+<section id="define-the-mesh">
+<h3>1.2. Define the mesh<a class="headerlink" href="#define-the-mesh" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># Define the mesh</span>
+<span class="n">NUM_ELEMENTS_X</span> <span class="o">=</span> <span class="mi">120</span>
+<span class="n">NUM_ELEMENTS_Y</span> <span class="o">=</span> <span class="mi">30</span>
+<span class="n">LENGTH_X</span> <span class="o">=</span> <span class="mf">4.8</span> <span class="c1"># 0.12</span>
+<span class="n">LENGTH_Y</span> <span class="o">=</span> <span class="mf">1.6</span> <span class="c1"># 0.03</span>
+
+<span class="n">LENGTH_X</span> <span class="o">=</span> <span class="mf">0.12</span>
+<span class="n">LENGTH_Y</span> <span class="o">=</span> <span class="mf">0.03</span>
+
+<span class="n">mesh</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">RectangleMesh</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span> <span class="n">df</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="n">LENGTH_X</span><span class="p">,</span> <span class="n">LENGTH_Y</span><span class="p">)],</span>
+    <span class="p">[</span><span class="n">NUM_ELEMENTS_X</span><span class="p">,</span> <span class="n">NUM_ELEMENTS_Y</span><span class="p">],</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">CellType</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="n">quadrilateral</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">f</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="o">-</span><span class="mf">9.e-1</span> <span class="p">))</span>
+<span class="n">k</span> <span class="o">=</span> <span class="mi">10</span>
+</pre></div>
+</div>
+</section>
+<section id="define-the-pde-problem">
+<h3>1.3. Define the PDE problem<a class="headerlink" href="#define-the-pde-problem" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># PDE problem</span>
+<span class="n">pde_problem</span> <span class="o">=</span> <span class="n">PDEProblem</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+<span class="c1"># Add input to the PDE problem:</span>
+<span class="c1"># name = &#39;density&#39;, function = density_function (function is the solution vector here)</span>
+<span class="n">density_function_space</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;DG&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">density_function</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">density_function_space</span><span class="p">)</span>
+<span class="n">density_function</span><span class="o">.</span><span class="n">vector</span><span class="p">()</span><span class="o">.</span><span class="n">set_local</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">density_function_space</span><span class="o">.</span><span class="n">dim</span><span class="p">()))</span>
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span><span class="s1">&#39;density&#39;</span><span class="p">,</span> <span class="n">density_function</span><span class="p">)</span>
+
+<span class="c1"># Define the traction condition:</span>
+<span class="c1"># here traction force is applied on the middle of the right edge</span>
+<span class="k">class</span> <span class="nc">TractionBoundary</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">SubDomain</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">inside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">on_boundary</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">((</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">LENGTH_Y</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">LENGTH_Y</span><span class="o">/</span><span class="n">NUM_ELEMENTS_Y</span> <span class="o">+</span> <span class="n">df</span><span class="o">.</span><span class="n">DOLFIN_EPS</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">LENGTH_X</span> <span class="p">)</span> <span class="o">&lt;</span> <span class="n">df</span><span class="o">.</span><span class="n">DOLFIN_EPS</span><span class="o">*</span><span class="mf">1.5e15</span><span class="p">))</span>
+
+<span class="c1"># Define the traction boundary</span>
+<span class="n">sub_domains</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">MeshFunction</span><span class="p">(</span><span class="s1">&#39;size_t&#39;</span><span class="p">,</span> <span class="n">mesh</span><span class="p">,</span> <span class="n">mesh</span><span class="o">.</span><span class="n">topology</span><span class="p">()</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">upper_edge</span> <span class="o">=</span> <span class="n">TractionBoundary</span><span class="p">()</span>
+<span class="n">upper_edge</span><span class="o">.</span><span class="n">mark</span><span class="p">(</span><span class="n">sub_domains</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">dss</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Measure</span><span class="p">(</span><span class="s1">&#39;ds&#39;</span><span class="p">)(</span><span class="n">subdomain_data</span><span class="o">=</span><span class="n">sub_domains</span><span class="p">)</span>
+<span class="n">tractionBC</span> <span class="o">=</span> <span class="n">dss</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+
+<span class="c1"># Add states to the PDE problem (line 58):</span>
+<span class="c1"># name = &#39;displacements&#39;, function = displacements_function (function is the solution vector here)</span>
+<span class="c1"># residual_form = get_residual_form(u, v, rho_e) from atomics.pdes.thermo_mechanical_uniform_temp</span>
+<span class="c1"># *inputs = density (can be multiple, here &#39;density&#39; is the only input)</span>
+<span class="n">displacements_function_space</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">VectorFunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;Lagrange&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">displacements_function</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">displacements_function_space</span><span class="p">)</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">TestFunction</span><span class="p">(</span><span class="n">displacements_function_space</span><span class="p">)</span>
+<span class="n">residual_form</span> <span class="o">=</span> <span class="n">get_residual_form</span><span class="p">(</span>
+    <span class="n">displacements_function</span><span class="p">,</span>
+    <span class="n">v</span><span class="p">,</span>
+    <span class="n">density_function</span><span class="p">,</span>
+    <span class="n">density_function_space</span><span class="p">,</span>
+    <span class="n">tractionBC</span><span class="p">,</span>
+    <span class="n">f</span><span class="p">,</span>
+    <span class="mi">1</span>
+<span class="p">)</span>
+
+
+
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s1">&#39;displacements&#39;</span><span class="p">,</span> <span class="n">displacements_function</span><span class="p">,</span> <span class="n">residual_form</span><span class="p">,</span> <span class="s1">&#39;density&#39;</span><span class="p">)</span>
+
+<span class="c1"># Add output-avg_density to the PDE problem:</span>
+<span class="n">volume</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">mesh</span><span class="p">))</span>
+<span class="n">avg_density_form</span> <span class="o">=</span> <span class="n">density_function</span> <span class="o">/</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1.</span> <span class="o">*</span> <span class="n">volume</span><span class="p">))</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_scalar_output</span><span class="p">(</span><span class="s1">&#39;avg_density&#39;</span><span class="p">,</span> <span class="n">avg_density_form</span><span class="p">,</span> <span class="s1">&#39;density&#39;</span><span class="p">)</span>
+
+<span class="c1"># Add output-compliance to the PDE problem:</span>
+<span class="n">compliance_form</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">displacements_function</span><span class="p">)</span> <span class="o">*</span> <span class="n">dss</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_scalar_output</span><span class="p">(</span><span class="s1">&#39;compliance&#39;</span><span class="p">,</span> <span class="n">compliance_form</span><span class="p">,</span> <span class="s1">&#39;displacements&#39;</span><span class="p">)</span>
+
+<span class="c1"># Add boundary conditions to the PDE problem:</span>
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_bc</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">DirichletBC</span><span class="p">(</span><span class="n">displacements_function_space</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)),</span> <span class="s1">&#39;(abs(x[0]-0.) &lt; DOLFIN_EPS)&#39;</span><span class="p">))</span>
+</pre></div>
+</div>
+</section>
+<section id="set-up-the-openmdao-model">
+<h3>1.4. Set up the OpenMDAO model<a class="headerlink" href="#set-up-the-openmdao-model" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prob</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">Problem</span><span class="p">()</span>
+
+<span class="n">num_dof_density</span> <span class="o">=</span> <span class="n">pde_problem</span><span class="o">.</span><span class="n">inputs_dict</span><span class="p">[</span><span class="s1">&#39;density&#39;</span><span class="p">][</span><span class="s1">&#39;function&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">function_space</span><span class="p">()</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span>
+
+<span class="n">comp</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">IndepVarComp</span><span class="p">()</span>
+<span class="n">comp</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span>
+    <span class="s1">&#39;density_unfiltered&#39;</span><span class="p">,</span>
+    <span class="n">shape</span><span class="o">=</span><span class="n">num_dof_density</span><span class="p">,</span>
+    <span class="n">val</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">num_dof_density</span><span class="p">),</span>
+    <span class="c1"># val=np.random.random(num_dof_density) * 0.86,</span>
+<span class="p">)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_subsystem</span><span class="p">(</span><span class="s1">&#39;indep_var_comp&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">promotes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">])</span>
+
+<span class="n">comp</span> <span class="o">=</span> <span class="n">GeneralFilterComp</span><span class="p">(</span><span class="n">density_function_space</span><span class="o">=</span><span class="n">density_function_space</span><span class="p">)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_subsystem</span><span class="p">(</span><span class="s1">&#39;general_filter_comp&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">promotes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">])</span>
+
+
+<span class="n">group</span> <span class="o">=</span> <span class="n">AtomicsGroup</span><span class="p">(</span><span class="n">pde_problem</span><span class="o">=</span><span class="n">pde_problem</span><span class="p">)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_subsystem</span><span class="p">(</span><span class="s1">&#39;atomics_group&#39;</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">promotes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">])</span>
+
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_design_var</span><span class="p">(</span><span class="s1">&#39;density_unfiltered&#39;</span><span class="p">,</span><span class="n">upper</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mf">5e-3</span> <span class="p">)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_objective</span><span class="p">(</span><span class="s1">&#39;compliance&#39;</span><span class="p">)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="s1">&#39;avg_density&#39;</span><span class="p">,</span><span class="n">upper</span><span class="o">=</span><span class="mf">0.50</span><span class="p">)</span>
+
+<span class="n">prob</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">pyOptSparseDriver</span><span class="p">()</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;SNOPT&#39;</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">opt_settings</span><span class="p">[</span><span class="s1">&#39;Verify level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">driver</span><span class="o">.</span><span class="n">opt_settings</span><span class="p">[</span><span class="s1">&#39;Major iterations limit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100000</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">opt_settings</span><span class="p">[</span><span class="s1">&#39;Minor iterations limit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100000</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">opt_settings</span><span class="p">[</span><span class="s1">&#39;Iterations limit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100000000</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">opt_settings</span><span class="p">[</span><span class="s1">&#39;Major step limit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
+
+<span class="n">driver</span><span class="o">.</span><span class="n">opt_settings</span><span class="p">[</span><span class="s1">&#39;Major feasibility tolerance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0e-5</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">opt_settings</span><span class="p">[</span><span class="s1">&#39;Major optimality tolerance&#39;</span><span class="p">]</span> <span class="o">=</span><span class="mf">1.3e-9</span>
+
+<span class="n">prob</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">run_model</span><span class="p">()</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">run_driver</span><span class="p">()</span>
+
+<span class="n">eps</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sym</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">displacements_function</span><span class="p">))</span>
+<span class="n">eps_dev</span> <span class="o">=</span> <span class="n">eps</span> <span class="o">-</span> <span class="mi">1</span><span class="o">/</span><span class="mi">3</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">tr</span><span class="p">(</span><span class="n">eps</span><span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">Identity</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">eps_eq</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mf">2.0</span> <span class="o">/</span> <span class="mf">3.0</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">inner</span><span class="p">(</span><span class="n">eps_dev</span><span class="p">,</span> <span class="n">eps_dev</span><span class="p">))</span>
+<span class="n">eps_eq_proj</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">eps_eq</span><span class="p">,</span> <span class="n">density_function_space</span><span class="p">)</span>
+<span class="n">ratio</span> <span class="o">=</span> <span class="n">eps</span> <span class="o">/</span> <span class="n">eps_eq</span>
+
+<span class="n">fFile</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">HDF5File</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">MPI</span><span class="o">.</span><span class="n">comm_world</span><span class="p">,</span><span class="s2">&quot;eps_eq_proj_1000.h5&quot;</span><span class="p">,</span><span class="s2">&quot;w&quot;</span><span class="p">)</span>
+<span class="n">fFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">eps_eq_proj</span><span class="p">,</span><span class="s2">&quot;/f&quot;</span><span class="p">)</span>
+<span class="n">fFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="n">F_m</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">grad</span><span class="p">(</span><span class="n">displacements_function</span><span class="p">)</span> <span class="o">+</span> <span class="n">df</span><span class="o">.</span><span class="n">Identity</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">det_F_m</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">det</span><span class="p">(</span><span class="n">F_m</span><span class="p">)</span>
+<span class="n">det_F_m_proj</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">det_F_m</span><span class="p">,</span> <span class="n">density_function_space</span><span class="p">)</span>
+
+<span class="n">fFile</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">HDF5File</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">MPI</span><span class="o">.</span><span class="n">comm_world</span><span class="p">,</span><span class="s2">&quot;det_F_m_proj_1000.h5&quot;</span><span class="p">,</span><span class="s2">&quot;w&quot;</span><span class="p">)</span>
+<span class="n">fFile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">det_F_m_proj</span><span class="p">,</span><span class="s2">&quot;/f&quot;</span><span class="p">)</span>
+<span class="n">fFile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+<span class="n">f2</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">density_function_space</span><span class="p">)</span>
+<span class="c1"># fFile = df.HDF5File(df.MPI.comm_world,&quot;eps_eq_proj_1000.h5&quot;,&quot;r&quot;)</span>
+<span class="c1"># fFile.read(f2,&quot;/f&quot;)</span>
+<span class="c1"># fFile.close()</span>
+
+<span class="c1">#save the solution vector</span>
+<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/case_1/hyperelastic_cantilever_beam/displacement.pvd&#39;</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">displacements_function</span>
+<span class="n">stiffness</span>  <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">density_function</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">8.</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">density_function</span><span class="p">)),</span> <span class="n">density_function_space</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/case_1/hyperelastic_cantilever_beam/stiffness.pvd&#39;</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">stiffness</span>
+<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/case_1/hyperelastic_cantilever_beam/eps_eq_proj_1000.pvd&#39;</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">eps_eq_proj</span>
+<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/case_1/hyperelastic_cantilever_beam/detF_m_1000.pvd&#39;</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">det_F_m_proj</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="results-density-plot">
+<h2>2. Results (density plot)<a class="headerlink" href="#results-density-plot" title="Permalink to this headline">¶</a></h2>
+<p>The users can visualize the optimized densities by opening the <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;.pvd</span></code> from Paraview.</p>
+<blockquote>
+<div><figure class="align-center">
+<a class="reference internal image-reference" href="../../../../_images/doc_case1_2_result.png"><img alt="../../../../_images/doc_case1_2_result.png" src="../../../../_images/doc_case1_2_result.png" style="width: 510.0px; height: 217.5px;" /></a>
+</figure>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../case_2.html" class="btn btn-neutral float-right" title="Case study II: battery pack topology optimizations" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="case_1_1.html" class="btn btn-neutral float-left" title="Case study I: linear elastic cantilever beam topology optimization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2020, LSDO Lab, UCSD.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

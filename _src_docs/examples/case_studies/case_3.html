@@ -1,0 +1,532 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Case study III: liquid crystal elastomer shape matching &mdash; atomics 0.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/jupyter-sphinx.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/thebelab.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/thebelab-helper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Other examples" href="../other_examples.html" />
+    <link rel="prev" title="Case study II: battery pack topology optimizations" href="case_2.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> atomics
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../solution.html">Steps for solving a topology optimization problem in ATOMiCS</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../../examples.html">Examples library</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="../case_studies.html">Case studies</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="case_1.html">Case study I: cantilever beam problems</a></li>
+<li class="toctree-l3"><a class="reference internal" href="case_2.html">Case study II: battery pack topology optimizations</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Case study III: liquid crystal elastomer shape matching</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../other_examples.html">Other examples</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../methods.html">Density-based methods</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../pdes.html">PDE library</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../extension.html">Advanced user guide—extensions for ATOmiCS toolbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../extension.html#indices-and-tables">Indices and tables</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">Developer API</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">atomics</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../examples.html">Examples library</a> &raquo;</li>
+        
+          <li><a href="../case_studies.html">Case studies</a> &raquo;</li>
+        
+      <li>Case study III: liquid crystal elastomer shape matching</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../../_sources/_src_docs/examples/case_studies/case_3.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <section id="case-study-iii-liquid-crystal-elastomer-shape-matching">
+<h1>Case study III: liquid crystal elastomer shape matching<a class="headerlink" href="#case-study-iii-liquid-crystal-elastomer-shape-matching" title="Permalink to this headline">¶</a></h1>
+<p>Our goals is to design the ordered regions and the director angles on the ordered regions of a liquid crystal elastomer film with four layers, and the director angles on the regions to match a target shape of a 2.5 degree folding:</p>
+<blockquote>
+<div><figure class="align-center">
+<a class="reference internal image-reference" href="../../../_images/doc_case3_goal.png"><img alt="../../../_images/doc_case3_goal.png" src="../../../_images/doc_case3_goal.png" style="width: 405.0px; height: 207.9px;" /></a>
+</figure>
+</div></blockquote>
+<p>The variational form for the problem is</p>
+<div class="math notranslate nohighlight">
+\[\int_{\Omega} \sigma:\nabla v d x =0,\]</div>
+<p>where the <span class="math notranslate nohighlight">\(\sigma\)</span>, <span class="math notranslate nohighlight">\(v\)</span> are the stress tenser and the test functions.</p>
+<p>The code can be downloaded from
+<a class="reference external" href="https://github.com/LSDOlab/atomics/blob/master/atomics/examples/case_3_LCE_shape_matching/run_lce_qdvs.py">here</a></p>
+<section id="code">
+<h2>1. Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
+<p>We explain the code in detail in this section.</p>
+<section id="import">
+<h3>1.1. Import<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h3>
+<p>First, import <code class="docutils literal notranslate"><span class="pre">dolfin</span></code>, <code class="docutils literal notranslate"><span class="pre">meshio</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, <code class="docutils literal notranslate"><span class="pre">pygmsh</span></code>, <code class="docutils literal notranslate"><span class="pre">scipy</span></code>
+<code class="docutils literal notranslate"><span class="pre">atomics.api</span></code>, <code class="docutils literal notranslate"><span class="pre">atomics.pde</span></code>, and <code class="docutils literal notranslate"><span class="pre">atomics.general_filter_comp</span></code>
+, as well as the stock OpenMDAO components such as <code class="docutils literal notranslate"><span class="pre">extract_comp</span></code>, and <code class="docutils literal notranslate"><span class="pre">interpolant_comp</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dolfin</span> <span class="k">as</span> <span class="nn">df</span>
+<span class="kn">import</span> <span class="nn">meshio</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pygmsh</span>
+<span class="kn">import</span> <span class="nn">scipy.sparse</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">spatial</span>
+
+<span class="kn">import</span> <span class="nn">openmdao.api</span> <span class="k">as</span> <span class="nn">om</span>
+
+<span class="kn">from</span> <span class="nn">atomics.api</span> <span class="kn">import</span> <span class="n">PDEProblem</span><span class="p">,</span> <span class="n">AtomicsGroup</span>
+<span class="kn">from</span> <span class="nn">atomics.pdes.thermo_mechanical_lce</span> <span class="kn">import</span> <span class="n">get_residual_form</span>
+<span class="kn">from</span> <span class="nn">atomics.general_filter_comp</span> <span class="kn">import</span> <span class="n">GeneralFilterComp</span>
+
+<span class="kn">from</span> <span class="nn">atomics.extract_comp</span> <span class="kn">import</span> <span class="n">ExtractComp</span>
+<span class="kn">from</span> <span class="nn">atomics.interpolant_comp</span> <span class="kn">import</span> <span class="n">InterpolantComp</span>
+<span class="kn">from</span> <span class="nn">atomics.copy_comp</span> <span class="kn">import</span> <span class="n">Copycomp</span>
+<span class="kn">from</span> <span class="nn">atomics.symmetric_angle_comp</span> <span class="kn">import</span> <span class="n">SymmericAnglecomp</span>
+<span class="kn">from</span> <span class="nn">atomics.symmetric_rho_comp</span> <span class="kn">import</span> <span class="n">SymmericRhocomp</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">code for LCE topology optimization</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Define constants</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="c1"># parameters for the film</span>
+<span class="n">LENGTH</span>  <span class="o">=</span>  <span class="mf">2.5e-3</span>
+<span class="n">WIDTH</span>   <span class="o">=</span>  <span class="mf">5e-3</span>
+<span class="n">THICKNESS</span> <span class="o">=</span> <span class="mf">5e-5</span>
+<span class="n">START_X</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.5e-3</span>
+<span class="n">START_Y</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.5e-3</span>
+<span class="n">START_Z</span> <span class="o">=</span> <span class="o">-</span><span class="mf">2.5e-6</span>
+<span class="n">NUM_ELEMENTS_X</span> <span class="o">=</span> <span class="n">NUM_ELEMENTS_Y</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">NUM_ELEMENTS_Z</span> <span class="o">=</span> <span class="mi">4</span>
+<span class="n">K</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">5.e6</span><span class="p">)</span>
+<span class="n">ALPHA</span> <span class="o">=</span> <span class="mf">2.5e-3</span>
+
+<span class="n">degree</span> <span class="o">=</span> <span class="mf">2.5</span>
+<span class="n">angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">180</span> <span class="o">*</span> <span class="n">degree</span>
+<span class="c1"># angle = 0</span>
+</pre></div>
+</div>
+</section>
+<section id="define-the-mesh">
+<h3>1.2. Define the mesh<a class="headerlink" href="#define-the-mesh" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">mesh</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">BoxMesh</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+    <span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="o">-</span><span class="n">LENGTH</span><span class="p">,</span> <span class="o">-</span><span class="n">WIDTH</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">df</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="n">LENGTH</span><span class="p">,</span> <span class="n">WIDTH</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="n">THICKNESS</span><span class="p">)],</span>
+    <span class="p">[</span><span class="n">NUM_ELEMENTS_X</span><span class="p">,</span> <span class="n">NUM_ELEMENTS_Y</span><span class="p">,</span> <span class="n">NUM_ELEMENTS_Z</span><span class="p">],</span>
+    <span class="n">df</span><span class="o">.</span><span class="n">CellType</span><span class="o">.</span><span class="n">Type</span><span class="o">.</span><span class="n">hexahedron</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Define bcs (middle lines to preserve symmetry)</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="k">class</span> <span class="nc">MidHBoundary</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">SubDomain</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">inside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">on_boundary</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">START_Y</span><span class="o">-</span><span class="n">START_Y</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">df</span><span class="o">.</span><span class="n">DOLFIN_EPS</span> <span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">MidVBoundary</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">SubDomain</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">inside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">on_boundary</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">START_X</span><span class="o">-</span><span class="n">START_X</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">df</span><span class="o">.</span><span class="n">DOLFIN_EPS</span><span class="p">)</span>
+
+<span class="k">class</span> <span class="nc">MidZBoundary</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">SubDomain</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">inside</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">on_boundary</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">(</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">START_X</span><span class="o">-</span><span class="n">START_X</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">df</span><span class="o">.</span><span class="n">DOLFIN_EPS</span> <span class="o">*</span><span class="mf">1e12</span>
+                    <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">0</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">df</span><span class="o">.</span><span class="n">DOLFIN_EPS</span> <span class="o">*</span><span class="mf">1e9</span>
+                    <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="p">(</span><span class="n">START_Y</span><span class="o">-</span><span class="n">START_Y</span><span class="p">))</span> <span class="o">&lt;</span> <span class="n">df</span><span class="o">.</span><span class="n">DOLFIN_EPS</span><span class="o">*</span><span class="mf">1e12</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="define-the-pde-problem">
+<h3>1.3. Define the PDE problem<a class="headerlink" href="#define-the-pde-problem" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># PDE problem</span>
+<span class="n">pde_problem</span> <span class="o">=</span> <span class="n">PDEProblem</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Add input to the PDE problem</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="c1"># name = &#39;density&#39;, function = density_function</span>
+<span class="n">density_function_space</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;DG&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">density_function</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">density_function_space</span><span class="p">)</span>
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span><span class="s1">&#39;density&#39;</span><span class="p">,</span> <span class="n">density_function</span><span class="p">)</span>
+
+<span class="c1"># name = &#39;angle&#39;, function = angle_function</span>
+<span class="n">angle_function_space</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">FunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;DG&#39;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">angle_function</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">angle_function_space</span><span class="p">)</span>
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_input</span><span class="p">(</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span> <span class="n">angle_function</span><span class="p">)</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Add states</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="c1"># Define displacements function</span>
+<span class="n">displacements_function_space</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">VectorFunctionSpace</span><span class="p">(</span><span class="n">mesh</span><span class="p">,</span> <span class="s1">&#39;Lagrange&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">displacements_function</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Function</span><span class="p">(</span><span class="n">displacements_function_space</span><span class="p">)</span>
+<span class="n">v</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">TestFunction</span><span class="p">(</span><span class="n">displacements_function_space</span><span class="p">)</span>
+
+<span class="n">residual_form</span> <span class="o">=</span> <span class="n">get_residual_form</span><span class="p">(</span>
+    <span class="n">displacements_function</span><span class="p">,</span>
+    <span class="n">v</span><span class="p">,</span>
+    <span class="n">density_function</span><span class="p">,</span>
+    <span class="n">angle_function</span><span class="p">,</span>
+    <span class="n">K</span><span class="p">,</span>
+    <span class="n">ALPHA</span>
+<span class="p">)</span>
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s1">&#39;displacements&#39;</span><span class="p">,</span> <span class="n">displacements_function</span><span class="p">,</span> <span class="n">residual_form</span><span class="p">,</span> <span class="s1">&#39;density&#39;</span><span class="p">,</span> <span class="s1">&#39;angle&#39;</span><span class="p">)</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Add output</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="c1"># Add output-avg_density to the PDE problem:</span>
+<span class="n">volume</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">mesh</span><span class="p">))</span>
+<span class="n">avg_density_form</span> <span class="o">=</span> <span class="n">density_function</span> <span class="o">/</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1.</span> <span class="o">*</span> <span class="n">volume</span><span class="p">))</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_scalar_output</span><span class="p">(</span><span class="s1">&#39;avg_density&#39;</span><span class="p">,</span> <span class="n">avg_density_form</span><span class="p">,</span> <span class="s1">&#39;density&#39;</span><span class="p">)</span>
+
+<span class="c1"># Add output-errorL2 to the PDE problem:</span>
+<span class="n">desired_disp</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Expression</span><span class="p">((</span> <span class="s2">&quot;-(1-cos(angle))*x[0]&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;0.0&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;abs(x[0])*sin(angle)&quot;</span><span class="p">),</span>
+                            <span class="n">angle</span><span class="o">=</span><span class="n">angle</span><span class="p">,</span>
+                            <span class="n">degree</span><span class="o">=</span><span class="mi">1</span> <span class="p">)</span>
+<span class="c1"># desired_disp = df.project(desired_disp, displacements_function_space )</span>
+
+<span class="n">vol</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span><span class="n">df</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">mesh</span><span class="p">))</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">desired_disp</span> <span class="o">-</span> <span class="n">displacements_function</span>
+<span class="n">norm_form</span> <span class="o">=</span> <span class="n">e</span><span class="o">**</span><span class="mi">2</span><span class="o">/</span><span class="n">vol</span><span class="o">*</span><span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1e9</span><span class="p">)</span><span class="o">*</span><span class="n">df</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
+<span class="c1"># norm = df.assemble(e**2/vol*df.dx(domain=mesh))</span>
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_scalar_output</span><span class="p">(</span><span class="s1">&#39;error_norm&#39;</span><span class="p">,</span> <span class="n">norm_form</span><span class="p">,</span> <span class="s1">&#39;displacements&#39;</span><span class="p">)</span>
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">4. 3. Add bcs</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="n">bc_displacements_v</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">DirichletBC</span><span class="p">(</span><span class="n">displacements_function_space</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span>
+                                <span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">((</span><span class="mf">0.0</span><span class="p">)),</span>
+                                <span class="n">MidVBoundary</span><span class="p">())</span>
+<span class="n">bc_displacements_h</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">DirichletBC</span><span class="p">(</span><span class="n">displacements_function_space</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+                                    <span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">((</span><span class="mf">0.0</span><span class="p">)),</span>
+                                    <span class="n">MidHBoundary</span><span class="p">())</span>
+<span class="n">bc_displacements_z</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">DirichletBC</span><span class="p">(</span><span class="n">displacements_function_space</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                                    <span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">((</span><span class="mf">0.0</span><span class="p">)),</span>
+                                    <span class="n">MidZBoundary</span><span class="p">())</span>
+<span class="c1"># Add boundary conditions to the PDE problem:</span>
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_bc</span><span class="p">(</span><span class="n">bc_displacements_v</span><span class="p">)</span>
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_bc</span><span class="p">(</span><span class="n">bc_displacements_h</span><span class="p">)</span>
+<span class="n">pde_problem</span><span class="o">.</span><span class="n">add_bc</span><span class="p">(</span><span class="n">bc_displacements_z</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="set-up-the-openmdao-model">
+<h3>1.4. Set up the OpenMDAO model<a class="headerlink" href="#set-up-the-openmdao-model" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">Add OpenMDAO comps &amp; groups</span>
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="c1"># Define the OpenMDAO problem and model</span>
+<span class="n">prob</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">Problem</span><span class="p">()</span>
+
+<span class="n">num_dof_density</span> <span class="o">=</span> <span class="n">pde_problem</span><span class="o">.</span><span class="n">inputs_dict</span><span class="p">[</span><span class="s1">&#39;density&#39;</span><span class="p">][</span><span class="s1">&#39;function&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">function_space</span><span class="p">()</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span>
+<span class="n">bot_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_dof_density</span><span class="o">/</span><span class="mi">4</span><span class="o">/</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">top_idx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_dof_density</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="mi">4</span><span class="p">)</span><span class="o">-</span><span class="nb">int</span><span class="p">(</span><span class="n">num_dof_density</span><span class="o">/</span><span class="mi">4</span><span class="o">/</span><span class="mi">4</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">num_dof_density</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">ini_angle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num_dof_density</span><span class="o">/</span><span class="mi">2</span><span class="o">/</span><span class="mi">4</span><span class="p">))</span>
+<span class="n">ini_angle</span><span class="p">[</span><span class="n">bot_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="o">/</span><span class="mi">2</span>
+<span class="c1"># Add IndepVarComp-density_unfiltered &amp; angle</span>
+<span class="n">comp</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">IndepVarComp</span><span class="p">()</span>
+<span class="n">comp</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span>
+    <span class="s1">&#39;density_unfiltered_layer_q&#39;</span><span class="p">,</span>
+    <span class="n">shape</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">density_function_space</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">/</span><span class="mi">4</span><span class="o">/</span><span class="mi">4</span><span class="p">),</span>
+    <span class="n">val</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">density_function_space</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">/</span><span class="mi">4</span><span class="o">/</span><span class="mi">4</span><span class="p">))),</span>
+<span class="p">)</span>
+<span class="c1"># comp.add_output(</span>
+<span class="c1">#     &#39;density_unfiltered&#39;,</span>
+<span class="c1">#     shape=int(density_function_space.dim()),</span>
+<span class="c1">#     val=np.ones(int(density_function_space.dim())),</span>
+<span class="c1"># )</span>
+<span class="n">comp</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span>
+    <span class="s1">&#39;angle_t_b_q&#39;</span><span class="p">,</span>
+    <span class="n">shape</span><span class="o">=</span><span class="n">ini_angle</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
+    <span class="n">val</span><span class="o">=</span><span class="n">ini_angle</span><span class="p">,</span> <span class="c1">#TO be fixed</span>
+    <span class="c1"># val=np.random.random(num_dof_density) * 0.86,</span>
+<span class="p">)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_subsystem</span><span class="p">(</span><span class="s1">&#39;indep_var_comp&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">promotes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;indep_var_comp&#39;</span><span class="p">)</span>
+
+<span class="n">comp</span> <span class="o">=</span> <span class="n">SymmericRhocomp</span><span class="p">(</span>
+    <span class="n">in_name</span><span class="o">=</span><span class="s1">&#39;density_unfiltered_layer_q&#39;</span><span class="p">,</span>
+    <span class="n">out_name</span><span class="o">=</span><span class="s1">&#39;density_unfiltered_layer&#39;</span><span class="p">,</span>
+    <span class="n">in_shape</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">density_function_space</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">/</span><span class="mi">16</span><span class="p">),</span>
+    <span class="n">num_copies</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_subsystem</span><span class="p">(</span><span class="s1">&#39;sym_rho_comp&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">promotes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">])</span>
+
+<span class="n">comp</span> <span class="o">=</span> <span class="n">SymmericAnglecomp</span><span class="p">(</span>
+    <span class="n">in_name</span><span class="o">=</span><span class="s1">&#39;angle_t_b_q&#39;</span><span class="p">,</span>
+    <span class="n">out_name</span><span class="o">=</span><span class="s1">&#39;angle_t_b&#39;</span><span class="p">,</span>
+    <span class="n">in_shape</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">ini_angle</span><span class="o">.</span><span class="n">size</span><span class="p">),</span>
+    <span class="n">num_copies</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_subsystem</span><span class="p">(</span><span class="s1">&#39;sym_angle_comp&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">promotes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">])</span>
+
+<span class="c1"># add copy comp</span>
+<span class="n">comp</span> <span class="o">=</span> <span class="n">Copycomp</span><span class="p">(</span>
+    <span class="n">in_name</span><span class="o">=</span><span class="s1">&#39;density_unfiltered_layer&#39;</span><span class="p">,</span>
+    <span class="n">out_name</span><span class="o">=</span><span class="s1">&#39;density_unfiltered&#39;</span><span class="p">,</span>
+    <span class="n">in_shape</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">density_function_space</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">/</span><span class="mi">4</span><span class="p">),</span>
+    <span class="n">num_copies</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_subsystem</span><span class="p">(</span><span class="s1">&#39;copy_comp&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">promotes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">])</span>
+
+<span class="c1"># Add interpolant</span>
+<span class="n">comp</span> <span class="o">=</span> <span class="n">InterpolantComp</span><span class="p">(</span>
+    <span class="n">in_name</span><span class="o">=</span><span class="s1">&#39;angle_t_b&#39;</span><span class="p">,</span>
+    <span class="n">out_name</span><span class="o">=</span><span class="s1">&#39;angle&#39;</span><span class="p">,</span>
+    <span class="n">in_shape</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="n">density_function_space</span><span class="o">.</span><span class="n">dim</span><span class="p">()</span><span class="o">/</span><span class="mi">2</span><span class="p">),</span>
+    <span class="n">num_pts</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_subsystem</span><span class="p">(</span><span class="s1">&#39;interpolant_comp&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">promotes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">])</span>
+
+
+<span class="c1"># Add filter</span>
+<span class="n">comp</span> <span class="o">=</span> <span class="n">GeneralFilterComp</span><span class="p">(</span><span class="n">density_function_space</span><span class="o">=</span><span class="n">density_function_space</span><span class="p">)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_subsystem</span><span class="p">(</span><span class="s1">&#39;general_filter_comp&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">promotes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">])</span>
+
+<span class="c1"># Add AtomicsGroup</span>
+<span class="n">group</span> <span class="o">=</span> <span class="n">AtomicsGroup</span><span class="p">(</span><span class="n">pde_problem</span><span class="o">=</span><span class="n">pde_problem</span><span class="p">)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_subsystem</span><span class="p">(</span><span class="s1">&#39;atomics_group&#39;</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">promotes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">])</span>
+
+
+<span class="c1"># prob.model.add_design_var(&#39;density_unfiltered&#39;,upper=1., lower=1e-4)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_design_var</span><span class="p">(</span><span class="s1">&#39;density_unfiltered_layer_q&#39;</span><span class="p">,</span><span class="n">upper</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_design_var</span><span class="p">(</span><span class="s1">&#39;angle_t_b_q&#39;</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_objective</span><span class="p">(</span><span class="s1">&#39;error_norm&#39;</span><span class="p">)</span>
+<span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="s1">&#39;avg_density&#39;</span><span class="p">,</span><span class="n">upper</span><span class="o">=</span><span class="mf">0.4</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+<span class="n">prob</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">pyOptSparseDriver</span><span class="p">()</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;SNOPT&#39;</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">opt_settings</span><span class="p">[</span><span class="s1">&#39;Verify level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">opt_settings</span><span class="p">[</span><span class="s1">&#39;Major iterations limit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">7000</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">opt_settings</span><span class="p">[</span><span class="s1">&#39;Minor iterations limit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1000000</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">opt_settings</span><span class="p">[</span><span class="s1">&#39;Iterations limit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100000000</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">opt_settings</span><span class="p">[</span><span class="s1">&#39;Major step limit&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">2.0</span>
+
+<span class="n">driver</span><span class="o">.</span><span class="n">opt_settings</span><span class="p">[</span><span class="s1">&#39;Major feasibility tolerance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0e-5</span>
+<span class="n">driver</span><span class="o">.</span><span class="n">opt_settings</span><span class="p">[</span><span class="s1">&#39;Major optimality tolerance&#39;</span><span class="p">]</span> <span class="o">=</span><span class="mf">1.e-7</span>
+
+<span class="n">prob</span><span class="o">.</span><span class="n">setup</span><span class="p">()</span>
+
+<span class="c1"># prob.check_partials(compact_print=True)</span>
+<span class="c1"># print(prob[&#39;compliance&#39;]); exit()</span>
+
+<span class="n">prob</span><span class="o">.</span><span class="n">run_driver</span><span class="p">()</span>
+
+<span class="c1">#save the solution vector</span>
+<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/case_3/lce/displacements.pvd&#39;</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">displacements_function</span>
+
+<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/case_3/lce/angles.pvd&#39;</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">angle_function</span>
+
+<span class="n">stiffness</span>  <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">density_function</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">8.</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">density_function</span><span class="p">)),</span> <span class="n">density_function_space</span><span class="p">)</span>
+<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/case_3/lce/stiffness.pvd&#39;</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">stiffness</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="results-density-and-angle-plots">
+<h2>2. Results (density and angle plots)<a class="headerlink" href="#results-density-and-angle-plots" title="Permalink to this headline">¶</a></h2>
+<p>The users can visualize the optimized densities by opening the <code class="docutils literal notranslate"><span class="pre">stiffness.pvd</span></code> from Paraview.</p>
+<blockquote>
+<div><figure class="align-center">
+<a class="reference internal image-reference" href="../../../_images/doc_case3_result.png"><img alt="../../../_images/doc_case3_result.png" src="../../../_images/doc_case3_result.png" style="width: 654.5px; height: 230.64999999999998px;" /></a>
+</figure>
+</div></blockquote>
+</section>
+</section>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../other_examples.html" class="btn btn-neutral float-right" title="Other examples" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="case_2.html" class="btn btn-neutral float-left" title="Case study II: battery pack topology optimizations" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2020, LSDO Lab, UCSD.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
