@@ -23,7 +23,6 @@ The details of ATOmiCS can be found in the following article:
    publisher={Springer}
    }
 
-
 A preprint of the above article can be found `here <https://github.com/LSDOlab/lsdo_bib/blob/main/pdf/yan2022topology.pdf>`_.
 
 
