@@ -1,7 +1,7 @@
 # ATOmiCS
 ATOmiCS stands for **A**utomated **T**opology **O**ptimization for **m**ultidisciplinary problems using FEn**iCS**. It is a Python module that performs topology optimization for various physics problems with automated derivatives. ATOmiCS is implemented based on [OpenMDAO](https://openmdao.org/) and [FEniCS](https://fenicsproject.org/). The details of ATOmiCS can be found in the following article:
 
-```
+.. code-block:: python
 @article{yan2022topology,
   title={Topology optimization with automated derivative computation for multidisciplinary design problems},
   author={Yan, Jiayao and Xiang, Ru and Kamensky, David and Tolley, Michael T and Hwang, John T},
@@ -12,7 +12,7 @@ ATOmiCS stands for **A**utomated **T**opology **O**ptimization for **m**ultidisc
   year={2022},
   publisher={Springer}
 }
-```
+
 
 A preprint of the above article can be found [here](https://github.com/LSDOlab/lsdo_bib/blob/main/pdf/yan2022topology.pdf).
 
