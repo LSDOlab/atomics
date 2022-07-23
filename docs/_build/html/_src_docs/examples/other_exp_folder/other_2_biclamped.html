@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>biclamped beam topology optimization &mdash; atomics 0.1 documentation</title>
@@ -32,14 +33,13 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-        <script type="text/javascript" src="../../../_static/thebelab-helper.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script type="text/javascript" src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/thebelab-helper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -100,7 +100,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../examples.html">Examples library</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../methods.html">Density-based methods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pdes.html">PDE library</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../extension.html">Advanced user guideline—extend ATOmiCS toolbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../extension.html">Advanced user guide—extensions for ATOmiCS toolbox</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../extension.html#indices-and-tables">Indices and tables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">Developer API</a></li>
 </ul>
@@ -170,7 +170,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="biclamped-beam-topology-optimization">
+  <section id="biclamped-beam-topology-optimization">
 <h1>biclamped beam topology optimization<a class="headerlink" href="#biclamped-beam-topology-optimization" title="Permalink to this headline">¶</a></h1>
 <p>The variational form for the linear elastic problem is</p>
 <div class="math notranslate nohighlight">
@@ -178,13 +178,13 @@
 <p>where the <span class="math notranslate nohighlight">\(\sigma\)</span>, <span class="math notranslate nohighlight">\(v\)</span> are the stress tenser and the test functions.</p>
 <p>The code can be downloaded from
 <a class="reference external" href="https://github.com/LSDOlab/atomics/blob/master/atomics/examples/other_examples/run_biclamped_thermoelastic.py">here</a></p>
-<div class="section" id="code">
+<section id="code">
 <h2>1. Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dolfin</span> <span class="kn">as</span> <span class="nn">df</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dolfin</span> <span class="k">as</span> <span class="nn">df</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">import</span> <span class="nn">openmdao.api</span> <span class="kn">as</span> <span class="nn">om</span>
+<span class="kn">import</span> <span class="nn">openmdao.api</span> <span class="k">as</span> <span class="nn">om</span>
 
 <span class="kn">from</span> <span class="nn">atomics.api</span> <span class="kn">import</span> <span class="n">PDEProblem</span><span class="p">,</span> <span class="n">AtomicsGroup</span>
 <span class="kn">from</span> <span class="nn">atomics.pdes.thermo_mechanical_uniform_temp</span> <span class="kn">import</span> <span class="n">get_residual_form</span>
@@ -322,8 +322,8 @@
 <span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/stiffness_th_55.pvd&#39;</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">density_function</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

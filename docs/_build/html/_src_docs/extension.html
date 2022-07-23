@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Advanced user guideline—extend ATOmiCS toolbox &mdash; atomics 0.1 documentation</title>
+  <title>Advanced user guide—extensions for ATOmiCS toolbox &mdash; atomics 0.1 documentation</title>
   
 
   
@@ -32,21 +33,19 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
-        <script type="text/javascript" src="../_static/thebelab-helper.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script type="text/javascript" src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/thebelab-helper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Define a new PDE" href="extensions_folder/new_pde.html" />
+    <link rel="next" title="Defining a new PDE" href="extensions_folder/new_pde.html" />
     <link rel="prev" title="Neo-Hookean nonliear elastic problem" href="pdes/neo_hookean.html" /> 
 </head>
 
@@ -102,11 +101,11 @@
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples library</a></li>
 <li class="toctree-l1"><a class="reference internal" href="methods.html">Density-based methods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pdes.html">PDE library</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced user guideline—extend ATOmiCS toolbox</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="extensions_folder/new_pde.html">Define a new PDE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensions_folder/new_output.html">Implementing a customized computation for preprocessing or postprocession or outputs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Advanced user guide—extensions for ATOmiCS toolbox</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="extensions_folder/new_pde.html">Defining a new PDE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensions_folder/new_output.html">Implementing a customized computation for preprocessing, postprocessing or outputs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="extensions_folder/new_solver.html">Potentially implementing a new solver</a></li>
-<li class="toctree-l2"><a class="reference internal" href="extensions_folder/new_opt.html">Adding additional design variables, constraints or changing to a different objective</a></li>
+<li class="toctree-l2"><a class="reference internal" href="extensions_folder/new_opt.html">Adding additional design variables, constraints, or changing to a different objective</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
@@ -159,7 +158,7 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>Advanced user guideline—extend ATOmiCS toolbox</li>
+      <li>Advanced user guide—extensions for ATOmiCS toolbox</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -178,29 +177,26 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="advanced-user-guideline-extend-atomics-toolbox">
-<span id="step-label"></span><h1>Advanced user guideline—extend ATOmiCS toolbox<a class="headerlink" href="#advanced-user-guideline-extend-atomics-toolbox" title="Permalink to this headline">¶</a></h1>
-<p>This tutorial provides an advanced user guideline on how to extend ATomiCS toolbox to work with different governing equations,
-preprocessing and postprocession components, new solvers, addtional design variables, different outputs
+  <section id="advanced-user-guide-extensions-for-atomics-toolbox">
+<span id="step-label"></span><h1>Advanced user guide—extensions for ATOmiCS toolbox<a class="headerlink" href="#advanced-user-guide-extensions-for-atomics-toolbox" title="Permalink to this headline">¶</a></h1>
+<p>This tutorial provides an advanced user guide on how to extend ATomiCS toolbox to work with different governing equations,
+preprocessing and postprocessing components, new solvers, additional design variables, different outputs
 that are not already implemented by the developers of ATomiCS tool.</p>
-<div class="section" id="list-of-extensions">
-<h2>list of extensions<a class="headerlink" href="#list-of-extensions" title="Permalink to this headline">¶</a></h2>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="extensions_folder/new_pde.html">Define a new PDE</a></li>
-<li class="toctree-l1"><a class="reference internal" href="extensions_folder/new_output.html">Implementing a customized computation for preprocessing or postprocession or outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extensions_folder/new_pde.html">Defining a new PDE</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extensions_folder/new_output.html">Implementing a customized computation for preprocessing, postprocessing or outputs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="extensions_folder/new_solver.html">Potentially implementing a new solver</a></li>
-<li class="toctree-l1"><a class="reference internal" href="extensions_folder/new_opt.html">Adding additional design variables, constraints or changing to a different objective</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extensions_folder/new_opt.html">Adding additional design variables, constraints, or changing to a different objective</a></li>
 </ul>
 </div>
-</div>
-</div>
-<div class="section" id="indices-and-tables">
+</section>
+<section id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="../search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
-</div>
+</section>
 
 
            </div>
@@ -208,7 +204,7 @@ that are not already implemented by the developers of ATomiCS tool.</p>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="extensions_folder/new_pde.html" class="btn btn-neutral float-right" title="Define a new PDE" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="extensions_folder/new_pde.html" class="btn btn-neutral float-right" title="Defining a new PDE" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="pdes/neo_hookean.html" class="btn btn-neutral float-left" title="Neo-Hookean nonliear elastic problem" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

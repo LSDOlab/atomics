@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Density-based methods &mdash; atomics 0.1 documentation</title>
@@ -32,14 +33,13 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
-        <script type="text/javascript" src="../_static/thebelab-helper.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script type="text/javascript" src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/thebelab-helper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -104,7 +104,7 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pdes.html">PDE library</a></li>
-<li class="toctree-l1"><a class="reference internal" href="extension.html">Advanced user guideline—extend ATOmiCS toolbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="extension.html">Advanced user guide—extensions for ATOmiCS toolbox</a></li>
 <li class="toctree-l1"><a class="reference internal" href="extension.html#indices-and-tables">Indices and tables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">Developer API</a></li>
 </ul>
@@ -174,23 +174,23 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="density-based-methods">
+  <section id="density-based-methods">
 <h1>Density-based methods<a class="headerlink" href="#density-based-methods" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="simp">
+<section id="simp">
 <h2>1. SIMP<a class="headerlink" href="#simp" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><div class="math notranslate nohighlight">
 \[E = E_{min} + (E_{max} - E_{min}) \rho ^ p\]</div>
 </div></blockquote>
-</div>
-<div class="section" id="ramp">
+</section>
+<section id="ramp">
 <h2>2. RAMP<a class="headerlink" href="#ramp" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><div class="math notranslate nohighlight">
 \[E = \frac{\rho}{(1 + 8. * (1. - \rho)) * E_{max}}\]</div>
 </div></blockquote>
-</div>
-<div class="section" id="code">
+</section>
+<section id="code">
 <h2>3. code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">method</span> <span class="o">==</span><span class="s1">&#39;SIMP&#39;</span><span class="p">:</span>
     <span class="n">C</span> <span class="o">=</span> <span class="n">rho_e</span><span class="o">**</span><span class="mi">3</span>
@@ -200,8 +200,8 @@
 </div>
 <div class="toctree-wrapper compound">
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

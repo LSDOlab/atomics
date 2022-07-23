@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Adding additional design variables, constraints or changing to a different objective &mdash; atomics 0.1 documentation</title>
+  <title>Adding additional design variables, constraints, or changing to a different objective &mdash; atomics 0.1 documentation</title>
   
 
   
@@ -32,14 +33,12 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script type="text/javascript" src="../../_static/thebelab-helper.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script type="text/javascript" src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/thebelab-helper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -102,11 +101,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples library</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../methods.html">Density-based methods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pdes.html">PDE library</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../extension.html">Advanced user guideline—extend ATOmiCS toolbox</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="new_pde.html">Define a new PDE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="new_output.html">Implementing a customized computation for preprocessing or postprocession or outputs</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../extension.html">Advanced user guide—extensions for ATOmiCS toolbox</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="new_pde.html">Defining a new PDE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="new_output.html">Implementing a customized computation for preprocessing, postprocessing or outputs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="new_solver.html">Potentially implementing a new solver</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Adding additional design variables, constraints or changing to a different objective</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Adding additional design variables, constraints, or changing to a different objective</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../extension.html#indices-and-tables">Indices and tables</a></li>
@@ -159,9 +158,9 @@
     
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="../extension.html">Advanced user guideline—extend ATOmiCS toolbox</a> &raquo;</li>
+          <li><a href="../extension.html">Advanced user guide—extensions for ATOmiCS toolbox</a> &raquo;</li>
         
-      <li>Adding additional design variables, constraints or changing to a different objective</li>
+      <li>Adding additional design variables, constraints, or changing to a different objective</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -180,9 +179,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="adding-additional-design-variables-constraints-or-changing-to-a-different-objective">
-<h1>Adding additional design variables, constraints or changing to a different objective<a class="headerlink" href="#adding-additional-design-variables-constraints-or-changing-to-a-different-objective" title="Permalink to this headline">¶</a></h1>
-<p>The design variables, constraints and the objective for the optimization are all specified in the <code class="docutils literal notranslate"><span class="pre">run_file</span></code>.</p>
+  <section id="adding-additional-design-variables-constraints-or-changing-to-a-different-objective">
+<h1>Adding additional design variables, constraints, or changing to a different objective<a class="headerlink" href="#adding-additional-design-variables-constraints-or-changing-to-a-different-objective" title="Permalink to this headline">¶</a></h1>
+<p>The design variables, constraints, and the objective for the optimization are all specified in the <code class="docutils literal notranslate"><span class="pre">run_file</span></code>.</p>
 <blockquote>
 <div><ol class="arabic">
 <li><dl>
@@ -191,7 +190,7 @@
 <span class="n">comp</span><span class="o">.</span><span class="n">add_output</span><span class="p">(</span><span class="o">&lt;</span><span class="n">design_variable_name</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="n">shape</span><span class="p">,</span> <span class="n">val</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">shape</span><span class="p">)))</span>
 </pre></div>
 </div>
-<p>Then, the user can add it to the optimization problem</p>
+<p>Then, the user can add it to the optimization problem.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prob</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">Problem</span><span class="p">()</span>
 <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_design_var</span><span class="p">(</span><span class="o">&lt;</span><span class="n">design_variable_name</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="n">upper_bd</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="n">lower_bd</span><span class="p">)</span>
 </pre></div>
@@ -201,7 +200,7 @@
 </li>
 <li><dl>
 <dt>Adding additional constraints or changing to a different objective</dt><dd><p>The constraints and objective are the output for the optimization problem,
-which can be computed using one of the three method discribed in Subsection 2 of this Section.
+which can be computed using one of the three methods described in Subsection 2 of this Section.
 Then, the user just need to specify</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_objective</span><span class="p">(</span><span class="o">&lt;</span><span class="n">objective_name</span><span class="o">&gt;</span><span class="p">)</span>
 <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="o">&lt;</span><span class="n">constraint_name</span><span class="o">&gt;</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="n">upper_bd</span><span class="p">,</span> <span class="n">lower</span><span class="o">=</span><span class="n">lower_bd</span><span class="p">)</span>
@@ -213,7 +212,7 @@ Then, the user just need to specify</p>
 </li>
 </ol>
 </div></blockquote>
-</div>
+</section>
 
 
            </div>

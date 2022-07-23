@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Topology optimization using external mesh &mdash; atomics 0.1 documentation</title>
@@ -32,14 +33,13 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-        <script type="text/javascript" src="../../../_static/thebelab-helper.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script type="text/javascript" src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/thebelab-helper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -110,7 +110,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../methods.html">Density-based methods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pdes.html">PDE library</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../extension.html">Advanced user guideline—extend ATOmiCS toolbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../extension.html">Advanced user guide—extensions for ATOmiCS toolbox</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../extension.html#indices-and-tables">Indices and tables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">Developer API</a></li>
 </ul>
@@ -184,14 +184,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="topology-optimization-using-external-mesh">
+  <section id="topology-optimization-using-external-mesh">
 <span id="exp-gmsh-label"></span><h1>Topology optimization using external mesh<a class="headerlink" href="#topology-optimization-using-external-mesh" title="Permalink to this headline">¶</a></h1>
 <p>This example demonstrates a l-shape beam topology optimization using external mesh from <code class="docutils literal notranslate"><span class="pre">GMSH</span></code> GUI with the boundary conditions shown below.
 We clamp the top of the beam and apply a traction force on a few elements (two elements here) at the right corner.</p>
 <blockquote>
-<div><div class="figure align-center">
+<div><figure class="align-center">
 <a class="reference internal image-reference" href="../../../_images/other_1_bd.png"><img alt="../../../_images/other_1_bd.png" src="../../../_images/other_1_bd.png" style="width: 327.0px; height: 334.0px;" /></a>
-</div>
+</figure>
 </div></blockquote>
 <p>The variational form for the linear elastic problem is</p>
 <div class="math notranslate nohighlight">
@@ -199,25 +199,25 @@ We clamp the top of the beam and apply a traction force on a few elements (two e
 <p>where the <span class="math notranslate nohighlight">\(\sigma\)</span>, <span class="math notranslate nohighlight">\(v\)</span> are the stress tenser and the test functions.</p>
 <p>The code can be downloaded from
 <a class="reference external" href="https://github.com/LSDOlab/atomics/blob/master/atomics/examples/other_examples/run_l_bracket_gmsh.py">here</a></p>
-<div class="section" id="code">
+<section id="code">
 <h2>1. Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
 <p>We explain the code in detail in this section.</p>
-<div class="section" id="draw-the-mesh-in-gmsh">
+<section id="draw-the-mesh-in-gmsh">
 <h3>1.0. draw the mesh in <code class="docutils literal notranslate"><span class="pre">GMSH</span></code><a class="headerlink" href="#draw-the-mesh-in-gmsh" title="Permalink to this headline">¶</a></h3>
 <p>This has been explained in <a class="reference internal" href="../../solution.html#step-label"><span class="std std-ref">Steps for solving a topology optimization problem in ATOMiCS</span></a>.</p>
 <blockquote>
-<div><div class="figure align-center">
+<div><figure class="align-center">
 <a class="reference internal image-reference" href="../../../_images/doc_gmsh_example.png"><img alt="../../../_images/doc_gmsh_example.png" src="../../../_images/doc_gmsh_example.png" style="width: 285.5px; height: 315.0px;" /></a>
-</div>
+</figure>
 </div></blockquote>
-</div>
-<div class="section" id="import">
+</section>
+<section id="import">
 <h3>1.1. Import<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h3>
 <p>First, import <code class="docutils literal notranslate"><span class="pre">dolfin</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, <code class="docutils literal notranslate"><span class="pre">openmdao</span></code>, <code class="docutils literal notranslate"><span class="pre">atomics.api</span></code>, and <code class="docutils literal notranslate"><span class="pre">atomics.pde</span></code>, <code class="docutils literal notranslate"><span class="pre">atomics.filter</span></code>, and <code class="docutils literal notranslate"><span class="pre">meshio</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dolfin</span> <span class="kn">as</span> <span class="nn">df</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dolfin</span> <span class="k">as</span> <span class="nn">df</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">import</span> <span class="nn">openmdao.api</span> <span class="kn">as</span> <span class="nn">om</span>
+<span class="kn">import</span> <span class="nn">openmdao.api</span> <span class="k">as</span> <span class="nn">om</span>
 
 <span class="kn">from</span> <span class="nn">atomics.api</span> <span class="kn">import</span> <span class="n">PDEProblem</span><span class="p">,</span> <span class="n">AtomicsGroup</span>
 <span class="kn">from</span> <span class="nn">atomics.pdes.linear_elastic</span> <span class="kn">import</span> <span class="n">get_residual_form</span> <span class="c1"># here we select a linear elastic PDE</span>
@@ -226,8 +226,8 @@ We clamp the top of the beam and apply a traction force on a few elements (two e
 <span class="kn">import</span> <span class="nn">meshio</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="convert-mesh-into-xml">
+</section>
+<section id="convert-mesh-into-xml">
 <h3>1.2. Convert mesh into <code class="docutils literal notranslate"><span class="pre">.xml</span></code><a class="headerlink" href="#convert-mesh-into-xml" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># import L-shaped bracket from gmsh vtk file and use meshio to convert to xml file</span>
 <span class="c1"># (TODO: XDMF not working)</span>
@@ -239,8 +239,8 @@ We clamp the top of the beam and apply a traction force on a few elements (two e
 <span class="n">mesh</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span><span class="s2">&quot;fenics_mesh_l_bracket.xml&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="define-the-pde-problem">
+</section>
+<section id="define-the-pde-problem">
 <h3>1.3. Define the PDE problem<a class="headerlink" href="#define-the-pde-problem" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the mesh and create the PDE problem</span>
 <span class="n">NUM_ELEMENTS_X</span> <span class="o">=</span> <span class="mi">80</span>
@@ -302,8 +302,8 @@ We clamp the top of the beam and apply a traction force on a few elements (two e
                     <span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">((</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)),</span> <span class="s1">&#39;(abs(x[1]-30.) &lt; DOLFIN_EPS)&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="set-up-the-openmdao-model">
+</section>
+<section id="set-up-the-openmdao-model">
 <h3>1.4. Set up the OpenMDAO model<a class="headerlink" href="#set-up-the-openmdao-model" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the OpenMDAO problem and model</span>
 <span class="n">prob</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">Problem</span><span class="p">()</span>
@@ -329,7 +329,7 @@ We clamp the top of the beam and apply a traction force on a few elements (two e
 <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_objective</span><span class="p">(</span><span class="s1">&#39;compliance&#39;</span><span class="p">)</span>
 <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="s1">&#39;avg_density&#39;</span><span class="p">,</span><span class="n">upper</span><span class="o">=</span><span class="mf">0.40</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="bp">True</span><span class="p">:</span>
+<span class="k">if</span> <span class="kc">True</span><span class="p">:</span>
     <span class="n">prob</span><span class="o">.</span><span class="n">driver</span> <span class="o">=</span> <span class="n">driver</span> <span class="o">=</span> <span class="n">om</span><span class="o">.</span><span class="n">pyOptSparseDriver</span><span class="p">()</span>
     <span class="n">driver</span><span class="o">.</span><span class="n">options</span><span class="p">[</span><span class="s1">&#39;optimizer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;SNOPT&#39;</span>
     <span class="n">driver</span><span class="o">.</span><span class="n">opt_settings</span><span class="p">[</span><span class="s1">&#39;Verify level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
@@ -359,18 +359,18 @@ We clamp the top of the beam and apply a traction force on a few elements (two e
 <span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/density_l_bracket_fine.pvd&#39;</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">density_function</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="results-density-plot">
+</section>
+</section>
+<section id="results-density-plot">
 <h2>2. Results (density plot)<a class="headerlink" href="#results-density-plot" title="Permalink to this headline">¶</a></h2>
 <p>The users can visualize the optimized densities by opening the <code class="docutils literal notranslate"><span class="pre">density_l_bracket_fine.pvd</span></code> from Paraview.</p>
 <blockquote>
-<div><div class="figure align-center">
+<div><figure class="align-center">
 <a class="reference internal image-reference" href="../../../_images/doc_gmsh_result.png"><img alt="../../../_images/doc_gmsh_result.png" src="../../../_images/doc_gmsh_result.png" style="width: 266.40000000000003px; height: 350.8px;" /></a>
-</div>
+</figure>
 </div></blockquote>
-</div>
-<div class="section" id="notes">
+</section>
+<section id="notes">
 <h2>3. Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h2>
 <p>If you get an error like this or your compliance is zero:
 <code class="docutils literal notranslate"><span class="pre">***</span> <span class="pre">Warning:</span> <span class="pre">Found</span> <span class="pre">no</span> <span class="pre">facets</span> <span class="pre">matching</span> <span class="pre">domain</span> <span class="pre">for</span> <span class="pre">boundary</span> <span class="pre">condition.</span></code>
@@ -382,8 +382,8 @@ The <code class="docutils literal notranslate"><span class="pre">scalar</span></
                 <span class="s1">&#39;(abs(x[1]-2.5e-2) &lt; DOLFIN_EPS) and (abs(x[0]-2.5e-2) &lt; DOLFIN_EPS*scalar)&#39;</span><span class="p">))</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

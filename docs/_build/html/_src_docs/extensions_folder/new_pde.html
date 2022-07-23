@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Define a new PDE &mdash; atomics 0.1 documentation</title>
+  <title>Defining a new PDE &mdash; atomics 0.1 documentation</title>
   
 
   
@@ -32,22 +33,21 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../_static/language_data.js"></script>
-        <script type="text/javascript" src="../../_static/thebelab-helper.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script type="text/javascript" src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/thebelab-helper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
     
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Implementing a customized computation for preprocessing or postprocession or outputs" href="new_output.html" />
-    <link rel="prev" title="Advanced user guideline—extend ATOmiCS toolbox" href="../extension.html" /> 
+    <link rel="next" title="Implementing a customized computation for preprocessing, postprocessing or outputs" href="new_output.html" />
+    <link rel="prev" title="Advanced user guide—extensions for ATOmiCS toolbox" href="../extension.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -102,11 +102,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples library</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../methods.html">Density-based methods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../pdes.html">PDE library</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../extension.html">Advanced user guideline—extend ATOmiCS toolbox</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Define a new PDE</a></li>
-<li class="toctree-l2"><a class="reference internal" href="new_output.html">Implementing a customized computation for preprocessing or postprocession or outputs</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../extension.html">Advanced user guide—extensions for ATOmiCS toolbox</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Defining a new PDE</a></li>
+<li class="toctree-l2"><a class="reference internal" href="new_output.html">Implementing a customized computation for preprocessing, postprocessing or outputs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="new_solver.html">Potentially implementing a new solver</a></li>
-<li class="toctree-l2"><a class="reference internal" href="new_opt.html">Adding additional design variables, constraints or changing to a different objective</a></li>
+<li class="toctree-l2"><a class="reference internal" href="new_opt.html">Adding additional design variables, constraints, or changing to a different objective</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../extension.html#indices-and-tables">Indices and tables</a></li>
@@ -159,9 +159,9 @@
     
       <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="../extension.html">Advanced user guideline—extend ATOmiCS toolbox</a> &raquo;</li>
+          <li><a href="../extension.html">Advanced user guide—extensions for ATOmiCS toolbox</a> &raquo;</li>
         
-      <li>Define a new PDE</li>
+      <li>Defining a new PDE</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -180,26 +180,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="define-a-new-pde">
-<h1>Define a new PDE<a class="headerlink" href="#define-a-new-pde" title="Permalink to this headline">¶</a></h1>
+  <section id="defining-a-new-pde">
+<h1>Defining a new PDE<a class="headerlink" href="#defining-a-new-pde" title="Permalink to this headline">¶</a></h1>
 <p>ATOmiCS wraps <code class="docutils literal notranslate"><span class="pre">FEniCS</span></code> for the solution of the PDEs.
 The input for FEniCS is the variational (weak) form.
 Thus, to implement a physics problem that is not included in ATOmiCS,
-the users need to implement the variational form using FEniCS unifed form language (UFL) and add it to ATOmiCS pde folder
+the users need to implement the variational form using FEniCS unified form language (UFL) and add it to the ATOmiCS PDE folder
 (<code class="docutils literal notranslate"><span class="pre">atomics/atomics/pdes</span></code>).
-We demonstration this process using an example that adds a st. Venant–Kirchoff model
-to ATOmiCS pde folder, and run a cantilever beam optimization with the new PDE.</p>
+We demonstrate this process using an example that adds the st. Venant–Kirchhoff model to the ATOmiCS the PDE folder.</p>
 <blockquote>
-<div><p>1.1 Derive the vatiational form</p>
+<div><p>1.1 Derive the variational form</p>
 <blockquote>
-<div><p>St. Venant–Kirchoff model is a type of simple hyperelastic problem.
-The vatiational form of these hyperelastic problem can be derived
+<div><p>St. Venant–Kirchhoff model is a type of simple hyperelastic problem.
+The variational form of this kind of hyperelastic problem can be derived
 by minimizing the potential energy on domain <span class="math notranslate nohighlight">\(\Omega\)</span></p>
 <div class="math notranslate nohighlight">
 \[\Psi = \int_{\Omega} \psi(u) \, {\rm d} x
 - \int_{\Omega} b \cdot u \, {\rm d} x
 - \int_{\partial\Omega} t \cdot u \, {\rm d} s,\]</div>
-<p>where <span class="math notranslate nohighlight">\(\psi\)</span> is the strain energy density for st. Venant–Kirchoff model;
+<p>where <span class="math notranslate nohighlight">\(\psi\)</span> is the strain energy density for st. Venant–Kirchhoff model;
 <span class="math notranslate nohighlight">\(b\)</span> and <span class="math notranslate nohighlight">\(t\)</span> are the body and the traction force, respectively;
 <span class="math notranslate nohighlight">\(u\)</span> is the displacements function.</p>
 <p>We minimize this potential energy by making its directional derivative
@@ -207,7 +206,7 @@ with respect to the change in <span class="math notranslate nohighlight">\(u\)</
 <div class="math notranslate nohighlight">
 \[D_{v} \Psi = \left.
 \frac{d \Psi(u + \epsilon v)}{d\epsilon} \right|_{\epsilon = 0}=0.\]</div>
-<p>We compute the <span class="math notranslate nohighlight">\(\psi(u)\)</span> according to the st. Venant–Kirchoff model.
+<p>We compute the <span class="math notranslate nohighlight">\(\psi(u)\)</span> according to the st. Venant–Kirchhoff model.
 We consider the deformation gradient</p>
 <div class="math notranslate nohighlight">
 \[F = I + \nabla u;\]</div>
@@ -233,8 +232,8 @@ We consider the deformation gradient</p>
 <p>1.2 Write the variational form in <code class="docutils literal notranslate"><span class="pre">atomics/atomics/pdes/&lt;filename&gt;.py</span></code> using UFL</p>
 <blockquote>
 <div><p>We write the bilinear term as below:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dolfin</span> <span class="kn">as</span> <span class="nn">df</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dolfin</span> <span class="k">as</span> <span class="nn">df</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="k">def</span> <span class="nf">get_residual_form</span><span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">,</span> <span class="n">rho_e</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;RAMP&#39;</span><span class="p">):</span>
     <span class="n">df</span><span class="o">.</span><span class="n">dx</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="n">metadata</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;quadrature_degree&quot;</span><span class="p">:</span> <span class="mi">4</span><span class="p">})</span>
@@ -271,7 +270,7 @@ We consider the deformation gradient</p>
 \[\int_{\Omega} b \cdot u \, {\rm d} x
 + \int_{\partial\Omega} t \cdot u \, {\rm d} s,\]</div>
 <p>and the subdomain
-where they are applied on subject to change across different problems.
+where they are applied on subject to are problem specific.
 We define this term in the  <code class="docutils literal notranslate"><span class="pre">run_file</span></code>.
 The user can refer to <a class="reference internal" href="../solution.html#step-label"><span class="std std-ref">Steps for solving a topology optimization problem in ATOMiCS</span></a> on how to define a subdomain.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">residual_form</span> <span class="o">-=</span> <span class="n">df</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="n">dss</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
@@ -279,7 +278,7 @@ The user can refer to <a class="reference internal" href="../solution.html#step-
 </div>
 </div></blockquote>
 </div></blockquote>
-</div>
+</section>
 
 
            </div>
@@ -287,8 +286,8 @@ The user can refer to <a class="reference internal" href="../solution.html#step-
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="new_output.html" class="btn btn-neutral float-right" title="Implementing a customized computation for preprocessing or postprocession or outputs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="../extension.html" class="btn btn-neutral float-left" title="Advanced user guideline—extend ATOmiCS toolbox" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="new_output.html" class="btn btn-neutral float-right" title="Implementing a customized computation for preprocessing, postprocessing or outputs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../extension.html" class="btn btn-neutral float-left" title="Advanced user guide—extensions for ATOmiCS toolbox" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

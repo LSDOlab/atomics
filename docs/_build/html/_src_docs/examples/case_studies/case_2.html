@@ -4,7 +4,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Case study II: battery pack topology optimizations &mdash; atomics 0.1 documentation</title>
@@ -32,14 +33,13 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../../../_static/jquery.js"></script>
-        <script type="text/javascript" src="../../../_static/underscore.js"></script>
-        <script type="text/javascript" src="../../../_static/doctools.js"></script>
-        <script type="text/javascript" src="../../../_static/language_data.js"></script>
-        <script type="text/javascript" src="../../../_static/thebelab-helper.js"></script>
-        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
-        <script type="text/javascript" src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
-        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/thebelab-helper.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+        <script src="https://unpkg.com/@jupyter-widgets/html-manager@^0.20.0/dist/embed-amd.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -111,7 +111,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../methods.html">Density-based methods</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../pdes.html">PDE library</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../extension.html">Advanced user guideline—extend ATOmiCS toolbox</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../extension.html">Advanced user guide—extensions for ATOmiCS toolbox</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../extension.html#indices-and-tables">Indices and tables</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">Developer API</a></li>
 </ul>
@@ -185,13 +185,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="case-study-ii-battery-pack-topology-optimizations">
+  <section id="case-study-ii-battery-pack-topology-optimizations">
 <span id="exp-case2-label"></span><h1>Case study II: battery pack topology optimizations<a class="headerlink" href="#case-study-ii-battery-pack-topology-optimizations" title="Permalink to this headline">¶</a></h1>
 <p>The boundary conditions for battery pack topology optimization are shown below:</p>
 <blockquote>
-<div><div class="figure align-center">
+<div><figure class="align-center">
 <a class="reference internal image-reference" href="../../../_images/doc_case3_bc.png"><img alt="../../../_images/doc_case3_bc.png" src="../../../_images/doc_case3_bc.png" style="width: 374.40000000000003px; height: 324.0px;" /></a>
-</div>
+</figure>
 </div></blockquote>
 <p>We model each battery as a boundary heat flux (red ring) with a fixed temperature on the four edges of the square.
 We use a uniform traction load F on the four edges of the battter pack to model the load-caring functionality of the battery pack.</p>
@@ -205,21 +205,21 @@ We use a uniform traction load F on the four edges of the battter pack to model 
 <span class="math notranslate nohighlight">\(T\)</span> and <span class="math notranslate nohighlight">\(\hat{T}\)</span> are the function and the test functions for the temperature field.</p>
 <p>The code can be downloaded from
 <a class="reference external" href="https://github.com/LSDOlab/atomics/blob/master/atomics/examples/case_2_battery_pack_opts/run_battery_opts.py">here</a></p>
-<div class="section" id="code">
+<section id="code">
 <h2>1. Code<a class="headerlink" href="#code" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="import">
+<section id="import">
 <h3>1.1. Import<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h3>
 <p>First, import <code class="docutils literal notranslate"><span class="pre">dolfin</span></code>, <code class="docutils literal notranslate"><span class="pre">meshio</span></code>, <code class="docutils literal notranslate"><span class="pre">numpy</span></code>, <code class="docutils literal notranslate"><span class="pre">pygmsh</span></code>, <code class="docutils literal notranslate"><span class="pre">scipy</span></code>
 <code class="docutils literal notranslate"><span class="pre">atomics.api</span></code>, <code class="docutils literal notranslate"><span class="pre">atomics.pde</span></code>, and <code class="docutils literal notranslate"><span class="pre">atomics.general_filter_comp</span></code>
 , as well as the stock OpenMDAO components, <code class="docutils literal notranslate"><span class="pre">extract_comp</span></code>, and <code class="docutils literal notranslate"><span class="pre">ksconstraints_comp</span></code>.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dolfin</span> <span class="kn">as</span> <span class="nn">df</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">dolfin</span> <span class="k">as</span> <span class="nn">df</span>
 <span class="kn">import</span> <span class="nn">meshio</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pygmsh</span>
 <span class="kn">import</span> <span class="nn">scipy.sparse</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">spatial</span>
 
-<span class="kn">import</span> <span class="nn">openmdao.api</span> <span class="kn">as</span> <span class="nn">om</span>
+<span class="kn">import</span> <span class="nn">openmdao.api</span> <span class="k">as</span> <span class="nn">om</span>
 
 <span class="kn">from</span> <span class="nn">atomics.api</span> <span class="kn">import</span> <span class="n">PDEProblem</span><span class="p">,</span> <span class="n">AtomicsGroup</span>
 <span class="kn">from</span> <span class="nn">atomics.pdes.thermo_mechanical_mix_2d_stress</span> <span class="kn">import</span> <span class="n">get_residual_form</span>
@@ -294,8 +294,8 @@ We use a uniform traction load F on the four edges of the battter pack to model 
 <span class="c1"># f_t = df.Constant(( 0., 0.))</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="define-the-mesh">
+</section>
+<section id="define-the-mesh">
 <h3>1.2. Define the mesh<a class="headerlink" href="#define-the-mesh" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">2. Define mesh</span>
@@ -341,7 +341,7 @@ We use a uniform traction load F on the four edges of the battter pack to model 
 <span class="n">os</span><span class="o">.</span><span class="n">system</span><span class="p">(</span><span class="s1">&#39;dolfin-convert test_2d.msh mesh_2d.xml&#39;</span><span class="p">)</span>
 <span class="n">mesh</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">Mesh</span><span class="p">(</span><span class="s2">&quot;mesh_2d.xml&quot;</span><span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
 <span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
@@ -438,8 +438,8 @@ We use a uniform traction load F on the four edges of the battter pack to model 
 <span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions_2d/domains_quart.pvd&#39;</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">sub_domains</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="define-the-pde-problem">
+</section>
+<section id="define-the-pde-problem">
 <h3>1.3. Define the PDE problem<a class="headerlink" href="#define-the-pde-problem" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># PDE problem</span>
 <span class="n">pde_problem</span> <span class="o">=</span> <span class="n">PDEProblem</span><span class="p">(</span><span class="n">mesh</span><span class="p">)</span>
@@ -481,7 +481,7 @@ We use a uniform traction load F on the four edges of the battter pack to model 
 
 <span class="n">residual_form</span> <span class="o">-=</span>  <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">f_r</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="n">dss</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">+</span> <span class="n">df</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">f_t</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="o">*</span> <span class="n">dss</span><span class="p">(</span><span class="mi">14</span><span class="p">)</span>  <span class="o">+</span> \
                     <span class="n">q</span><span class="o">*</span><span class="n">T_hat</span><span class="o">*</span><span class="n">dss</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span> <span class="o">+</span> <span class="n">q_half</span><span class="o">*</span><span class="n">T_hat</span><span class="o">*</span><span class="n">dss</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span> <span class="o">+</span> <span class="n">q_quart</span><span class="o">*</span><span class="n">T_hat</span><span class="o">*</span><span class="n">dss</span><span class="p">(</span><span class="mi">7</span><span class="p">))</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;get residual_form-------&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;get residual_form-------&quot;</span><span class="p">)</span>
 <span class="n">pde_problem</span><span class="o">.</span><span class="n">add_state</span><span class="p">(</span><span class="s1">&#39;mixed_states&#39;</span><span class="p">,</span> <span class="n">mixed_function</span><span class="p">,</span> <span class="n">residual_form</span><span class="p">,</span> <span class="s1">&#39;density&#39;</span><span class="p">)</span>
 
 <span class="sd">&#39;&#39;&#39;</span>
@@ -492,19 +492,19 @@ We use a uniform traction load F on the four edges of the battter pack to model 
 <span class="n">volume</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">assemble</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1.</span><span class="p">)</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">mesh</span><span class="p">))</span>
 <span class="n">avg_density_form</span> <span class="o">=</span> <span class="n">density_function</span> <span class="o">/</span> <span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">Constant</span><span class="p">(</span><span class="mf">1.</span> <span class="o">*</span> <span class="n">volume</span><span class="p">))</span> <span class="o">*</span> <span class="n">df</span><span class="o">.</span><span class="n">dx</span><span class="p">(</span><span class="n">domain</span><span class="o">=</span><span class="n">mesh</span><span class="p">)</span>
 <span class="n">pde_problem</span><span class="o">.</span><span class="n">add_scalar_output</span><span class="p">(</span><span class="s1">&#39;avg_density&#39;</span><span class="p">,</span> <span class="n">avg_density_form</span><span class="p">,</span> <span class="s1">&#39;density&#39;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Add output-avg_density-------&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Add output-avg_density-------&quot;</span><span class="p">)</span>
 
 <span class="c1"># Add output-compliance to the PDE problem:</span>
 
 <span class="n">compliance_form</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">f_r</span><span class="p">,</span> <span class="n">displacements_function</span><span class="p">)</span> <span class="o">*</span> <span class="n">dss</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">+</span>\
                     <span class="n">df</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">f_t</span><span class="p">,</span> <span class="n">displacements_function</span><span class="p">)</span> <span class="o">*</span> <span class="n">dss</span><span class="p">(</span><span class="mi">14</span><span class="p">)</span>
 <span class="n">pde_problem</span><span class="o">.</span><span class="n">add_scalar_output</span><span class="p">(</span><span class="s1">&#39;compliance&#39;</span><span class="p">,</span> <span class="n">compliance_form</span><span class="p">,</span> <span class="s1">&#39;mixed_states&#39;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Add output-compliance-------&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Add output-compliance-------&quot;</span><span class="p">)</span>
 
 <span class="n">compliance_form</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">f_r</span><span class="p">,</span> <span class="n">displacements_function</span><span class="p">)</span> <span class="o">*</span> <span class="n">dss</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span> <span class="o">+</span>\
                     <span class="n">df</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">f_t</span><span class="p">,</span> <span class="n">displacements_function</span><span class="p">)</span> <span class="o">*</span> <span class="n">dss</span><span class="p">(</span><span class="mi">14</span><span class="p">)</span>
 <span class="n">pde_problem</span><span class="o">.</span><span class="n">add_scalar_output</span><span class="p">(</span><span class="s1">&#39;compliance&#39;</span><span class="p">,</span> <span class="n">compliance_form</span><span class="p">,</span> <span class="s1">&#39;mixed_states&#39;</span><span class="p">)</span>
-<span class="k">print</span><span class="p">(</span><span class="s2">&quot;Add output-compliance-------&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Add output-compliance-------&quot;</span><span class="p">)</span>
 
 
 <span class="c1"># Add output-compliance to the PDE problem:</span>
@@ -591,8 +591,8 @@ We use a uniform traction load F on the four edges of the battter pack to model 
 <span class="n">lower_bd</span><span class="p">[</span><span class="n">idx_array</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="set-up-the-openmdao-model">
+</section>
+<section id="set-up-the-openmdao-model">
 <h3>1.4. Set up the OpenMDAO model<a class="headerlink" href="#set-up-the-openmdao-model" title="Permalink to this headline">¶</a></h3>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Define the OpenMDAO problem and model</span>
 
@@ -609,16 +609,16 @@ We use a uniform traction load F on the four edges of the battter pack to model 
 <span class="p">)</span>
 <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_subsystem</span><span class="p">(</span><span class="s1">&#39;indep_var_comp&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">promotes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">])</span>
 
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;indep_var_comp&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;indep_var_comp&#39;</span><span class="p">)</span>
 
 <span class="n">comp</span> <span class="o">=</span> <span class="n">GeneralFilterComp</span><span class="p">(</span><span class="n">density_function_space</span><span class="o">=</span><span class="n">density_function_space</span><span class="p">)</span>
 <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_subsystem</span><span class="p">(</span><span class="s1">&#39;general_filter_comp&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">promotes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">])</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;general_filter_comp&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;general_filter_comp&#39;</span><span class="p">)</span>
 
 
 <span class="n">group</span> <span class="o">=</span> <span class="n">AtomicsGroup</span><span class="p">(</span><span class="n">pde_problem</span><span class="o">=</span><span class="n">pde_problem</span><span class="p">)</span>
 <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_subsystem</span><span class="p">(</span><span class="s1">&#39;atomics_group&#39;</span><span class="p">,</span> <span class="n">group</span><span class="p">,</span> <span class="n">promotes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">])</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;atomics_group&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;atomics_group&#39;</span><span class="p">)</span>
 
 <span class="n">comp</span> <span class="o">=</span> <span class="n">ExtractComp</span><span class="p">(</span>
     <span class="n">in_name</span><span class="o">=</span><span class="s1">&#39;mixed_states&#39;</span><span class="p">,</span>
@@ -627,7 +627,7 @@ We use a uniform traction load F on the four edges of the battter pack to model 
     <span class="n">partial_dof</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mixed_fs</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">dofmap</span><span class="p">()</span><span class="o">.</span><span class="n">dofs</span><span class="p">()),</span>
 <span class="p">)</span>
 <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_subsystem</span><span class="p">(</span><span class="s1">&#39;ExtractComp&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">promotes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">])</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;ExtractComp&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ExtractComp&#39;</span><span class="p">)</span>
 
 <span class="n">comp</span> <span class="o">=</span> <span class="n">KSConstraintsComp</span><span class="p">(</span>
     <span class="n">in_name</span><span class="o">=</span><span class="s1">&#39;temperature_field&#39;</span><span class="p">,</span>
@@ -638,7 +638,7 @@ We use a uniform traction load F on the four edges of the battter pack to model 
     <span class="n">rho</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_subsystem</span><span class="p">(</span><span class="s1">&#39;KSConstraintsComp&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="p">,</span> <span class="n">promotes</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">])</span>
-<span class="k">print</span><span class="p">(</span><span class="s1">&#39;KSConstraintsComp&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;KSConstraintsComp&#39;</span><span class="p">)</span>
 
 <span class="n">comp</span> <span class="o">=</span> <span class="n">KSConstraintsComp</span><span class="p">(</span>
     <span class="n">in_name</span><span class="o">=</span><span class="s1">&#39;von_Mises&#39;</span><span class="p">,</span>
@@ -658,13 +658,13 @@ We use a uniform traction load F on the four edges of the battter pack to model 
     <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_objective</span><span class="p">(</span><span class="s1">&#39;avg_density&#39;</span><span class="p">)</span>
     <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="s1">&#39;t_max&#39;</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
     <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="s1">&#39;density&#39;</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span><span class="n">lower</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>
-                            <span class="n">indices</span><span class="o">=</span><span class="n">idx_array</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                            <span class="n">indices</span><span class="o">=</span><span class="n">idx_array</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_objective</span><span class="p">(</span><span class="s1">&#39;compliance&#39;</span><span class="p">)</span>
-    <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="s1">&#39;avg_density&#39;</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mf">0.80</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="s1">&#39;avg_density&#39;</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mf">0.80</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="s1">&#39;t_max&#39;</span><span class="p">,</span> <span class="n">upper</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
     <span class="n">prob</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">add_constraint</span><span class="p">(</span><span class="s1">&#39;density&#39;</span><span class="p">,</span><span class="n">upper</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span><span class="n">lower</span><span class="o">=</span><span class="mf">1.</span><span class="p">,</span>
-                                <span class="n">indices</span><span class="o">=</span><span class="n">idx_array</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                                <span class="n">indices</span><span class="o">=</span><span class="n">idx_array</span><span class="p">,</span> <span class="n">linear</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
 <span class="c1"># prob.model.add_objective(&#39;compliance&#39;)</span>
 <span class="c1"># prob.model.add_constraint(&#39;von_Mises_max&#39;, upper=10)</span>
@@ -692,25 +692,25 @@ We use a uniform traction load F on the four edges of the battter pack to model 
 <span class="n">displacements_function_val</span><span class="p">,</span> <span class="n">temperature_function_val</span><span class="o">=</span> <span class="n">mixed_function</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
 <span class="s1">&#39;solutions/case_1/cantilever_beam/displacement.pvd&#39;</span>
 <span class="c1">#save the solution vector</span>
-<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/case_2/battter_pack_{}/displacements.pvd&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">objective</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="n">displacements_function_val</span>
-<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/case_2/battter_pack_{}/temperature.pvd&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">objective</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="n">temperature_function_val</span>
-<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/case_2/battter_pack_{}/density.pvd&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">objective</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="n">density_function</span>
+<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/case_2/battter_pack_</span><span class="si">{}</span><span class="s1">/displacements.pvd&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">objective</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="n">displacements_function_val</span>
+<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/case_2/battter_pack_</span><span class="si">{}</span><span class="s1">/temperature.pvd&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">objective</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="n">temperature_function_val</span>
+<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/case_2/battter_pack_</span><span class="si">{}</span><span class="s1">/density.pvd&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">objective</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="n">density_function</span>
 <span class="n">stiffness</span>  <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">project</span><span class="p">(</span><span class="n">density_function</span><span class="o">/</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="mf">8.</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">-</span> <span class="n">density_function</span><span class="p">)),</span> <span class="n">density_function_space</span><span class="p">)</span>
-<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/case_2/battter_pack_{}/stiffness.pvd&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">objective</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="n">stiffness</span>
+<span class="n">df</span><span class="o">.</span><span class="n">File</span><span class="p">(</span><span class="s1">&#39;solutions/case_2/battter_pack_</span><span class="si">{}</span><span class="s1">/stiffness.pvd&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">objective</span><span class="p">))</span> <span class="o">&lt;&lt;</span> <span class="n">stiffness</span>
 </pre></div>
 </div>
-</div>
-</div>
-<div class="section" id="results-density-plot">
+</section>
+</section>
+<section id="results-density-plot">
 <h2>2. Results (density plot)<a class="headerlink" href="#results-density-plot" title="Permalink to this headline">¶</a></h2>
 <p>The users can visualize the optimized densities by opening the <code class="docutils literal notranslate"><span class="pre">&lt;name&gt;.pvd</span></code> from Paraview.</p>
 <blockquote>
-<div><div class="figure align-center">
+<div><figure class="align-center">
 <a class="reference internal image-reference" href="../../../_images/doc_case2_result.png"><img alt="../../../_images/doc_case2_result.png" src="../../../_images/doc_case2_result.png" style="width: 307.2px; height: 349.2px;" /></a>
-</div>
+</figure>
 </div></blockquote>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
