@@ -5,7 +5,7 @@ Installing
 ----------
 To install ATOMiCS and run topology optimization problems, users need to follow these steps:
 
-1.  Install `FEniCS <https://fenicsproject.org/download/>`_ partial differential equation (PDE) solver. 
+1.  Install `FEniCS 2019.1.0 <https://fenicsproject.org/download/archive/>`_ partial differential equation (PDE) solver. 
 
   - For MAC users, the anaconda installation method is recommend.
     For Ubuntu users, please just install according to the Ubuntu installation guidline.
